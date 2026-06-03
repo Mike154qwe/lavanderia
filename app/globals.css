@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f4f7fb;
+  --foreground: #0f172a;
+
+  --primary: #14b8a6;
+  --primary-dark: #0f766e;
+
+  --card: #ffffff;
+  --border: #e2e8f0;
+
+  --muted: #64748b;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  outline: none;
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  background: white;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+}
+
+/* =========================
+   SCROLL
+========================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #edf2f7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  border-radius: 30px;
+  background: white;
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.04),
+    0 4px 10px rgba(15, 23, 42, 0.03);
+}
+
+.shadow-soft {
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.06),
+    0 8px 20px rgba(15, 23, 42, 0.03);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-modern {
+  width: 100%;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  font-size: 15px;
+  color: var(--foreground);
+  background: white;
+}
+
+.input-modern::placeholder {
+  color: #94a3b8;
+}
+
+.textarea-modern {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  padding: 18px;
+  min-height: 120px;
+  resize: vertical;
+  font-size: 15px;
+  color: var(--foreground);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary {
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    #14b8a6,
+    #0f766e
+  );
+
+  padding: 15px 24px;
+
+  font-size: 15px;
+  font-weight: 800;
+  color: white;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow:
+    0 14px 30px rgba(20, 184, 166, 0.22),
+    0 4px 10px rgba(20, 184, 166, 0.14);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 18px 35px rgba(20, 184, 166, 0.28),
+    0 6px 14px rgba(20, 184, 166, 0.18);
+}
+
+.btn-dark {
+  border: none;
+  border-radius: 20px;
+  background: #0f172a;
+
+  padding: 15px 24px;
+
+  font-size: 15px;
+  font-weight: 800;
+  color: white;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.btn-dark:hover {
+  background: #020617;
+}
+
+.btn-danger {
+  border: none;
+  border-radius: 18px;
+  background: #fee2e2;
+
+  padding: 12px 18px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  color: #dc2626;
+
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+}
+
+/* =========================
+   TITLES
+========================= */
+
+.title-xl {
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.title-lg {
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  border-radius: 999px;
+
+  padding: 8px 14px;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.badge-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.table-modern {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-modern th {
+  padding: 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.table-modern td {
+  padding: 18px 16px;
+  border-top: 1px solid #edf2f7;
+}
+
+.table-modern tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+.fade-in {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  telefono   String?  @unique
+  direccion  String?
+  createdAt  DateTime @default(now())
+
+  pedidos Pedido[]
+
+  @@index([telefono])
+  @@index([nombre])
+}
+
+model Pedido {
+  id           Int      @id @default(autoincrement())
+  clienteId    Int
+  servicio     String
+  total        Int
+  estado       String   @default("RECIBIDO")
+  observacion  String?
+  createdAt    DateTime @default(now())
+
+  cliente Cliente @relation(fields: [clienteId], references: [id])
+
+  prendas    Prenda[]
+  pagos      Pago[]
+  historial  HistorialEstado[]
+  entregasParciales EntregaParcial[]
+
+  @@index([estado])
+  @@index([createdAt])
+  @@index([clienteId])
+}
+
+model Prenda {
+  id          Int      @id @default(autoincrement())
+  pedidoId    Int
+  servicio    String
+  tipo        String
+  descripcion String?
+  cantidad    Int
+  valor       Int
+  createdAt   DateTime @default(now())
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+
+  entregasParciales EntregaParcial[]
+
+  @@index([pedidoId])
+}
+
+model Pago {
+  id        Int      @id @default(autoincrement())
+  pedidoId  Int
+  valor     Int
+  metodo    String
+  createdAt DateTime @default(now())
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+
+  @@index([pedidoId])
+  @@index([createdAt])
+}
+
+model HistorialEstado {
+  id        Int      @id @default(autoincrement())
+  pedidoId  Int
+  estado    String
+  createdAt DateTime @default(now())
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+
+  @@index([pedidoId])
+  @@index([estado])
+  @@index([createdAt])
+}
+
+model EntregaParcial {
+  id           Int      @id @default(autoincrement())
+  pedidoId     Int
+  prendaId     Int
+  cantidad     Int
+  observacion  String?
+  createdAt    DateTime @default(now())
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+
+  prenda Prenda @relation(fields: [prendaId], references: [id])
+
+  @@index([pedidoId])
+  @@index([prendaId])
+  @@index([createdAt])
+}
+
+model GastoCaja {
+  id           Int      @id @default(autoincrement())
+  tipo         String
+  descripcion  String?
+  valor        Int
+  metodo       String
+  responsable  String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model CierreCaja {
+  id               Int      @id @default(autoincrement())
+  efectivo         Int      @default(0)
+  nequi            Int      @default(0)
+  daviplata        Int      @default(0)
+  transferencia    Int      @default(0)
+  tarjeta          Int      @default(0)
+  gastos           Int      @default(0)
+  totalCaja        Int      @default(0)
+  responsable      String?
+  observacion      String?
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+}

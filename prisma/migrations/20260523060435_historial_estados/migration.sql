@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "HistorialEstado" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "pedidoId" INTEGER NOT NULL,
+    "estado" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "HistorialEstado_pedidoId_fkey" FOREIGN KEY ("pedidoId") REFERENCES "Pedido" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

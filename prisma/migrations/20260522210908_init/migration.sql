@@ -1,0 +1,41 @@
+-- CreateTable
+CREATE TABLE "Cliente" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nombre" TEXT NOT NULL,
+    "telefono" TEXT,
+    "direccion" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "Pedido" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "clienteId" INTEGER NOT NULL,
+    "estado" TEXT NOT NULL DEFAULT 'RECIBIDO',
+    "total" INTEGER NOT NULL DEFAULT 0,
+    "observacion" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Pedido_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Prenda" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "pedidoId" INTEGER NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "descripcion" TEXT,
+    "cantidad" INTEGER NOT NULL DEFAULT 1,
+    "valorUnitario" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "Prenda_pedidoId_fkey" FOREIGN KEY ("pedidoId") REFERENCES "Pedido" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Pago" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "pedidoId" INTEGER NOT NULL,
+    "metodo" TEXT NOT NULL,
+    "valor" INTEGER NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Pago_pedidoId_fkey" FOREIGN KEY ("pedidoId") REFERENCES "Pedido" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
