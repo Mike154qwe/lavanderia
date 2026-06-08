@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
@@ -33,9 +32,7 @@ export default async function MovimientosPage() {
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="rounded-3xl bg-white p-8 shadow">
           <h1 className="text-4xl font-bold text-slate-900">
             Entradas y salidas

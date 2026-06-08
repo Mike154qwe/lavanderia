@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import MoneyInput from "@/components/MoneyInput";
 
 type Cliente = {
@@ -60,9 +59,7 @@ export default function NuevoPedidoForm({
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="card p-8">
           <h1 className="title-xl text-slate-900">
             Nueva entrada

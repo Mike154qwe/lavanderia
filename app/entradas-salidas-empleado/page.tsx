@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
@@ -18,18 +17,43 @@ function sameDay(a: Date, b: Date) {
   );
 }
 
+function normalizar(texto: string) {
+  return texto.trim().toLowerCase();
+}
+
+function coincidePedido(pedido: any, q: string) {
+  if (!q) return true;
+
+  const query = normalizar(q);
+  const id = String(pedido.id);
+  const idFormateado = formatPedido(pedido.id);
+  const nombre = normalizar(pedido.cliente?.nombre || "");
+  const telefono = normalizar(pedido.cliente?.telefono || "");
+
+  return (
+    id.includes(query) ||
+    idFormateado.includes(query) ||
+    nombre.includes(query) ||
+    telefono.includes(query)
+  );
+}
+
 export default async function EntradasSalidasEmpleadoPage({
   searchParams,
 }: {
   searchParams: Promise<{
     fecha?: string;
     year?: string;
+    q?: string;
+    tipo?: string;
   }>;
 }) {
   const params = await searchParams;
 
   const hoy = new Date();
   const year = Number(params.year || hoy.getFullYear());
+  const q = params.q?.trim() || "";
+  const tipoFiltro = params.tipo || "todos";
 
   const fechaSeleccionada = params.fecha
     ? new Date(params.fecha + "T00:00:00")
@@ -38,7 +62,7 @@ export default async function EntradasSalidasEmpleadoPage({
   const inicioAno = new Date(year, 0, 1);
   const finAno = new Date(year + 1, 0, 1);
 
-  const pedidosAno: any[] = await (prisma as any).pedido.findMany({
+  const pedidosAnoRaw: any[] = await (prisma as any).pedido.findMany({
     where: {
       createdAt: {
         gte: inicioAno,
@@ -55,7 +79,7 @@ export default async function EntradasSalidasEmpleadoPage({
     },
   });
 
-  const salidasAno: any[] = await (prisma as any).historialEstado.findMany({
+  const salidasAnoRaw: any[] = await (prisma as any).historialEstado.findMany({
     where: {
       estado: "ENTREGADO",
       createdAt: {
@@ -77,6 +101,12 @@ export default async function EntradasSalidasEmpleadoPage({
     },
   });
 
+  const pedidosAno = pedidosAnoRaw.filter((pedido) => coincidePedido(pedido, q));
+
+  const salidasAno = salidasAnoRaw.filter((salida) =>
+    coincidePedido(salida.pedido, q)
+  );
+
   const meses = [
     "Enero",
     "Febrero",
@@ -92,23 +122,26 @@ export default async function EntradasSalidasEmpleadoPage({
     "Diciembre",
   ];
 
-  const entradasSeleccionadas = fechaSeleccionada
-    ? pedidosAno.filter((pedido: any) =>
-        sameDay(pedido.createdAt, fechaSeleccionada)
-      )
-    : [];
+  const entradasSeleccionadas =
+    fechaSeleccionada && tipoFiltro !== "salidas"
+      ? pedidosAno.filter((pedido: any) =>
+          sameDay(pedido.createdAt, fechaSeleccionada)
+        )
+      : [];
 
-  const salidasSeleccionadas = fechaSeleccionada
-    ? salidasAno.filter((salida: any) =>
-        sameDay(salida.createdAt, fechaSeleccionada)
-      )
-    : [];
+  const salidasSeleccionadas =
+    fechaSeleccionada && tipoFiltro !== "entradas"
+      ? salidasAno.filter((salida: any) =>
+          sameDay(salida.createdAt, fechaSeleccionada)
+        )
+      : [];
+
+  const totalEntradasAno = pedidosAno.length;
+  const totalSalidasAno = salidasAno.length;
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="card p-8">
           <p className="text-lg font-black text-teal-600">
             Entradas y salidas
@@ -121,24 +154,71 @@ export default async function EntradasSalidasEmpleadoPage({
               </h1>
 
               <p className="mt-3 text-xl text-slate-500">
-                Cada día muestra entradas, salidas y el detalle del pedido.
+                Filtra por recibo, cliente, teléfono, entradas o salidas.
               </p>
             </div>
 
             <div className="flex gap-3">
               <Link
-                href={`/entradas-salidas-empleado?year=${year - 1}`}
+                href={`/entradas-salidas-empleado?year=${year - 1}&q=${q}&tipo=${tipoFiltro}`}
                 className="rounded-3xl bg-slate-900 px-6 py-4 text-xl font-black text-white"
               >
                 ← {year - 1}
               </Link>
 
               <Link
-                href={`/entradas-salidas-empleado?year=${year + 1}`}
+                href={`/entradas-salidas-empleado?year=${year + 1}&q=${q}&tipo=${tipoFiltro}`}
                 className="rounded-3xl bg-teal-500 px-6 py-4 text-xl font-black text-white"
               >
                 {year + 1} →
               </Link>
+            </div>
+          </div>
+
+          <form className="mt-8 grid gap-4 xl:grid-cols-[1fr_220px_180px_180px]">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar recibo, cliente o teléfono"
+              className="rounded-3xl border p-5 text-2xl font-black"
+            />
+
+            <select
+              name="tipo"
+              defaultValue={tipoFiltro}
+              className="rounded-3xl border p-5 text-xl font-black"
+            >
+              <option value="todos">Todos</option>
+              <option value="entradas">Solo entradas</option>
+              <option value="salidas">Solo salidas</option>
+            </select>
+
+            <input
+              name="year"
+              type="number"
+              defaultValue={year}
+              className="rounded-3xl border p-5 text-xl font-black"
+            />
+
+            <button className="rounded-3xl bg-teal-500 px-6 py-5 text-xl font-black text-white">
+              Filtrar
+            </button>
+          </form>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/entradas-salidas-empleado"
+              className="rounded-3xl bg-slate-200 px-6 py-4 text-lg font-black text-slate-700"
+            >
+              Limpiar filtros
+            </Link>
+
+            <div className="rounded-3xl bg-teal-50 px-6 py-4 text-lg font-black text-teal-700">
+              📥 Entradas encontradas: {totalEntradasAno}
+            </div>
+
+            <div className="rounded-3xl bg-emerald-50 px-6 py-4 text-lg font-black text-emerald-700">
+              📤 Salidas encontradas: {totalSalidasAno}
             </div>
           </div>
         </div>
@@ -162,7 +242,7 @@ export default async function EntradasSalidasEmpleadoPage({
               </div>
 
               <Link
-                href={`/entradas-salidas-empleado?year=${year}`}
+                href={`/entradas-salidas-empleado?year=${year}&q=${q}&tipo=${tipoFiltro}`}
                 className="rounded-3xl bg-slate-200 px-6 py-4 text-xl font-black text-slate-700"
               >
                 Cerrar detalle
@@ -213,46 +293,50 @@ export default async function EntradasSalidasEmpleadoPage({
             </div>
 
             <div className="mt-8 grid gap-8 xl:grid-cols-2">
-              <section className="rounded-3xl border bg-slate-50 p-6">
-                <h3 className="text-4xl font-black text-slate-900">
-                  📥 Entradas del día
-                </h3>
+              {tipoFiltro !== "salidas" && (
+                <section className="rounded-3xl border bg-slate-50 p-6">
+                  <h3 className="text-4xl font-black text-slate-900">
+                    📥 Entradas del día
+                  </h3>
 
-                <div className="mt-6 space-y-4">
-                  {entradasSeleccionadas.map((pedido: any) => (
-                    <PedidoDetalle
-                      key={`entrada-${pedido.id}`}
-                      pedido={pedido}
-                      tipo="Entrada"
-                    />
-                  ))}
+                  <div className="mt-6 space-y-4">
+                    {entradasSeleccionadas.map((pedido: any) => (
+                      <PedidoDetalle
+                        key={`entrada-${pedido.id}`}
+                        pedido={pedido}
+                        tipo="Entrada"
+                      />
+                    ))}
 
-                  {entradasSeleccionadas.length === 0 && (
-                    <Empty text="No hubo entradas este día." />
-                  )}
-                </div>
-              </section>
+                    {entradasSeleccionadas.length === 0 && (
+                      <Empty text="No hubo entradas con estos filtros." />
+                    )}
+                  </div>
+                </section>
+              )}
 
-              <section className="rounded-3xl border bg-slate-50 p-6">
-                <h3 className="text-4xl font-black text-slate-900">
-                  📤 Salidas del día
-                </h3>
+              {tipoFiltro !== "entradas" && (
+                <section className="rounded-3xl border bg-slate-50 p-6">
+                  <h3 className="text-4xl font-black text-slate-900">
+                    📤 Salidas del día
+                  </h3>
 
-                <div className="mt-6 space-y-4">
-                  {salidasSeleccionadas.map((salida: any) => (
-                    <PedidoDetalle
-                      key={`salida-${salida.id}-${salida.pedido.id}`}
-                      pedido={salida.pedido}
-                      tipo="Salida"
-                      fechaMovimiento={salida.createdAt}
-                    />
-                  ))}
+                  <div className="mt-6 space-y-4">
+                    {salidasSeleccionadas.map((salida: any) => (
+                      <PedidoDetalle
+                        key={`salida-${salida.id}-${salida.pedido.id}`}
+                        pedido={salida.pedido}
+                        tipo="Salida"
+                        fechaMovimiento={salida.createdAt}
+                      />
+                    ))}
 
-                  {salidasSeleccionadas.length === 0 && (
-                    <Empty text="No hubo salidas este día." />
-                  )}
-                </div>
-              </section>
+                    {salidasSeleccionadas.length === 0 && (
+                      <Empty text="No hubo salidas con estos filtros." />
+                    )}
+                  </div>
+                </section>
+              )}
             </div>
           </section>
         )}
@@ -270,13 +354,19 @@ export default async function EntradasSalidasEmpleadoPage({
                     const dia = index + 1;
                     const fecha = new Date(year, mesIndex, dia);
 
-                    const entradasDia = pedidosAno.filter((pedido: any) =>
-                      sameDay(pedido.createdAt, fecha)
-                    );
+                    const entradasDia =
+                      tipoFiltro !== "salidas"
+                        ? pedidosAno.filter((pedido: any) =>
+                            sameDay(pedido.createdAt, fecha)
+                          )
+                        : [];
 
-                    const salidasDia = salidasAno.filter((salida: any) =>
-                      sameDay(salida.createdAt, fecha)
-                    );
+                    const salidasDia =
+                      tipoFiltro !== "entradas"
+                        ? salidasAno.filter((salida: any) =>
+                            sameDay(salida.createdAt, fecha)
+                          )
+                        : [];
 
                     const fechaLink = `${year}-${String(mesIndex + 1).padStart(
                       2,
@@ -292,7 +382,7 @@ export default async function EntradasSalidasEmpleadoPage({
                     return (
                       <Link
                         key={dia}
-                        href={`/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}`}
+                        href={`/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${q}&tipo=${tipoFiltro}`}
                         className={`rounded-3xl border p-5 transition hover:-translate-y-1 hover:shadow-soft ${
                           seleccionado
                             ? "border-purple-400 bg-purple-50"
@@ -306,13 +396,17 @@ export default async function EntradasSalidasEmpleadoPage({
                         </p>
 
                         <div className="mt-4 space-y-2">
-                          <p className="rounded-2xl bg-white px-3 py-2 text-sm font-black text-teal-700">
-                            📥 Entradas: {entradasDia.length}
-                          </p>
+                          {tipoFiltro !== "salidas" && (
+                            <p className="rounded-2xl bg-white px-3 py-2 text-sm font-black text-teal-700">
+                              📥 Entradas: {entradasDia.length}
+                            </p>
+                          )}
 
-                          <p className="rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-700">
-                            📤 Salidas: {salidasDia.length}
-                          </p>
+                          {tipoFiltro !== "entradas" && (
+                            <p className="rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-700">
+                              📤 Salidas: {salidasDia.length}
+                            </p>
+                          )}
                         </div>
                       </Link>
                     );
