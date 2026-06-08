@@ -3,139 +3,52 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const gerenteLinks = [
-  {
-    href: "/empleado",
-    label: "Operación diaria",
-  },
-
-  {
-    href: "/inventario",
-    label: "Inventario",
-  },
-
-  {
-    href: "/pedidos-antiguos",
-    label: "Pedidos antiguos",
-  },
-
-  {
-    href: "/gerente",
-    label: "Finanzas",
-  },
-
-  {
-    href: "/movimientos",
-    label: "Movimientos",
-  },
-
-  {
-    href: "/pedidos/nuevo",
-    label: "Nuevo pedido",
-  },
-];
-
-const empleadoLinks = [
-  {
-    href: "/pedidos/rapido",
-    label: "📝 Nuevo pedido",
-  },
-
-  {
-    href: "/inventario-empleado",
-    label: "📦 Inventario",
-  },
-
-  {
-    href: "/entradas-salidas-empleado",
-    label: "📥📤 Entradas y salidas",
-  },
-
-  {
-    href: "/gastos-empleado",
-    label: "💰 Gastos del día",
-  },
+const links = [
+  { href: "/", label: "Inicio" },
+  { href: "/clientes", label: "Clientes" },
+  { href: "/pedidos", label: "Pedidos" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
 
-  const esEmpleado =
-    pathname.startsWith("/pedidos/rapido") ||
-    pathname.startsWith("/inventario-empleado") ||
-    pathname.startsWith("/entradas-salidas-empleado") ||
-    pathname.startsWith("/gastos-empleado");
-
-  const links = esEmpleado
-    ? empleadoLinks
-    : gerenteLinks;
-
-  const logoutUrl = esEmpleado
-    ? "/empleado-logout"
-    : "/logout";
-
   return (
-    <aside className="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-gradient-to-b from-indigo-950 via-violet-900 to-purple-700 text-white">
-      <div className="border-b border-white/10 p-8">
-        <h1 className="text-3xl font-black tracking-tight">
-          Lavaseco
-        </h1>
+    <nav className="sticky top-0 z-50 bg-slate-900 text-white shadow-lg">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <Link href="/" className="text-lg font-black tracking-tight text-white">
+          Lavaseco La Manuelita
+        </Link>
 
-        <p className="mt-2 text-sm text-violet-200">
-          La Manuelita
-        </p>
+        <div className="flex items-center gap-1">
+          {links.map((link) => {
+            const active =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname === link.href || pathname.startsWith(link.href + "/");
 
-        <div className="mt-5 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold">
-          {esEmpleado
-            ? "👩‍💼 Panel empleado"
-            : "👨‍💼 Panel gerencia"}
-        </div>
-      </div>
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                  active
+                    ? "bg-white text-slate-900"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
 
-      <nav className="flex-1 space-y-2 overflow-y-auto p-5">
-        {links.map((link) => {
-          const active =
-            pathname === link.href ||
-            pathname.startsWith(link.href + "/");
-
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center rounded-2xl px-5 py-4 text-sm font-bold transition ${
-                active
-                  ? "bg-white text-violet-700 shadow-2xl"
-                  : "text-violet-100 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="border-t border-white/10 p-5">
-        <div className="rounded-3xl bg-white/10 p-5 backdrop-blur">
-          <p className="text-sm font-bold">
-            {esEmpleado
-              ? "Acceso empleado"
-              : "Panel administrativo"}
-          </p>
-
-          <p className="mt-1 text-xs text-violet-200">
-            {esEmpleado
-              ? "Pedidos, inventario, gastos y entregas"
-              : "Administración completa de la lavandería"}
-          </p>
-
-          <a
-            href={logoutUrl}
-            className="mt-5 flex items-center justify-center rounded-2xl bg-red-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-600"
+          <Link
+            href="/pedidos/nuevo"
+            className="ml-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-indigo-700"
           >
-            🚪 Cerrar sesión
-          </a>
+            + Nuevo pedido
+          </Link>
         </div>
       </div>
-    </aside>
+    </nav>
   );
 }
