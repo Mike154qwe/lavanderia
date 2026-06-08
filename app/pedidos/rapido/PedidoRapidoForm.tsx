@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Navbar from "@/components/Navbar";
-
 type ItemPedido = {
   id: number;
   tipo: string;
@@ -158,9 +156,7 @@ export default function PedidoRapidoForm({
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <form action={guardarPedidoRapidoAction} className="mx-auto max-w-7xl">
           <input type="hidden" name="nombre" value={nombre} />
           <input type="hidden" name="telefono" value={telefono} />

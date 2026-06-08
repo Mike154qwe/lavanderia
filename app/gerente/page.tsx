@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -295,9 +294,7 @@ export default async function GerentePage({
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="card p-8">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div>

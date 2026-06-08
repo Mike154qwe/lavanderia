@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -56,9 +55,7 @@ export default function InventarioEmpleadoClient({
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="card p-8">
           <p className="text-lg font-black text-teal-600">
             Inventario empleado

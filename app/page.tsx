@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import Navbar from "@/components/Navbar";
-
 async function crearPedido(formData: FormData) {
   "use server";
 
@@ -33,9 +31,11 @@ async function crearPedido(formData: FormData) {
 
       prendas: {
         create: {
+          servicio,
           tipo: tipoPrenda,
           cantidad,
           descripcion,
+          valor: total,
         },
       },
 
@@ -57,9 +57,7 @@ async function crearPedido(formData: FormData) {
 export default function NuevoPedidoPage() {
   return (
     <main className="min-h-screen bg-slate-100">
-      <Navbar />
-
-      <section className="ml-72 p-8">
+      <section className="p-8">
         <div className="mx-auto max-w-5xl rounded-3xl bg-white p-8 shadow">
           <h1 className="text-4xl font-bold text-slate-900">Nuevo pedido</h1>
           <p className="mt-2 text-slate-500">
