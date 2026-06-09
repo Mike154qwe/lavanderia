@@ -119,7 +119,12 @@ export default async function PedidosAntiguosPage() {
                 <div className="flex flex-wrap items-start justify-between gap-5">
                   <div>
                     <h2 className="text-2xl font-black text-slate-900">
-                      Pedido #{formatPedido(pedido.id)} -{" "}
+                      <Link
+                        href={`/pedidos/${pedido.id}`}
+                        className="underline-offset-2 hover:text-teal-600 hover:underline"
+                      >
+                        #{formatPedido(pedido.id)}
+                      </Link>{" "}
                       {pedido.cliente.nombre}
                     </h2>
 
