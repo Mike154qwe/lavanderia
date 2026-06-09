@@ -576,22 +576,33 @@ export default async function GerentePage({
                       gastosDiaFiltro.length > 0;
 
                     const seleccionado = sameDay(fechaSeleccionada, fecha);
+                    const esHoy = sameDay(fecha, hoy);
 
                     return (
                       <Link
                         key={dia}
+                        id={esHoy ? "hoy" : undefined}
                         href={`/gerente?year=${year}&fecha=${fechaLink}`}
                         className={`rounded-3xl border p-5 transition hover:-translate-y-1 hover:shadow-soft ${
                           seleccionado
                             ? "border-purple-400 bg-purple-50"
+                            : esHoy
+                            ? "border-orange-400 bg-orange-50"
                             : activo
                             ? "border-teal-300 bg-teal-50"
                             : "border-slate-200 bg-white"
                         }`}
                       >
-                        <p className="text-3xl font-black text-slate-900">
-                          {dia}
-                        </p>
+                        <div className="flex items-start justify-between gap-1">
+                          <p className="text-3xl font-black text-slate-900">
+                            {dia}
+                          </p>
+                          {esHoy && (
+                            <span className="rounded-full bg-orange-400 px-2 py-0.5 text-xs font-black text-white">
+                              HOY
+                            </span>
+                          )}
+                        </div>
 
                         <div className="mt-4 space-y-2">
                           <p className="rounded-2xl bg-white px-3 py-2 text-sm font-black text-teal-700">
