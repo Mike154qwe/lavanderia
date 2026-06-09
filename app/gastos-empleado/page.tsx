@@ -110,14 +110,14 @@ export default async function GastosEmpleadoPage() {
               {tipos.map((item) => (
                 <label
                   key={item.tipo}
-                  className="cursor-pointer rounded-3xl border bg-white p-6 text-center hover:border-red-300 hover:bg-red-50"
+                  className="cursor-pointer rounded-3xl border-2 border-slate-200 bg-white p-6 text-center transition hover:border-red-300 hover:bg-red-50 has-[:checked]:border-red-500 has-[:checked]:bg-red-50 has-[:checked]:ring-2 has-[:checked]:ring-red-300"
                 >
                   <input
                     type="radio"
                     name="tipo"
                     value={item.tipo}
                     required
-                    className="mb-3"
+                    className="sr-only"
                   />
 
                   <div className="text-6xl">
@@ -135,16 +135,6 @@ export default async function GastosEmpleadoPage() {
               <label className="mb-3 block text-2xl font-black text-slate-800">
                 Valor
               </label>
-
-              <input
-                name="valor"
-                type="number"
-                min="0"
-                step="1000"
-                required
-                placeholder="Valor del gasto"
-                className="w-full rounded-3xl border p-6 text-3xl font-black"
-              />
 
               <GastosEmpleadoClient />
             </div>
@@ -197,7 +187,7 @@ export default async function GastosEmpleadoPage() {
                 name="descripcion"
                 rows={4}
                 placeholder="Descripción del gasto..."
-                className="w-full rounded-3xl border p-6 text-2xl font-black"
+                className="textarea-modern text-xl font-bold"
               />
             </div>
 
