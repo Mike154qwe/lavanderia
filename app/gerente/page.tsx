@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import IngresosDiarios from "@/components/charts/IngresosDiarios";
+import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -248,6 +250,35 @@ export default async function GerentePage({
     },
   });
 
+  // Pagos del mes actual para la gráfica de ingresos diarios
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const pagosMes: any[] = await (prisma as any).pago.findMany({
+    where: {
+      createdAt: {
+        gte: inicioMes,
+        lt: finAno,
+      },
+    },
+    select: {
+      valor: true,
+      createdAt: true,
+    },
+  });
+
+  const diasEnMes = hoy.getDate();
+  const ingresosDiarios = Array.from({ length: diasEnMes }, (_, i) => {
+    const dia = i + 1;
+    const fecha = new Date(hoy.getFullYear(), hoy.getMonth(), dia);
+    const total = pagosMes
+      .filter((p: any) => sameDay(p.createdAt, fecha))
+      .reduce((s: number, p: any) => s + p.valor, 0);
+    return { dia: String(dia), total };
+  });
+
+  const metodosPagoData = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"].map(
+    (m) => ({ metodo: m, total: sumarMetodo(pagosDia, m) })
+  );
+
   const efectivo = sumarMetodo(pagosDia, "Efectivo");
   const nequi = sumarMetodo(pagosDia, "Nequi");
   const daviplata = sumarMetodo(pagosDia, "Daviplata");
@@ -368,12 +399,36 @@ export default async function GerentePage({
             <Kpi title="Caja esperada" value={money(cajaEsperada)} icon="🔒" />
           </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-5">
-            <Metodo title="Efectivo" value={efectivo} icon="💵" />
-            <Metodo title="Nequi" value={nequi} icon="📱" />
-            <Metodo title="Daviplata" value={daviplata} icon="📲" />
-            <Metodo title="Transferencia" value={transferencia} icon="🏦" />
-            <Metodo title="Tarjeta" value={tarjeta} icon="💳" />
+          {/* Gráficas */}
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                    Ingresos diarios
+                  </p>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-600">
+                    {new Date(hoy.getFullYear(), hoy.getMonth()).toLocaleDateString("es-CO", { month: "long", year: "numeric" })}
+                  </p>
+                </div>
+                <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600">
+                  {diasEnMes} días
+                </span>
+              </div>
+              <IngresosDiarios data={ingresosDiarios} />
+            </div>
+
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card">
+              <div className="mb-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Pagos del día por método
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-gray-600">
+                  {fechaSeleccionada.toLocaleDateString("es-CO", { day: "numeric", month: "long" })}
+                </p>
+              </div>
+              <MetodosPago data={metodosPagoData} />
+            </div>
           </div>
         </section>
 
