@@ -223,6 +223,19 @@ button{
   width:100%;
   padding:10px;
   font-size:16px;
+  cursor:pointer;
+}
+
+a.back{
+  display:block;
+  text-align:center;
+  margin-top:10px;
+  color:#555;
+  font-size:12px;
+}
+
+@media print{
+  button, a.back{ display:none; }
 }
 </style>
 </head>
@@ -322,6 +335,8 @@ Generado por Sistema Lavaseco
 <button onclick="window.print()">
 🖨️ Imprimir Ticket
 </button>
+
+<a href="/gerente" class="back">← Volver al panel</a>
 
 </body>
 </html>
