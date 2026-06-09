@@ -3,617 +3,472 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import MoneyInput from "@/components/MoneyInput";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 
-function formatPedido(id: number) {
-  return String(id).padStart(5, "0");
-}
+const ESTADO_BADGE: Record<string, string> = {
+  RECIBIDO:   "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+  EN_PROCESO: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400",
+  LISTO:      "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400",
+  ENTREGADO:  "bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400",
+  CANCELADO:  "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
+};
+
+const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
+
+function money(n: number) { return `$${n.toLocaleString("es-CO")}`; }
+function fmt(id: number)  { return String(id).padStart(5, "0"); }
 
 function buildUrl(page: number, q: string, estado: string) {
-  const params = new URLSearchParams();
-
-  if (q) params.set("q", q);
-  if (estado && estado !== "TODOS") params.set("estado", estado);
-  params.set("page", String(page));
-
-  return `/inventario?${params.toString()}`;
+  const p = new URLSearchParams();
+  if (q) p.set("q", q);
+  if (estado && estado !== "TODOS") p.set("estado", estado);
+  p.set("page", String(page));
+  return `/inventario?${p.toString()}`;
 }
+
+/* ── Server actions ─────────────────────────────────────────── */
 
 async function agregarAbono(formData: FormData) {
   "use server";
-
   const pedidoId = Number(formData.get("pedidoId"));
-  const valor = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
-  const metodo = String(formData.get("metodo") || "Efectivo");
-
+  const valor    = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
+  const metodo   = String(formData.get("metodo") || "Efectivo");
   if (!pedidoId || valor <= 0) return;
-
-  await prisma.pago.create({
-    data: {
-      pedidoId,
-      valor,
-      metodo,
-    },
-  });
-
+  await prisma.pago.create({ data: { pedidoId, valor, metodo } });
   revalidatePath("/inventario");
-  revalidatePath("/empleado");
   revalidatePath("/gerente");
 }
 
 async function registrarEntregaParcial(formData: FormData) {
   "use server";
-
-  const pedidoId = Number(formData.get("pedidoId"));
-  const prendaId = Number(formData.get("prendaId"));
-  const cantidad = Number(formData.get("cantidad"));
+  const pedidoId    = Number(formData.get("pedidoId"));
+  const prendaId    = Number(formData.get("prendaId"));
+  const cantidad    = Number(formData.get("cantidad"));
   const observacion = String(formData.get("observacion") || "");
-  const abono = Number(String(formData.get("abono") || "0").replace(/\D/g, ""));
-  const metodo = String(formData.get("metodo") || "Efectivo");
-
+  const abono       = Number(String(formData.get("abono") || "0").replace(/\D/g, ""));
+  const metodo      = String(formData.get("metodo") || "Efectivo");
   if (!pedidoId || !prendaId || cantidad <= 0) return;
 
   const pedido: any = await (prisma as any).pedido.findUnique({
     where: { id: pedidoId },
-    include: {
-      pagos: true,
-      prendas: {
-        include: {
-          entregasParciales: true,
-        },
-      },
-    },
+    include: { pagos: true, prendas: { include: { entregasParciales: true } } },
   });
-
   if (!pedido) return;
 
   const prenda = pedido.prendas.find((p: any) => p.id === prendaId);
   if (!prenda) return;
 
-  const entregadas = prenda.entregasParciales.reduce(
-    (sum: number, entrega: any) => sum + entrega.cantidad,
-    0
-  );
+  const entregadas = prenda.entregasParciales.reduce((s: number, e: any) => s + e.cantidad, 0);
+  if (cantidad > prenda.cantidad - entregadas) return;
 
-  const pendientes = prenda.cantidad - entregadas;
+  const abonado = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
+  if (pedido.total - abonado > 0 && abono <= 0) return;
 
-  if (cantidad > pendientes) return;
-
-  const abonado = pedido.pagos.reduce(
-    (sum: number, pago: any) => sum + pago.valor,
-    0
-  );
-
-  const saldo = pedido.total - abonado;
-
-  if (saldo > 0 && abono <= 0) return;
-
-  if (abono > 0) {
-    await prisma.pago.create({
-      data: {
-        pedidoId,
-        valor: abono,
-        metodo,
-      },
-    });
-  }
+  if (abono > 0) await prisma.pago.create({ data: { pedidoId, valor: abono, metodo } });
 
   await (prisma as any).entregaParcial.create({
-    data: {
-      pedidoId,
-      prendaId,
-      cantidad,
-      observacion,
-    },
+    data: { pedidoId, prendaId, cantidad, observacion: observacion || null },
   });
 
   const actualizado: any = await (prisma as any).pedido.findUnique({
     where: { id: pedidoId },
-    include: {
-      prendas: {
-        include: {
-          entregasParciales: true,
-        },
-      },
-    },
+    include: { prendas: { include: { entregasParciales: true } } },
   });
 
   if (actualizado) {
-    const todoEntregado = actualizado.prendas.every((p: any) => {
-      const totalEntregado = p.entregasParciales.reduce(
-        (sum: number, entrega: any) => sum + entrega.cantidad,
-        0
-      );
-
-      return totalEntregado >= p.cantidad;
-    });
-
+    const todoEntregado = actualizado.prendas.every((p: any) =>
+      p.entregasParciales.reduce((s: number, e: any) => s + e.cantidad, 0) >= p.cantidad
+    );
     if (todoEntregado) {
-      await prisma.pedido.update({
-        where: { id: pedidoId },
-        data: { estado: "ENTREGADO" },
-      });
-
-      await (prisma as any).historialEstado.create({
-        data: {
-          pedidoId,
-          estado: "ENTREGADO",
-        },
-      });
+      await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
+      await (prisma as any).historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
     }
   }
 
   revalidatePath("/inventario");
-  revalidatePath("/empleado");
   revalidatePath("/gerente");
 }
 
 async function cambiarEstado(formData: FormData) {
   "use server";
-
-  const pedidoId = Number(formData.get("pedidoId"));
-  const nuevoEstado = String(formData.get("nuevoEstado")) as
-    | "RECIBIDO"
-    | "LISTO"
-    | "ENTREGADO"
-    | "CANCELADO";
-
+  const pedidoId    = Number(formData.get("pedidoId"));
+  const nuevoEstado = String(formData.get("nuevoEstado"));
   if (!pedidoId) return;
-
-  await prisma.pedido.update({
-    where: { id: pedidoId },
-    data: { estado: nuevoEstado },
-  });
-
-  await (prisma as any).historialEstado.create({
-    data: {
-      pedidoId,
-      estado: nuevoEstado,
-    },
-  });
-
+  await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: nuevoEstado as any } });
+  await (prisma as any).historialEstado.create({ data: { pedidoId, estado: nuevoEstado } });
   revalidatePath("/inventario");
-  revalidatePath("/empleado");
   revalidatePath("/gerente");
 }
+
+/* ── Page ──────────────────────────────────────────────────── */
 
 export default async function InventarioPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; estado?: string; page?: string }>;
 }) {
-  const params = await searchParams;
-
-  const q = params.q?.trim() || "";
+  const params      = await searchParams;
+  const q           = params.q?.trim() || "";
   const estadoFiltro = params.estado || "TODOS";
   const currentPage = Math.max(Number(params.page || "1"), 1);
 
-  const baseWhere: any = {
-    estado: {
-      notIn: ["ENTREGADO", "CANCELADO"],
-    },
-  };
-
-  if (estadoFiltro === "RECIBIDO" || estadoFiltro === "LISTO") {
-    baseWhere.estado = estadoFiltro;
-  }
+  const baseWhere: any = { estado: { notIn: ["ENTREGADO", "CANCELADO"] } };
+  if (estadoFiltro === "RECIBIDO" || estadoFiltro === "LISTO") baseWhere.estado = estadoFiltro;
 
   if (q) {
-    const idNumber = Number(q);
-
+    const idNum = Number(q.replace(/^0+/, ""));
     baseWhere.OR = [
-      ...(Number.isFinite(idNumber) && idNumber > 0
-        ? [{ id: idNumber }]
-        : []),
-      {
-        cliente: {
-          nombre: {
-            contains: q,
-          },
-        },
-      },
-      {
-        cliente: {
-          telefono: {
-            contains: q,
-          },
-        },
-      },
+      ...(Number.isFinite(idNum) && idNum > 0 ? [{ id: idNum }] : []),
+      { cliente: { nombre:   { contains: q } } },
+      { cliente: { telefono: { contains: q } } },
     ];
   }
 
-  const requiereFiltroSaldo =
-    estadoFiltro === "CON_SALDO" || estadoFiltro === "PAGADOS";
+  const needsSaldoFilter = estadoFiltro === "CON_SALDO" || estadoFiltro === "PAGADOS";
+  let pedidos: any[] = [];
+  let total = 0;
 
-  let pedidosFiltrados: any[] = [];
-  let totalPedidosBase = 0;
-
-  if (requiereFiltroSaldo) {
+  if (needsSaldoFilter) {
     const todos: any[] = await (prisma as any).pedido.findMany({
       where: baseWhere,
-      include: {
-        cliente: true,
-        pagos: true,
-        historial: true,
-        prendas: {
-          include: {
-            entregasParciales: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      include: { cliente: true, pagos: true, prendas: { include: { entregasParciales: true } } },
+      orderBy: { createdAt: "desc" },
     });
-
-    const filtradosPorSaldo = todos.filter((pedido: any) => {
-      const abonado = pedido.pagos.reduce(
-        (sum: number, pago: any) => sum + pago.valor,
-        0
-      );
-
-      const saldo = pedido.total - abonado;
-
-      if (estadoFiltro === "CON_SALDO") return saldo > 0;
-      if (estadoFiltro === "PAGADOS") return saldo <= 0;
-
-      return true;
+    const filtered = todos.filter((p: any) => {
+      const sal = p.total - p.pagos.reduce((s: number, pg: any) => s + pg.valor, 0);
+      return estadoFiltro === "CON_SALDO" ? sal > 0 : sal <= 0;
     });
-
-    totalPedidosBase = filtradosPorSaldo.length;
-
-    pedidosFiltrados = filtradosPorSaldo.slice(
-      (currentPage - 1) * PAGE_SIZE,
-      currentPage * PAGE_SIZE
-    );
+    total   = filtered.length;
+    pedidos = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   } else {
-    totalPedidosBase = await (prisma as any).pedido.count({
+    total   = await (prisma as any).pedido.count({ where: baseWhere });
+    pedidos = await (prisma as any).pedido.findMany({
       where: baseWhere,
-    });
-
-    pedidosFiltrados = await (prisma as any).pedido.findMany({
-      where: baseWhere,
-      include: {
-        cliente: true,
-        pagos: true,
-        historial: true,
-        prendas: {
-          include: {
-            entregasParciales: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      include: { cliente: true, pagos: true, prendas: { include: { entregasParciales: true } } },
+      orderBy: { createdAt: "desc" },
       skip: (currentPage - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     });
   }
 
-  const totalPages = Math.max(Math.ceil(totalPedidosBase / PAGE_SIZE), 1);
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
 
-  const totalPrendasPendientes = pedidosFiltrados.reduce(
-    (sum: number, pedido: any) =>
-      sum +
-      pedido.prendas.reduce((s: number, prenda: any) => {
-        const entregadas = prenda.entregasParciales.reduce(
-          (eSum: number, entrega: any) => eSum + entrega.cantidad,
-          0
-        );
+  /* KPIs de la página actual */
+  const kpiPrendas = pedidos.reduce((s: number, p: any) =>
+    s + p.prendas.reduce((ps: number, pr: any) => {
+      const ent = pr.entregasParciales.reduce((es: number, e: any) => es + e.cantidad, 0);
+      return ps + Math.max(pr.cantidad - ent, 0);
+    }, 0), 0);
 
-        return s + Math.max(prenda.cantidad - entregadas, 0);
-      }, 0),
-    0
-  );
-
-  const conSaldo = pedidosFiltrados.filter((pedido: any) => {
-    const abonado = pedido.pagos.reduce(
-      (sum: number, pago: any) => sum + pago.valor,
-      0
-    );
-
-    return pedido.total - abonado > 0;
-  }).length;
-
-  const listos = pedidosFiltrados.filter(
-    (pedido: any) => pedido.estado === "LISTO"
-  ).length;
+  const kpiSaldo  = pedidos.filter((p: any) => p.total - p.pagos.reduce((s: number, pg: any) => s + pg.valor, 0) > 0).length;
+  const kpiListos = pedidos.filter((p: any) => p.estado === "LISTO").length;
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="rounded-3xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">
-                Inventario en piso
-              </h1>
+    <div className="p-6">
 
-              <p className="mt-2 text-slate-500">
-                Mostrando {pedidosFiltrados.length} de {totalPedidosBase}{" "}
-                pedidos activos.
-              </p>
-            </div>
+      {/* ── Cabecera ─────────────────────────────────────── */}
+      <div className="card p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
+              Gerente
+            </p>
+            <h1 className="mt-1 text-2xl font-black text-gray-900">
+              Inventario en piso
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {pedidos.length} de {total} pedidos activos
+            </p>
+          </div>
+          <Link
+            href="/pedidos/nuevo"
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M12 5v14M5 12h14"/></svg>
+            Nueva entrada
+          </Link>
+        </div>
 
-            <Link
-              href="/pedidos/nuevo"
-              className="rounded-2xl bg-teal-500 px-6 py-4 font-bold text-white shadow hover:bg-teal-600"
-            >
-              Nueva entrada
+        {/* Filtros */}
+        <form className="mt-5 grid gap-3 sm:grid-cols-[1fr_200px_auto_auto]">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Buscar por recibo, cliente o teléfono…"
+            className="input-modern"
+          />
+          <select name="estado" defaultValue={estadoFiltro} className="input-modern">
+            <option value="TODOS">Todos los estados</option>
+            <option value="RECIBIDO">Recibidos</option>
+            <option value="LISTO">Listos para recoger</option>
+            <option value="CON_SALDO">Con saldo pendiente</option>
+            <option value="PAGADOS">Pagados</option>
+          </select>
+          <button className="btn-primary whitespace-nowrap">Filtrar</button>
+          <Link href="/inventario" className="btn-dark whitespace-nowrap text-center">
+            Limpiar
+          </Link>
+        </form>
+      </div>
+
+      {/* ── KPIs ─────────────────────────────────────────── */}
+      <div className="mt-5 grid gap-4 sm:grid-cols-4">
+        <KpiCard label="Pedidos"          value={pedidos.length} color="blue"  icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
+        <KpiCard label="Prendas pendientes" value={kpiPrendas} color="purple" icon="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z" />
+        <KpiCard label="Con saldo"        value={kpiSaldo}   color="red"    icon="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <KpiCard label="Listos"           value={kpiListos}  color="green"  icon="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3" />
+      </div>
+
+      {/* ── Lista de pedidos ─────────────────────────────── */}
+      <div className="mt-5 space-y-4">
+        {pedidos.map((pedido: any) => (
+          <PedidoCard
+            key={pedido.id}
+            pedido={pedido}
+            agregarAbono={agregarAbono}
+            registrarEntregaParcial={registrarEntregaParcial}
+            cambiarEstado={cambiarEstado}
+          />
+        ))}
+
+        {pedidos.length === 0 && (
+          <div className="card p-12 text-center">
+            <p className="text-4xl">📦</p>
+            <p className="mt-3 font-semibold text-gray-500">
+              No se encontraron pedidos con estos filtros.
+            </p>
+            <Link href="/inventario" className="mt-4 inline-block text-sm font-semibold text-brand-500 hover:underline">
+              Ver todos
             </Link>
           </div>
+        )}
+      </div>
 
-          <form className="mt-6 grid gap-3 lg:grid-cols-[1fr_220px_120px_120px]">
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Buscar por pedido, cliente o teléfono"
-              className="rounded-2xl border p-4"
-            />
-
-            <select
-              name="estado"
-              defaultValue={estadoFiltro}
-              className="rounded-2xl border p-4"
-            >
-              <option value="TODOS">Todos</option>
-              <option value="RECIBIDO">Recibidos</option>
-              <option value="LISTO">Listos</option>
-              <option value="CON_SALDO">Con saldo</option>
-              <option value="PAGADOS">Pagados</option>
-            </select>
-
-            <button className="rounded-2xl bg-teal-500 px-5 py-4 font-bold text-white hover:bg-teal-600">
-              Buscar
-            </button>
-
-            <Link
-              href="/inventario"
-              className="rounded-2xl bg-slate-200 px-5 py-4 text-center font-bold text-slate-700 hover:bg-slate-300"
-            >
-              Limpiar
-            </Link>
-          </form>
-        </div>
-
-        <div className="mt-8 grid gap-5 md:grid-cols-4">
-          <Kpi title="Pedidos página" value={pedidosFiltrados.length} />
-          <Kpi title="Prendas pendientes" value={totalPrendasPendientes} />
-          <Kpi title="Con saldo página" value={conSaldo} danger />
-          <Kpi title="Listos página" value={listos} />
-        </div>
-
-        <div className="mt-8 space-y-6">
-          {pedidosFiltrados.map((pedido: any) => (
-            <PedidoInventario key={pedido.id} pedido={pedido} />
-          ))}
-
-          {pedidosFiltrados.length === 0 && (
-            <div className="rounded-3xl bg-white p-10 text-center text-slate-500 shadow">
-              No se encontraron pedidos en inventario.
-            </div>
-          )}
-        </div>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 rounded-3xl bg-white p-6 shadow">
+      {/* ── Paginación ───────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="card mt-5 flex items-center justify-between p-4">
           <Link
             href={buildUrl(Math.max(currentPage - 1, 1), q, estadoFiltro)}
-            className={`rounded-2xl px-5 py-3 font-bold ${
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
               currentPage === 1
-                ? "pointer-events-none bg-slate-100 text-slate-400"
-                : "bg-slate-900 text-white hover:bg-slate-800"
+                ? "pointer-events-none text-gray-300"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
             }`}
           >
-            Anterior
+            ← Anterior
           </Link>
 
-          <span className="rounded-2xl bg-slate-100 px-5 py-3 font-bold text-slate-700">
-            Página {currentPage} de {totalPages}
+          <span className="text-sm font-semibold text-gray-500">
+            Página {currentPage} / {totalPages}
           </span>
 
           <Link
-            href={buildUrl(
-              Math.min(currentPage + 1, totalPages),
-              q,
-              estadoFiltro
-            )}
-            className={`rounded-2xl px-5 py-3 font-bold ${
+            href={buildUrl(Math.min(currentPage + 1, totalPages), q, estadoFiltro)}
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
               currentPage >= totalPages
-                ? "pointer-events-none bg-slate-100 text-slate-400"
-                : "bg-teal-500 text-white hover:bg-teal-600"
+                ? "pointer-events-none text-gray-300"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
             }`}
           >
-            Siguiente
+            Siguiente →
           </Link>
         </div>
-      </section>
-    </main>
+      )}
+    </div>
   );
 }
 
-function PedidoInventario({ pedido }: { pedido: any }) {
-  const abonado = pedido.pagos.reduce(
-    (sum: number, pago: any) => sum + pago.valor,
-    0
-  );
+/* ── PedidoCard ─────────────────────────────────────────────── */
 
-  const saldo = pedido.total - abonado;
-
-  const prendasRecibidas = pedido.prendas.reduce(
-    (sum: number, prenda: any) => sum + prenda.cantidad,
-    0
-  );
-
-  const prendasEntregadas = pedido.prendas.reduce((sum: number, prenda: any) => {
-    const entregadas = prenda.entregasParciales.reduce(
-      (s: number, entrega: any) => s + entrega.cantidad,
-      0
-    );
-
-    return sum + entregadas;
-  }, 0);
-
-  const prendasPendientes = prendasRecibidas - prendasEntregadas;
+function PedidoCard({
+  pedido,
+  agregarAbono,
+  registrarEntregaParcial,
+  cambiarEstado,
+}: {
+  pedido: any;
+  agregarAbono: (f: FormData) => void;
+  registrarEntregaParcial: (f: FormData) => void;
+  cambiarEstado: (f: FormData) => void;
+}) {
+  const abonado   = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
+  const saldo     = pedido.total - abonado;
+  const recibidas = pedido.prendas.reduce((s: number, p: any) => s + p.cantidad, 0);
+  const entregadasTotal = pedido.prendas.reduce((s: number, p: any) =>
+    s + p.entregasParciales.reduce((es: number, e: any) => es + e.cantidad, 0), 0);
+  const pendientesTotal = recibidas - entregadasTotal;
 
   return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <div className="flex flex-wrap items-start justify-between gap-5">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">
-            Pedido #{formatPedido(pedido.id)} - {pedido.cliente.nombre}
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Tel: {pedido.cliente.telefono || "No registrado"}
-          </p>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Dirección: {pedido.cliente.direccion || "No registrada"}
-          </p>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Entrada: {pedido.createdAt.toLocaleDateString("es-CO")}{" "}
-            {pedido.createdAt.toLocaleTimeString("es-CO", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
+    <div className="card overflow-hidden">
+      {/* Cabecera del pedido */}
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-gray-100 p-5 dark:border-white/[0.07]">
+        <div className="flex items-start gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-black text-brand-600 dark:bg-brand-500/15">
+            #{fmt(pedido.id)}
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/pedidos/${pedido.id}`}
+                className="font-black text-gray-900 hover:text-brand-500 hover:underline"
+              >
+                {pedido.cliente.nombre}
+              </Link>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
+                {pedido.estado}
+              </span>
+            </div>
+            <p className="mt-0.5 text-sm text-gray-500">
+              {pedido.cliente.telefono ?? "Sin teléfono"} ·{" "}
+              {new Date(pedido.createdAt).toLocaleDateString("es-CO")} ·{" "}
+              {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
         </div>
 
-        <span className="rounded-full bg-teal-100 px-4 py-2 text-sm font-bold text-teal-700">
-          {pedido.estado}
-        </span>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/recibos/${pedido.id}/pdf`}
+            target="_blank"
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:text-gray-400"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            Recibo
+          </Link>
+          <Link
+            href={`/pedidos/${pedido.id}`}
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:text-gray-400"
+          >
+            Ver detalle →
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-6">
-        <InfoBox title="Prendas recibidas" value={prendasRecibidas} />
-        <InfoBox title="Retiradas" value={prendasEntregadas} />
-        <InfoBox title="Pendientes" value={prendasPendientes} />
-        <MoneyBox title="Total" value={pedido.total} />
-        <MoneyBox title="Abonado" value={abonado} />
-        <MoneyBox title="Saldo" value={saldo} danger={saldo > 0} />
+      {/* Métricas */}
+      <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100 dark:divide-white/[0.07] dark:border-white/[0.07] sm:grid-cols-6">
+        <Metric label="Recibidas"  value={String(recibidas)} />
+        <Metric label="Retiradas"  value={String(entregadasTotal)} />
+        <Metric label="Pendientes" value={String(pendientesTotal)} bold />
+        <Metric label="Total"      value={money(pedido.total)} />
+        <Metric label="Abonado"    value={money(abonado)} />
+        <Metric label="Saldo"      value={money(saldo)} danger={saldo > 0} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-        <div className="rounded-3xl border bg-slate-50 p-5">
-          <h3 className="text-xl font-bold text-slate-900">
-            Prendas y retiros parciales
-          </h3>
+      {/* Cuerpo */}
+      <div className="grid gap-0 xl:grid-cols-[1fr_320px]">
 
-          <div className="mt-5 space-y-4">
+        {/* Prendas */}
+        <div className="border-r border-gray-100 p-5 dark:border-white/[0.07]">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
+            Prendas
+          </p>
+          <div className="space-y-3">
             {pedido.prendas.map((prenda: any) => {
-              const entregadas = prenda.entregasParciales.reduce(
-                (sum: number, entrega: any) => sum + entrega.cantidad,
-                0
-              );
-
-              const pendientes = prenda.cantidad - entregadas;
+              const ent  = prenda.entregasParciales.reduce((s: number, e: any) => s + e.cantidad, 0);
+              const pend = prenda.cantidad - ent;
+              const done = pend === 0;
 
               return (
-                <div key={prenda.id} className="rounded-2xl bg-white p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <p className="font-bold text-slate-900">
-                        {prenda.servicio ?? "Lavado"} - {prenda.tipo}
+                <div key={prenda.id} className={`rounded-xl border p-4 transition ${done ? "border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/5" : "border-gray-100 bg-gray-50 dark:border-white/[0.06] dark:bg-white/[0.02]"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">
+                        {prenda.tipo}
+                        <span className="ml-2 text-sm font-normal text-gray-500">
+                          {prenda.servicio}
+                        </span>
                       </p>
-
-                      <p className="mt-1 text-sm text-slate-500">
-                        Recibidas: {prenda.cantidad} · Retiradas: {entregadas} ·
-                        Pendientes: <b>{pendientes}</b>
+                      <p className="mt-0.5 text-sm text-gray-500">
+                        Recibidas: {prenda.cantidad} · Retiradas: {ent} ·{" "}
+                        <span className={done ? "font-semibold text-green-600" : "font-semibold text-gray-900"}>
+                          Pendientes: {pend}
+                        </span>
                       </p>
-
                       {prenda.descripcion && (
-                        <p className="mt-1 text-sm text-slate-400">
-                          {prenda.descripcion}
+                        <p className="mt-1.5 rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+                          ⚠️ {prenda.descripcion}
                         </p>
                       )}
                     </div>
-
-                    <p className="font-bold text-teal-600">
-                      ${(prenda.valor ?? 0).toLocaleString("es-CO")}
-                    </p>
+                    <span className="shrink-0 text-sm font-bold text-brand-500">
+                      {money(prenda.valor ?? 0)}
+                    </span>
                   </div>
 
+                  {/* Historial de retiros */}
                   {prenda.entregasParciales.length > 0 && (
-                    <div className="mt-3 rounded-xl bg-slate-50 p-3">
-                      <p className="text-sm font-bold text-slate-700">
-                        Historial de retiros
-                      </p>
-
-                      <div className="mt-2 space-y-1">
-                        {prenda.entregasParciales.map((entrega: any) => (
-                          <p key={entrega.id} className="text-sm text-slate-500">
-                            {entrega.cantidad} retiradas ·{" "}
-                            {entrega.createdAt.toLocaleDateString("es-CO")}{" "}
-                            {entrega.createdAt.toLocaleTimeString("es-CO", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                            {entrega.observacion
-                              ? ` · ${entrega.observacion}`
-                              : ""}
-                          </p>
-                        ))}
-                      </div>
+                    <div className="mt-3 rounded-lg bg-white px-3 py-2 dark:bg-white/5">
+                      {prenda.entregasParciales.map((e: any) => (
+                        <p key={e.id} className="text-xs text-gray-400">
+                          {e.cantidad} retiradas · {new Date(e.createdAt).toLocaleDateString("es-CO")} · {new Date(e.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                          {e.observacion ? ` · ${e.observacion}` : ""}
+                        </p>
+                      ))}
                     </div>
                   )}
 
-                  {pendientes > 0 ? (
-                    <details className="mt-4">
-                      <summary className="cursor-pointer rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white">
-                        Retirar parcialmente esta prenda
+                  {/* Retiro parcial */}
+                  {pend > 0 && (
+                    <details className="group mt-3">
+                      <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+                        Retirar esta prenda
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition duration-200 group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg>
                       </summary>
 
-                      <form
-                        action={registrarEntregaParcial}
-                        className="mt-4 grid gap-3 rounded-2xl bg-slate-50 p-4 md:grid-cols-2"
-                      >
+                      <form action={registrarEntregaParcial} className="mt-3 grid gap-2 sm:grid-cols-2">
                         <input type="hidden" name="pedidoId" value={pedido.id} />
                         <input type="hidden" name="prendaId" value={prenda.id} />
 
-                        <input
-                          name="cantidad"
-                          type="number"
-                          min="1"
-                          max={pendientes}
-                          required
-                          placeholder={`Cantidad a retirar. Máx ${pendientes}`}
-                          className="rounded-xl border p-3 text-sm"
-                        />
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-gray-500">
+                            Cantidad (máx. {pend})
+                          </label>
+                          <input
+                            name="cantidad"
+                            type="number"
+                            min="1"
+                            max={pend}
+                            defaultValue={pend}
+                            required
+                            className="input-modern"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-gray-500">
+                            Método
+                          </label>
+                          <select name="metodo" className="input-modern">
+                            {METODOS.map((m) => <option key={m}>{m}</option>)}
+                          </select>
+                        </div>
 
                         {saldo > 0 && (
-                          <MoneyInput
-                            name="abono"
-                            placeholder="Abono obligatorio"
-                          />
+                          <div>
+                            <label className="mb-1 block text-xs font-semibold text-gray-500">
+                              Abono (obligatorio)
+                            </label>
+                            <MoneyInput name="abono" placeholder="Valor del abono" />
+                          </div>
                         )}
 
-                        <select
-                          name="metodo"
-                          className="rounded-xl border p-3 text-sm"
-                        >
-                          <option value="Efectivo">Efectivo</option>
-                          <option value="Nequi">Nequi</option>
-                          <option value="Daviplata">Daviplata</option>
-                          <option value="Transferencia">Transferencia</option>
-                          <option value="Tarjeta">Tarjeta</option>
-                        </select>
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-gray-500">
+                            Observación
+                          </label>
+                          <input name="observacion" placeholder="Opcional" className="input-modern" />
+                        </div>
 
-                        <input
-                          name="observacion"
-                          placeholder="Observación del retiro"
-                          className="rounded-xl border p-3 text-sm"
-                        />
-
-                        <button className="rounded-xl bg-teal-500 px-4 py-3 text-sm font-bold text-white hover:bg-teal-600 md:col-span-2">
-                          Confirmar retiro parcial
+                        <button className="btn-primary sm:col-span-2">
+                          Confirmar retiro
                         </button>
                       </form>
                     </details>
-                  ) : (
-                    <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-600">
-                      Esta prenda ya fue retirada completamente.
+                  )}
+
+                  {done && (
+                    <p className="mt-2 text-xs font-semibold text-green-600">
+                      ✅ Completamente retirada
                     </p>
                   )}
                 </div>
@@ -622,90 +477,92 @@ function PedidoInventario({ pedido }: { pedido: any }) {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-3xl border bg-slate-50 p-5">
-            <h3 className="text-xl font-bold text-slate-900">
-              Abonos del pedido
-            </h3>
+        {/* Panel derecho: abonos + acciones */}
+        <div className="space-y-0 divide-y divide-gray-100 dark:divide-white/[0.07]">
 
-            <div className="mt-4 space-y-3">
-              {pedido.pagos.map((pago: any) => (
-                <div key={pago.id} className="rounded-2xl bg-white p-4">
-                  <p className="font-bold text-teal-600">
-                    ${pago.valor.toLocaleString("es-CO")}
-                  </p>
+          {/* Abonos */}
+          <div className="p-5">
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
+              Abonos
+            </p>
 
-                  <p className="mt-1 text-sm text-slate-500">{pago.metodo}</p>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    {pago.createdAt.toLocaleDateString("es-CO")}{" "}
-                    {pago.createdAt.toLocaleTimeString("es-CO", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-              ))}
-
-              {pedido.pagos.length === 0 && (
-                <p className="text-sm text-slate-500">
-                  No hay abonos registrados.
-                </p>
-              )}
-            </div>
+            {pedido.pagos.length > 0 ? (
+              <div className="space-y-2">
+                {pedido.pagos.map((pago: any) => (
+                  <div key={pago.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2.5 dark:bg-white/5">
+                    <div>
+                      <p className="text-sm font-bold text-brand-500">{money(pago.valor)}</p>
+                      <p className="text-xs text-gray-400">
+                        {pago.metodo} · {new Date(pago.createdAt).toLocaleDateString("es-CO")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">Sin abonos aún.</p>
+            )}
 
             {saldo > 0 && (
-              <form action={agregarAbono} className="mt-5 grid gap-3">
+              <form action={agregarAbono} className="mt-3 grid gap-2">
                 <input type="hidden" name="pedidoId" value={pedido.id} />
-
                 <MoneyInput
                   name="valor"
-                  placeholder={`Abono. Saldo: ${saldo.toLocaleString("es-CO")}`}
+                  placeholder={`Abono — saldo: ${money(saldo)}`}
                 />
-
-                <select name="metodo" className="rounded-xl border p-3 text-sm">
-                  <option value="Efectivo">Efectivo</option>
-                  <option value="Nequi">Nequi</option>
-                  <option value="Daviplata">Daviplata</option>
-                  <option value="Transferencia">Transferencia</option>
-                  <option value="Tarjeta">Tarjeta</option>
+                <select name="metodo" className="input-modern">
+                  {METODOS.map((m) => <option key={m}>{m}</option>)}
                 </select>
-
-                <button className="rounded-xl bg-teal-500 px-4 py-3 text-sm font-bold text-white hover:bg-teal-600">
-                  Registrar abono
-                </button>
+                <button className="btn-primary">Registrar abono</button>
               </form>
+            )}
+
+            {saldo <= 0 && (
+              <div className="mt-3 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 dark:bg-green-500/10">
+                <span className="text-green-500">✅</span>
+                <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                  Pedido pagado
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="rounded-3xl border bg-slate-50 p-5">
-            <h3 className="text-xl font-bold text-slate-900">
-              Acciones del pedido
-            </h3>
-
-            <div className="mt-4 grid gap-3">
+          {/* Acciones */}
+          <div className="p-5">
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
+              Cambiar estado
+            </p>
+            <div className="space-y-2">
               {pedido.estado === "RECIBIDO" && (
-                <EstadoForm
+                <EstadoBtn
                   pedidoId={pedido.id}
                   nuevoEstado="LISTO"
-                  label="Marcar pedido listo"
+                  label="✅ Marcar como LISTO"
+                  color="green"
+                  action={cambiarEstado}
                 />
               )}
-
               {pedido.estado === "LISTO" && saldo <= 0 && (
-                <EstadoForm
+                <EstadoBtn
                   pedidoId={pedido.id}
                   nuevoEstado="ENTREGADO"
-                  label="Entregar todo el pedido"
+                  label="📦 Entregar pedido completo"
+                  color="brand"
+                  action={cambiarEstado}
                 />
               )}
-
               {pedido.estado === "LISTO" && saldo > 0 && (
-                <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
-                  Para entregar todo el pedido debe pagar el saldo. También puede
-                  hacer retiro parcial con abono.
+                <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
+                  Hay saldo pendiente. Registra el pago para entregar todo.
                 </p>
               )}
+              <EstadoBtn
+                pedidoId={pedido.id}
+                nuevoEstado="CANCELADO"
+                label="Cancelar pedido"
+                color="red"
+                action={cambiarEstado}
+              />
             </div>
           </div>
         </div>
@@ -714,80 +571,62 @@ function PedidoInventario({ pedido }: { pedido: any }) {
   );
 }
 
-function EstadoForm({
-  pedidoId,
-  nuevoEstado,
-  label,
+/* ── Sub-componentes ──────────────────────────────────────── */
+
+function EstadoBtn({
+  pedidoId, nuevoEstado, label, color, action,
 }: {
   pedidoId: number;
   nuevoEstado: string;
   label: string;
+  color: "green" | "brand" | "red";
+  action: (f: FormData) => void;
 }) {
-  return (
-    <form action={cambiarEstado}>
-      <input type="hidden" name="pedidoId" value={pedidoId} />
-      <input type="hidden" name="nuevoEstado" value={nuevoEstado} />
+  const cls = {
+    green: "bg-green-500 hover:bg-green-600 text-white",
+    brand: "bg-brand-500 hover:bg-brand-600 text-white",
+    red:   "bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400",
+  }[color];
 
-      <button className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white hover:bg-slate-800">
+  return (
+    <form action={action}>
+      <input type="hidden" name="pedidoId"    value={pedidoId} />
+      <input type="hidden" name="nuevoEstado" value={nuevoEstado} />
+      <button className={`w-full rounded-xl px-4 py-2.5 text-sm font-bold transition ${cls}`}>
         {label}
       </button>
     </form>
   );
 }
 
-function Kpi({
-  title,
-  value,
-  danger,
-}: {
-  title: string;
-  value: number;
-  danger?: boolean;
-}) {
+function Metric({ label, value, bold, danger }: { label: string; value: string; bold?: boolean; danger?: boolean }) {
   return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <p className="text-sm text-slate-500">{title}</p>
-
-      <p
-        className={`mt-3 text-4xl font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
-        }`}
-      >
+    <div className="p-4 text-center">
+      <p className="text-xs font-semibold text-gray-400">{label}</p>
+      <p className={`mt-1 text-base font-black ${danger ? "text-red-500" : bold ? "text-gray-900" : "text-gray-700"}`}>
         {value}
       </p>
     </div>
   );
 }
 
-function InfoBox({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="text-xs text-slate-500">{title}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
-    </div>
-  );
-}
+function KpiCard({ label, value, icon, color }: { label: string; value: number; icon: string; color: "blue" | "purple" | "red" | "green" }) {
+  const palette = {
+    blue:   "bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
+    purple: "bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400",
+    red:    "bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400",
+    green:  "bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400",
+  }[color];
 
-function MoneyBox({
-  title,
-  value,
-  danger,
-}: {
-  title: string;
-  value: number;
-  danger?: boolean;
-}) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="text-xs text-slate-500">{title}</p>
-
-      <p
-        className={`mt-1 text-2xl font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
-        }`}
-      >
-        ${value.toLocaleString("es-CO")}
-      </p>
+    <div className="card p-5">
+      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${palette}`}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
+        </svg>
+      </div>
+      <p className="text-2xl font-black text-gray-900">{value}</p>
+      <p className="mt-0.5 text-sm font-medium text-gray-500">{label}</p>
     </div>
   );
 }

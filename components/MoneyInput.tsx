@@ -48,7 +48,7 @@ export default function MoneyInput({
         value={display}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
-        className="money-input rounded-xl border p-3 text-sm"
+        className="input-modern"
       />
     </>
   );
