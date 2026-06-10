@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { EmptyState } from "@/components/EmptyState";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
@@ -140,15 +141,22 @@ export default async function PedidosPage({
       {/* ── Tabla ────────────────────────────────────────── */}
       <div className="card mt-5 overflow-hidden">
         {pedidos.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-4xl">📋</p>
-            <p className="mt-3 font-semibold text-gray-500">
-              No se encontraron pedidos.
-            </p>
-            <Link href="/pedidos/nuevo" className="mt-4 inline-block rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-600">
-              Crear primer pedido
-            </Link>
-          </div>
+          <EmptyState
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                <rect x="9" y="3" width="6" height="4" rx="2"/>
+                <path d="M9 12h6M9 16h4"/>
+              </svg>
+            }
+            title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos todavía"}
+            description={q || estadoFiltro !== "TODOS" ? "Intenta con otros filtros o borra la búsqueda." : "Crea el primer pedido para empezar a gestionar el inventario."}
+            action={
+              q || estadoFiltro !== "TODOS"
+                ? { label: "Ver todos", href: "/pedidos", secondary: true }
+                : { label: "Crear pedido", href: "/pedidos/nuevo" }
+            }
+          />
         ) : (
           <>
             <div className="overflow-x-auto">

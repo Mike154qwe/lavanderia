@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { EmptyState } from "@/components/EmptyState";
 
 export const metadata: Metadata = { title: "Inventario" };
 import { revalidatePath } from "next/cache";
@@ -239,14 +240,18 @@ export default async function InventarioPage({
         ))}
 
         {pedidos.length === 0 && (
-          <div className="card p-12 text-center">
-            <p className="text-4xl">📦</p>
-            <p className="mt-3 font-semibold text-gray-500">
-              No se encontraron pedidos con estos filtros.
-            </p>
-            <Link href="/inventario" className="mt-4 inline-block text-sm font-semibold text-brand-500 hover:underline">
-              Ver todos
-            </Link>
+          <div className="card">
+            <EmptyState
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
+                  <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+              }
+              title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos activos"}
+              description={q || estadoFiltro !== "TODOS" ? "Prueba con otros filtros o busca por nombre, teléfono o número." : "Los pedidos que recibas aparecerán aquí."}
+              action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
+            />
           </div>
         )}
       </div>

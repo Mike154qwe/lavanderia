@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { EmptyState } from "@/components/EmptyState";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -154,17 +155,18 @@ export default async function ClientesPage({
       {/* ── Tabla ────────────────────────────────────────── */}
       <div className="card mt-5 overflow-hidden">
         {clientes.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-4xl">👤</p>
-            <p className="mt-3 font-semibold text-gray-500">
-              {q ? `No se encontraron clientes para "${q}".` : "Aún no hay clientes registrados."}
-            </p>
-            {q && (
-              <Link href="/clientes" className="mt-3 inline-block text-sm font-semibold text-brand-500 hover:underline">
-                Ver todos
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            }
+            title={q ? `Sin resultados para "${q}"` : "No hay clientes registrados"}
+            description={q ? "Prueba con otro nombre o teléfono." : "Los clientes que agregues aparecerán aquí."}
+            action={q ? { label: "Ver todos", href: "/clientes", secondary: true } : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
