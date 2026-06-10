@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
 
 const PAGE_SIZE = 20;
@@ -37,6 +38,7 @@ async function agregarAbono(formData: FormData) {
   await prisma.pago.create({ data: { pedidoId, valor, metodo } });
   revalidatePath("/inventario");
   revalidatePath("/gerente");
+  redirect("/inventario?flash=Abono+registrado");
 }
 
 async function registrarEntregaParcial(formData: FormData) {
@@ -87,6 +89,7 @@ async function registrarEntregaParcial(formData: FormData) {
 
   revalidatePath("/inventario");
   revalidatePath("/gerente");
+  redirect("/inventario?flash=Entrega+registrada");
 }
 
 async function cambiarEstado(formData: FormData) {
@@ -98,6 +101,7 @@ async function cambiarEstado(formData: FormData) {
   await (prisma as any).historialEstado.create({ data: { pedidoId, estado: nuevoEstado } });
   revalidatePath("/inventario");
   revalidatePath("/gerente");
+  redirect("/inventario?flash=Estado+actualizado");
 }
 
 /* ── Page ──────────────────────────────────────────────────── */

@@ -74,7 +74,7 @@ async function agregarAbonoEmpleado(formData: FormData) {
   revalidatePath("/inventario-empleado");
   revalidatePath("/inventario");
 
-  redirect(`/inventario-empleado?q=${pedidoId}`);
+  redirect(`/inventario-empleado?q=${pedidoId}&flash=Abono+registrado`);
 }
 
 async function retirarParcialEmpleado(formData: FormData) {
@@ -190,7 +190,7 @@ async function retirarParcialEmpleado(formData: FormData) {
   revalidatePath("/inventario-empleado");
   revalidatePath("/inventario");
 
-  redirect(`/inventario-empleado?q=${pedidoId}`);
+  redirect(`/inventario-empleado?q=${pedidoId}&flash=Entrega+registrada`);
 }
 
 async function entregarCompletoEmpleado(formData: FormData) {
@@ -264,7 +264,7 @@ async function entregarCompletoEmpleado(formData: FormData) {
   revalidatePath("/inventario-empleado");
   revalidatePath("/inventario");
 
-  redirect("/inventario-empleado");
+  redirect("/inventario-empleado?flash=Pedido+entregado");
 }
 
 export default async function InventarioEmpleadoPage({

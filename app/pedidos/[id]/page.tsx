@@ -25,7 +25,7 @@ async function cambiarEstadoAction(formData: FormData) {
   if (!id || !ESTADOS.includes(estado as (typeof ESTADOS)[number])) return;
   await prisma.pedido.update({ where: { id }, data: { estado } });
   await (prisma as any).historialEstado.create({ data: { pedidoId: id, estado } });
-  redirect(`/pedidos/${id}`);
+  redirect(`/pedidos/${id}?flash=Estado+actualizado`);
 }
 
 async function registrarPagoAction(formData: FormData) {
@@ -35,7 +35,7 @@ async function registrarPagoAction(formData: FormData) {
   const metodo = String(formData.get("metodo") || "Efectivo");
   if (!id || valor <= 0) return;
   await prisma.pago.create({ data: { pedidoId: id, valor, metodo } });
-  redirect(`/pedidos/${id}`);
+  redirect(`/pedidos/${id}?flash=Pago+registrado`);
 }
 
 /* ── Page ──────────────────────────────────────────────────── */
