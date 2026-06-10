@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
+import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -9,18 +10,7 @@ type Prenda  = { id: number; tipo: string; servicio: string; descripcion: string
 type Cliente = { nombre: string; telefono: string | null };
 type Pedido  = { id: number; estado: string; total: number; createdAt: string; cliente: Cliente; pagos: Pago[]; prendas: Prenda[] };
 
-const ESTADO_BADGE: Record<string, string> = {
-  RECIBIDO:   "bg-blue-100 text-blue-700",
-  EN_PROCESO: "bg-yellow-100 text-yellow-700",
-  LISTO:      "bg-green-100 text-green-700",
-  ENTREGADO:  "bg-gray-100 text-gray-500",
-  CANCELADO:  "bg-red-100 text-red-600",
-};
-
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
-
-function fmt(id: number)  { return String(id).padStart(5, "0"); }
-function money(n: number) { return `$${n.toLocaleString("es-CO")}`; }
 function calc(p: Prenda)  {
   const entregadas = p.entregasParciales.reduce((s, e) => s + e.cantidad, 0);
   return { entregadas, pendientes: p.cantidad - entregadas };

@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { formatPedido } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Pedidos antiguos" };
-
-function formatPedido(id: number) {
-  return String(id).padStart(5, "0");
-}
 
 function whatsappLink(telefono: string | null, pedidoId: number) {
   if (!telefono) return "#";

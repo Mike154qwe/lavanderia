@@ -1,12 +1,5 @@
 import { prisma } from "@/lib/prisma";
-
-function money(value: number) {
-  return `$${value.toLocaleString("es-CO")}`;
-}
-
-function formatPedido(id: number) {
-  return String(id).padStart(5, "0");
-}
+import { money, formatPedido } from "@/lib/format";
 
 function inicioDia(fecha: Date) {
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());

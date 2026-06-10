@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { money } from "@/lib/format";
 
 type ItemPedido = {
   id: number;
@@ -50,10 +51,6 @@ const NOMBRES_PASO = [
   "Valor",
   "Resumen",
 ];
-
-function money(value: number) {
-  return `$${value.toLocaleString("es-CO")}`;
-}
 
 function nuevoItem(): ItemPedido {
   return {
