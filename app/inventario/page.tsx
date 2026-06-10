@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -44,7 +44,7 @@ async function registrarEntregaParcial(formData: FormData) {
   const metodo      = String(formData.get("metodo") || "Efectivo");
   if (!pedidoId || !prendaId || cantidad <= 0) return;
 
-  const pedido: any = await (prisma as any).pedido.findUnique({
+  const pedido = await prisma.pedido.findUnique({
     where: { id: pedidoId },
     include: { pagos: true, prendas: { include: { entregasParciales: true } } },
   });
@@ -61,11 +61,11 @@ async function registrarEntregaParcial(formData: FormData) {
 
   if (abono > 0) await prisma.pago.create({ data: { pedidoId, valor: abono, metodo } });
 
-  await (prisma as any).entregaParcial.create({
+  await prisma.entregaParcial.create({
     data: { pedidoId, prendaId, cantidad, observacion: observacion || null },
   });
 
-  const actualizado: any = await (prisma as any).pedido.findUnique({
+  const actualizado = await prisma.pedido.findUnique({
     where: { id: pedidoId },
     include: { prendas: { include: { entregasParciales: true } } },
   });
@@ -76,7 +76,7 @@ async function registrarEntregaParcial(formData: FormData) {
     );
     if (todoEntregado) {
       await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
-      await (prisma as any).historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
+      await prisma.historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
     }
   }
 
@@ -91,7 +91,7 @@ async function cambiarEstado(formData: FormData) {
   const nuevoEstado = String(formData.get("nuevoEstado"));
   if (!pedidoId) return;
   await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: nuevoEstado as any } });
-  await (prisma as any).historialEstado.create({ data: { pedidoId, estado: nuevoEstado } });
+  await prisma.historialEstado.create({ data: { pedidoId, estado: nuevoEstado } });
   revalidatePath("/inventario");
   revalidatePath("/gerente");
   redirect("/inventario?flash=Estado+actualizado");
@@ -126,7 +126,7 @@ export default async function InventarioPage({
   let total = 0;
 
   if (needsSaldoFilter) {
-    const todos: any[] = await (prisma as any).pedido.findMany({
+    const todos = await prisma.pedido.findMany({
       where: baseWhere,
       include: { cliente: true, pagos: true, prendas: { include: { entregasParciales: true } } },
       orderBy: { createdAt: "desc" },
@@ -138,8 +138,8 @@ export default async function InventarioPage({
     total   = filtered.length;
     pedidos = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   } else {
-    total   = await (prisma as any).pedido.count({ where: baseWhere });
-    pedidos = await (prisma as any).pedido.findMany({
+    total   = await prisma.pedido.count({ where: baseWhere });
+    pedidos = await prisma.pedido.findMany({
       where: baseWhere,
       include: { cliente: true, pagos: true, prendas: { include: { entregasParciales: true } } },
       orderBy: { createdAt: "desc" },

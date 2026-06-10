@@ -27,7 +27,7 @@ async function cambiarEstadoAction(formData: FormData) {
   const estado = String(formData.get("estado"));
   if (!id || !ESTADOS.includes(estado as (typeof ESTADOS)[number])) return;
   await prisma.pedido.update({ where: { id }, data: { estado } });
-  await (prisma as any).historialEstado.create({ data: { pedidoId: id, estado } });
+  await prisma.historialEstado.create({ data: { pedidoId: id, estado } });
   redirect(`/pedidos/${id}?flash=Estado+actualizado`);
 }
 

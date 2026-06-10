@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import InventarioEmpleadoClient from "./InventarioEmpleadoClient";
 
@@ -16,7 +16,7 @@ async function buscarPedidos(q: string) {
   const qLimpio = q.replace(/^0+/, "");
   const idNumber = Number(qLimpio);
 
-  return await (prisma as any).pedido.findMany({
+  return await prisma.pedido.findMany({
     where: {
       estado: {
         notIn: ["ENTREGADO", "CANCELADO"],
@@ -92,7 +92,7 @@ async function retirarParcialEmpleado(formData: FormData) {
 
   if (!pedidoId || !prendaId || cantidad <= 0) return;
 
-  const pedido: any = await (prisma as any).pedido.findUnique({
+  const pedido = await prisma.pedido.findUnique({
     where: {
       id: pedidoId,
     },
@@ -139,7 +139,7 @@ async function retirarParcialEmpleado(formData: FormData) {
     });
   }
 
-  await (prisma as any).entregaParcial.create({
+  await prisma.entregaParcial.create({
     data: {
       pedidoId,
       prendaId,
@@ -148,7 +148,7 @@ async function retirarParcialEmpleado(formData: FormData) {
     },
   });
 
-  const actualizado: any = await (prisma as any).pedido.findUnique({
+  const actualizado = await prisma.pedido.findUnique({
     where: {
       id: pedidoId,
     },
@@ -181,7 +181,7 @@ async function retirarParcialEmpleado(formData: FormData) {
         },
       });
 
-      await (prisma as any).historialEstado.create({
+      await prisma.historialEstado.create({
         data: {
           pedidoId,
           estado: "ENTREGADO",
@@ -203,7 +203,7 @@ async function entregarCompletoEmpleado(formData: FormData) {
 
   if (!pedidoId) return;
 
-  const pedido: any = await (prisma as any).pedido.findUnique({
+  const pedido = await prisma.pedido.findUnique({
     where: {
       id: pedidoId,
     },
@@ -237,7 +237,7 @@ async function entregarCompletoEmpleado(formData: FormData) {
     const pendientes = prenda.cantidad - entregadas;
 
     if (pendientes > 0) {
-      await (prisma as any).entregaParcial.create({
+      await prisma.entregaParcial.create({
         data: {
           pedidoId,
           prendaId: prenda.id,
@@ -257,7 +257,7 @@ async function entregarCompletoEmpleado(formData: FormData) {
     },
   });
 
-  await (prisma as any).historialEstado.create({
+  await prisma.historialEstado.create({
     data: {
       pedidoId,
       estado: "ENTREGADO",

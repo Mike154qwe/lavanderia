@@ -61,7 +61,7 @@ export async function GET(
 ) {
   const { id } = await context.params;
 
-  const cierre: any = await (prisma as any).cierreCaja.findUnique({
+  const cierre = await prisma.cierreCaja.findUnique({
     where: {
       id: Number(id),
     },
@@ -76,7 +76,7 @@ export async function GET(
   const inicio = inicioDia(cierre.createdAt);
   const fin = finDia(cierre.createdAt);
 
-  const cierreAnterior: any = await (prisma as any).cierreCaja.findFirst({
+  const cierreAnterior = await prisma.cierreCaja.findFirst({
     where: {
       id: {
         not: cierre.id,
@@ -94,7 +94,7 @@ export async function GET(
   const desde = cierreAnterior ? cierreAnterior.createdAt : inicio;
   const hasta = cierre.createdAt;
 
-  const pagos: any[] = await (prisma as any).pago.findMany({
+  const pagos = await prisma.pago.findMany({
     where: {
       createdAt: {
         gt: desde,
@@ -113,7 +113,7 @@ export async function GET(
     },
   });
 
-  const gastos: any[] = await (prisma as any).gastoCaja.findMany({
+  const gastos = await prisma.gastoCaja.findMany({
     where: {
       createdAt: {
         gt: desde,

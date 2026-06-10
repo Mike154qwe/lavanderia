@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
@@ -15,7 +15,7 @@ export default async function MovimientosPage() {
   const mesHoy = hoy.getMonth();
   const diaHoy = hoy.getDate();
 
-  const pedidos: any[] = await (prisma as any).pedido.findMany({
+  const pedidos = await prisma.pedido.findMany({
     include: { cliente: true, prendas: true, historial: true },
     orderBy: { createdAt: "desc" },
   });

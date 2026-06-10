@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
 
@@ -18,7 +18,7 @@ async function registrarGastoEmpleado(formData: FormData) {
   const metodo      = String(formData.get("metodo") || "Efectivo");
   const responsable = String(formData.get("responsable") || "Empleado").trim();
   if (!tipo || valor <= 0) return;
-  await (prisma as any).gastoCaja.create({
+  await prisma.gastoCaja.create({
     data: { tipo, descripcion: descripcion || null, valor, metodo, responsable },
   });
   revalidatePath("/gastos-empleado");
@@ -41,7 +41,7 @@ export default async function GastosEmpleadoPage() {
   const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
   const fin    = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
 
-  const gastos: any[] = await (prisma as any).gastoCaja.findMany({
+  const gastos = await prisma.gastoCaja.findMany({
     where: { createdAt: { gte: inicio, lt: fin } },
     orderBy: { createdAt: "desc" },
   });
