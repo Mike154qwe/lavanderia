@@ -12,7 +12,7 @@ async function crearCliente(formData: FormData) {
     },
   });
 
-  redirect("/clientes");
+  redirect("/clientes?flash=Cliente+creado");
 }
 
 export default function NuevoClientePage() {

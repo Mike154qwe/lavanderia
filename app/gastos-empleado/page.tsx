@@ -20,7 +20,7 @@ async function registrarGastoEmpleado(formData: FormData) {
   });
   revalidatePath("/gastos-empleado");
   revalidatePath("/gerente");
-  redirect("/gastos-empleado");
+  redirect("/gastos-empleado?flash=Gasto+registrado");
 }
 
 const TIPOS = [
