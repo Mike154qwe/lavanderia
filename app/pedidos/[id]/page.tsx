@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
+import CancelButton from "./CancelButton";
 
 const ESTADOS = ["RECIBIDO", "EN_PROCESO", "LISTO", "ENTREGADO", "CANCELADO"] as const;
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"] as const;
@@ -272,7 +273,7 @@ export default async function DetallePedidoPage({
                   Hay saldo pendiente. Registra el pago antes de entregar.
                 </p>
               )}
-              <QuickEstado pedidoId={pedido.id} estado="CANCELADO" label="Cancelar pedido" color="red" action={cambiarEstadoAction} />
+              <CancelButton pedidoId={pedido.id} action={cambiarEstadoAction} />
             </div>
 
             {/* Override manual */}
