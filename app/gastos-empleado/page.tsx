@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

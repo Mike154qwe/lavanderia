@@ -1,9 +1,19 @@
 import { Fragment } from "react";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const id = Number((await params).id);
+  return { title: `Pedido #${String(id).padStart(5, "0")}` };
+}
 
 const ESTADOS = ["RECIBIDO", "EN_PROCESO", "LISTO", "ENTREGADO", "CANCELADO"] as const;
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"] as const;

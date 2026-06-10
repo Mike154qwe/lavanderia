@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import InventarioEmpleadoClient from "./InventarioEmpleadoClient";
+
+export const metadata: Metadata = { title: "Inventario" };
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

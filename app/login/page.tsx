@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { loginAction } from "./actions";
+
+export const metadata: Metadata = { title: "Acceso gerente" };
 
 export default async function LoginPage({
   searchParams,

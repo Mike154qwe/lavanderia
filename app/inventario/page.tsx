@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = { title: "Inventario" };
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
