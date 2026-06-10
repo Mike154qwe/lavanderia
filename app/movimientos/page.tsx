@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = { title: "Movimientos" };
 
 const MESES = [
   "Enero","Febrero","Marzo","Abril","Mayo","Junio",

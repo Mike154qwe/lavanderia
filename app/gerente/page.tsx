@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import IngresosDiarios from "@/components/charts/IngresosDiarios";
+
+export const metadata: Metadata = { title: "Gerente" };
 import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

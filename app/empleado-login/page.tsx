@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { empleadoLoginAction } from "./actions";
+
+export const metadata: Metadata = { title: "Acceso empleado" };
 
 export default function EmpleadoLoginPage() {
   return (

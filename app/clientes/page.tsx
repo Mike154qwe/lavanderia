@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+
+export const metadata: Metadata = { title: "Clientes" };
 
 async function crearCliente(formData: FormData) {
   "use server";

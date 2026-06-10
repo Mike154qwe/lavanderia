@@ -8,8 +8,11 @@ import { FlashToast } from "@/components/FlashToast";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Lavaseco La Manuelita",
-  description: "Sistema de gestión de lavandería",
+  title: {
+    default: "La Manuelita",
+    template: "%s · La Manuelita",
+  },
+  description: "Sistema de gestión — Lavaseco La Manuelita",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
