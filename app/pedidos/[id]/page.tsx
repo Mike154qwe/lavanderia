@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import type { Metadata } from "next";
+import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -17,14 +18,6 @@ export async function generateMetadata({
 
 const ESTADOS = ["RECIBIDO", "EN_PROCESO", "LISTO", "ENTREGADO", "CANCELADO"] as const;
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"] as const;
-
-const ESTADO_BADGE: Record<string, string> = {
-  RECIBIDO:   "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
-  EN_PROCESO: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400",
-  LISTO:      "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400",
-  ENTREGADO:  "bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400",
-  CANCELADO:  "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
-};
 
 /* ── Server actions ─────────────────────────────────────────── */
 
@@ -49,9 +42,6 @@ async function registrarPagoAction(formData: FormData) {
 }
 
 /* ── Page ──────────────────────────────────────────────────── */
-
-function money(n: number) { return `$${n.toLocaleString("es-CO")}`; }
-function fmt(id: number)  { return String(id).padStart(5, "0"); }
 
 export default async function DetallePedidoPage({
   params,

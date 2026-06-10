@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { money, formatPedido } from "@/lib/format";
 
 export const runtime = "nodejs";
 
@@ -8,13 +9,6 @@ const ROJO    = rgb(0.8, 0, 0);
 const NEGRO   = rgb(0, 0, 0);
 const WIDTH   = 226; // pts — ancho ticket 80 mm
 
-function money(value: number) {
-  return `$${value.toLocaleString("es-CO")}`;
-}
-
-function formatPedido(id: number) {
-  return String(id).padStart(5, "0");
-}
 
 /** Elimina tildes y caracteres no-ASCII para que Helvetica los renderice bien. */
 function san(text: string): string {

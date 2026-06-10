@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { money, fmt } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Entradas y salidas" };
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-
-function fmt(id: number)   { return String(id).padStart(5, "0"); }
-function money(n: number)  { return `$${n.toLocaleString("es-CO")}`; }
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }

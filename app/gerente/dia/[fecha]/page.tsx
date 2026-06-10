@@ -1,10 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-
-function formatPedido(id: number) {
-  return String(id).padStart(5, "0");
-}
+import { formatPedido } from "@/lib/format";
 
 async function registrarGasto(formData: FormData) {
   "use server";

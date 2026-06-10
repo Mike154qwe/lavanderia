@@ -2,16 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import IngresosDiarios from "@/components/charts/IngresosDiarios";
-
-export const metadata: Metadata = { title: "Gerente" };
 import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { money, fmt } from "@/lib/format";
 
-/* ── Helpers ───────────────────────────────────────────────── */
-
-function money(value: number) { return `$${value.toLocaleString("es-CO")}`; }
-function fmt(id: number)      { return String(id).padStart(5, "0"); }
+export const metadata: Metadata = { title: "Gerente" };
 
 function inicioDia(fecha: Date) {
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
