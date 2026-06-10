@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import IngresosDiarios from "@/components/charts/IngresosDiarios";
@@ -33,16 +33,16 @@ async function hacerCierreCaja(formData: FormData) {
   const inicioHoy = inicioDia(ahora);
   const finHoy    = finDia(ahora);
 
-  const ultimoCierre: any = await (prisma as any).cierreCaja.findFirst({
+  const ultimoCierre = await prisma.cierreCaja.findFirst({
     where: { createdAt: { gte: inicioHoy, lt: finHoy } },
     orderBy: { createdAt: "desc" },
   });
 
   const desde = ultimoCierre ? ultimoCierre.createdAt : inicioHoy;
 
-  const [pagos, gastos]: [any[], any[]] = await Promise.all([
-    (prisma as any).pago.findMany({ where: { createdAt: { gt: desde, lte: ahora } } }),
-    (prisma as any).gastoCaja.findMany({ where: { createdAt: { gt: desde, lte: ahora } } }),
+  const [pagos, gastos] = await Promise.all([
+    prisma.pago.findMany({ where: { createdAt: { gt: desde, lte: ahora } } }),
+    prisma.gastoCaja.findMany({ where: { createdAt: { gt: desde, lte: ahora } } }),
   ]);
 
   const efectivo      = sumarMetodo(pagos, "Efectivo");
@@ -53,7 +53,7 @@ async function hacerCierreCaja(formData: FormData) {
   const totalGastos   = gastos.reduce((s: number, g: any) => s + g.valor, 0);
   const totalCaja     = efectivo + nequi + daviplata + transferencia + tarjeta - totalGastos;
 
-  const cierre: any = await (prisma as any).cierreCaja.create({
+  const cierre = await prisma.cierreCaja.create({
     data: { efectivo, nequi, daviplata, transferencia, tarjeta, gastos: totalGastos, totalCaja, responsable, observacion: observacion || null },
   });
 
@@ -83,40 +83,40 @@ export default async function GerentePage({
   const inicioAno = new Date(year, 0, 1);
   const finAno    = new Date(year + 1, 0, 1);
 
-  const [pedidosDia, pagosDia, gastosDia, salidasDia, cierresDia, pedidosAno, salidasAno, gastosAno]: any[][] =
+  const [pedidosDia, pagosDia, gastosDia, salidasDia, cierresDia, pedidosAno, salidasAno, gastosAno] =
     await Promise.all([
-      (prisma as any).pedido.findMany({
+      prisma.pedido.findMany({
         where: { createdAt: { gte: inicio, lt: fin } },
         include: { cliente: true, prendas: true, pagos: true },
         orderBy: { createdAt: "desc" },
       }),
-      (prisma as any).pago.findMany({
+      prisma.pago.findMany({
         where: { createdAt: { gte: inicio, lt: fin } },
         include: { pedido: { include: { cliente: true } } },
         orderBy: { createdAt: "desc" },
       }),
-      (prisma as any).gastoCaja.findMany({
+      prisma.gastoCaja.findMany({
         where: { createdAt: { gte: inicio, lt: fin } },
         orderBy: { createdAt: "desc" },
       }),
-      (prisma as any).historialEstado.findMany({
+      prisma.historialEstado.findMany({
         where: { estado: "ENTREGADO", createdAt: { gte: inicio, lt: fin } },
         include: { pedido: { include: { cliente: true, prendas: true, pagos: true } } },
         orderBy: { createdAt: "desc" },
       }),
-      (prisma as any).cierreCaja.findMany({
+      prisma.cierreCaja.findMany({
         where: { createdAt: { gte: inicio, lt: fin } },
         orderBy: { createdAt: "desc" },
       }),
-      (prisma as any).pedido.findMany({
+      prisma.pedido.findMany({
         where: { createdAt: { gte: inicioAno, lt: finAno } },
         select: { id: true, createdAt: true },
       }),
-      (prisma as any).historialEstado.findMany({
+      prisma.historialEstado.findMany({
         where: { estado: "ENTREGADO", createdAt: { gte: inicioAno, lt: finAno } },
         select: { createdAt: true },
       }),
-      (prisma as any).gastoCaja.findMany({
+      prisma.gastoCaja.findMany({
         where: { createdAt: { gte: inicioAno, lt: finAno } },
         select: { createdAt: true },
       }),
@@ -124,7 +124,7 @@ export default async function GerentePage({
 
   /* Charts */
   const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-  const pagosMes: any[] = await (prisma as any).pago.findMany({
+  const pagosMes = await prisma.pago.findMany({
     where: { createdAt: { gte: inicioMes } },
     select: { valor: true, createdAt: true },
   });

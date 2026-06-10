@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
@@ -38,12 +38,12 @@ export default async function EntradasSalidasEmpleadoPage({
   const finAno    = new Date(year + 1, 0, 1);
 
   const [pedidosRaw, salidasRaw]: [any[], any[]] = await Promise.all([
-    (prisma as any).pedido.findMany({
+    prisma.pedido.findMany({
       where: { createdAt: { gte: inicioAno, lt: finAno } },
       include: { cliente: true, prendas: true, pagos: true },
       orderBy: { createdAt: "asc" },
     }),
-    (prisma as any).historialEstado.findMany({
+    prisma.historialEstado.findMany({
       where: { estado: "ENTREGADO", createdAt: { gte: inicioAno, lt: finAno } },
       include: { pedido: { include: { cliente: true, prendas: true, pagos: true } } },
       orderBy: { createdAt: "asc" },

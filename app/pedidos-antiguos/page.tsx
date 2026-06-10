@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPedido } from "@/lib/format";
@@ -24,7 +24,7 @@ export default async function PedidosAntiguosPage() {
   const limite = new Date(hoy);
   limite.setMonth(limite.getMonth() - 3);
 
-  const pedidos: any[] = await (prisma as any).pedido.findMany({
+  const pedidos = await prisma.pedido.findMany({
     where: {
       createdAt: {
         lte: limite,

@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import NuevoPedidoForm from "./NuevoPedidoForm";
 
@@ -84,7 +84,7 @@ async function guardarPedidoAction(formData: FormData) {
 
   const total = prendas.reduce((sum, prenda) => sum + prenda.valor, 0);
 
-  const pedido: any = await (prisma as any).pedido.create({
+  const pedido = await prisma.pedido.create({
     data: {
       clienteId,
       servicio: prendas.map((p) => p.servicio).join(", "),

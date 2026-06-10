@@ -15,7 +15,7 @@ async function registrarGasto(formData: FormData) {
 
   if (!tipo || valor <= 0) return;
 
-  await (prisma as any).gastoCaja.create({
+  await prisma.gastoCaja.create({
     data: {
       tipo,
       descripcion,
@@ -46,7 +46,7 @@ export default async function DiaFinanzasPage({
   const fin = new Date(fecha);
   fin.setDate(fin.getDate() + 1);
 
-  const pedidos: any[] = await (prisma as any).pedido.findMany({
+  const pedidos = await prisma.pedido.findMany({
     where: {
       OR: [
         {
@@ -82,7 +82,7 @@ export default async function DiaFinanzasPage({
     },
   });
 
-  const gastos: any[] = await (prisma as any).gastoCaja.findMany({
+  const gastos = await prisma.gastoCaja.findMany({
     where: {
       createdAt: {
         gte: inicio,
