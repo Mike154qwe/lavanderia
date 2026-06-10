@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -172,8 +173,8 @@ export default async function DetallePedidoPage({
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-white/[0.04]">
                 {pedido.prendas.map((p) => (
-                  <>
-                    <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                  <Fragment key={p.id}>
+                    <tr className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
                       <td className="px-6 py-3.5">
                         <span className="rounded-lg bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600 dark:bg-white/10 dark:text-gray-300">
                           {p.servicio}
@@ -192,7 +193,7 @@ export default async function DetallePedidoPage({
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
