@@ -3,14 +3,13 @@
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { METODOS_PAGO } from "@/lib/types";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
 type Prenda  = { id: number; tipo: string; servicio: string; descripcion: string | null; cantidad: number; valor: number; entregasParciales: Entrega[] };
 type Cliente = { nombre: string; telefono: string | null };
 type Pedido  = { id: number; estado: string; total: number; createdAt: string; cliente: Cliente; pagos: Pago[]; prendas: Prenda[] };
-
-const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
 function calc(p: Prenda)  {
   const entregadas = p.entregasParciales.reduce((s, e) => s + e.cantidad, 0);
   return { entregadas, pendientes: p.cantidad - entregadas };
@@ -209,7 +208,7 @@ export default function InventarioEmpleadoClient({
                   <input type="hidden" name="pedidoId" value={pedido.id} />
                   <MoneyInput name="valor" placeholder={`Saldo: ${money(saldo)}`} />
                   <select name="metodo" className="input-modern">
-                    {METODOS.map((m) => <option key={m}>{m}</option>)}
+                    {METODOS_PAGO.map((m) => <option key={m}>{m}</option>)}
                   </select>
                   <button className="btn-primary whitespace-nowrap">Confirmar</button>
                 </form>
@@ -316,7 +315,7 @@ export default function InventarioEmpleadoClient({
                         <div>
                           <label className="mb-1 block text-xs font-bold text-gray-500">Método</label>
                           <select name="metodo" className="input-modern">
-                            {METODOS.map((m) => <option key={m}>{m}</option>)}
+                            {METODOS_PAGO.map((m) => <option key={m}>{m}</option>)}
                           </select>
                         </div>
 

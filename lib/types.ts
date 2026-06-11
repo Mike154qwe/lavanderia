@@ -1,5 +1,11 @@
 import { Prisma } from "@prisma/client";
 
+export const ESTADOS_PEDIDO = ["RECIBIDO", "EN_PROCESO", "LISTO", "ENTREGADO", "CANCELADO"] as const;
+export type EstadoPedido = (typeof ESTADOS_PEDIDO)[number];
+
+export const METODOS_PAGO = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"] as const;
+export type MetodoPago = (typeof METODOS_PAGO)[number];
+
 export type PedidoConTodo = Prisma.PedidoGetPayload<{
   include: {
     cliente: true;
