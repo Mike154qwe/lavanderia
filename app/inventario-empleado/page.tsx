@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import InventarioEmpleadoClient from "./InventarioEmpleadoClient";
+import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Inventario" };
 import { revalidatePath } from "next/cache";
@@ -62,9 +63,9 @@ async function agregarAbonoEmpleado(formData: FormData) {
 
   const pedidoId = Number(formData.get("pedidoId"));
   const valor = parseMoney(formData.get("valor"));
-  const metodo = String(formData.get("metodo") || "Efectivo");
+  const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
 
-  if (!pedidoId || valor <= 0) return;
+  if (!pedidoId || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
 
   await prisma.pago.create({
     data: {
@@ -87,10 +88,10 @@ async function retirarParcialEmpleado(formData: FormData) {
   const prendaId = Number(formData.get("prendaId"));
   const cantidad = Number(formData.get("cantidad") || 0);
   const abono = parseMoney(formData.get("abono"));
-  const metodo = String(formData.get("metodo") || "Efectivo");
+  const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
   const observacion = String(formData.get("observacion") || "").trim();
 
-  if (!pedidoId || !prendaId || cantidad <= 0) return;
+  if (!pedidoId || !prendaId || cantidad <= 0 || !METODOS_PAGO.includes(metodo)) return;
 
   const pedido = await prisma.pedido.findUnique({
     where: {

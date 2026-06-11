@@ -6,11 +6,11 @@ import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
 import { EmptyState } from "@/components/EmptyState";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Inventario" };
 
 const PAGE_SIZE = 20;
-const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
 
 function buildUrl(page: number, q: string, estado: string) {
   const p = new URLSearchParams();
@@ -26,8 +26,8 @@ async function agregarAbono(formData: FormData) {
   "use server";
   const pedidoId = Number(formData.get("pedidoId"));
   const valor    = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
-  const metodo   = String(formData.get("metodo") || "Efectivo");
-  if (!pedidoId || valor <= 0) return;
+  const metodo   = String(formData.get("metodo") || "Efectivo") as MetodoPago;
+  if (!pedidoId || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
   await prisma.pago.create({ data: { pedidoId, valor, metodo } });
   revalidatePath("/inventario");
   revalidatePath("/gerente");
@@ -41,8 +41,8 @@ async function registrarEntregaParcial(formData: FormData) {
   const cantidad    = Number(formData.get("cantidad"));
   const observacion = String(formData.get("observacion") || "");
   const abono       = Number(String(formData.get("abono") || "0").replace(/\D/g, ""));
-  const metodo      = String(formData.get("metodo") || "Efectivo");
-  if (!pedidoId || !prendaId || cantidad <= 0) return;
+  const metodo      = String(formData.get("metodo") || "Efectivo") as MetodoPago;
+  if (!pedidoId || !prendaId || cantidad <= 0 || !METODOS_PAGO.includes(metodo)) return;
 
   const pedido = await prisma.pedido.findUnique({
     where: { id: pedidoId },
@@ -90,8 +90,8 @@ async function registrarEntregaParcial(formData: FormData) {
 async function cambiarEstado(formData: FormData) {
   "use server";
   const pedidoId    = Number(formData.get("pedidoId"));
-  const nuevoEstado = String(formData.get("nuevoEstado"));
-  if (!pedidoId) return;
+  const nuevoEstado = String(formData.get("nuevoEstado")) as EstadoPedido;
+  if (!pedidoId || !ESTADOS_PEDIDO.includes(nuevoEstado)) return;
   await prisma.$transaction([
     prisma.pedido.update({ where: { id: pedidoId }, data: { estado: nuevoEstado } }),
     prisma.historialEstado.create({ data: { pedidoId, estado: nuevoEstado } }),
@@ -444,7 +444,7 @@ function PedidoCard({
                             Método
                           </label>
                           <select name="metodo" className="input-modern">
-                            {METODOS.map((m) => <option key={m}>{m}</option>)}
+                            {METODOS_PAGO.map((m) => <option key={m}>{m}</option>)}
                           </select>
                         </div>
 
@@ -516,7 +516,7 @@ function PedidoCard({
                   placeholder={`Abono — saldo: ${money(saldo)}`}
                 />
                 <select name="metodo" className="input-modern">
-                  {METODOS.map((m) => <option key={m}>{m}</option>)}
+                  {METODOS_PAGO.map((m) => <option key={m}>{m}</option>)}
                 </select>
                 <button className="btn-primary">Registrar abono</button>
               </form>

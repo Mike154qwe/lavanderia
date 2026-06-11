@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import type { Metadata } from "next";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -16,16 +17,13 @@ export async function generateMetadata({
   return { title: `Pedido #${String(id).padStart(5, "0")}` };
 }
 
-const ESTADOS = ["RECIBIDO", "EN_PROCESO", "LISTO", "ENTREGADO", "CANCELADO"] as const;
-const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"] as const;
-
 /* ── Server actions ─────────────────────────────────────────── */
 
 async function cambiarEstadoAction(formData: FormData) {
   "use server";
   const id     = Number(formData.get("pedidoId"));
-  const estado = String(formData.get("estado"));
-  if (!id || !ESTADOS.includes(estado as (typeof ESTADOS)[number])) return;
+  const estado = String(formData.get("estado")) as EstadoPedido;
+  if (!id || !ESTADOS_PEDIDO.includes(estado)) return;
   await prisma.$transaction([
     prisma.pedido.update({ where: { id }, data: { estado } }),
     prisma.historialEstado.create({ data: { pedidoId: id, estado } }),
@@ -37,8 +35,8 @@ async function registrarPagoAction(formData: FormData) {
   "use server";
   const id     = Number(formData.get("pedidoId"));
   const valor  = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
-  const metodo = String(formData.get("metodo") || "Efectivo");
-  if (!id || valor <= 0) return;
+  const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
+  if (!id || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
   await prisma.pago.create({ data: { pedidoId: id, valor, metodo } });
   redirect(`/pedidos/${id}?flash=Pago+registrado`);
 }
@@ -241,7 +239,7 @@ export default async function DetallePedidoPage({
                 placeholder={saldo > 0 ? `Saldo pendiente: ${money(saldo)}` : "Monto del pago"}
               />
               <select name="metodo" className="input-modern">
-                {METODOS.map((m) => <option key={m} value={m}>{m}</option>)}
+                {METODOS_PAGO.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
               <button className="btn-primary whitespace-nowrap">
                 Registrar pago
@@ -288,7 +286,7 @@ export default async function DetallePedidoPage({
               <form action={cambiarEstadoAction} className="mt-3 flex gap-3">
                 <input type="hidden" name="pedidoId" value={pedido.id} />
                 <select name="estado" defaultValue={pedido.estado} className="input-modern flex-1">
-                  {ESTADOS.map((e) => (
+                  {ESTADOS_PEDIDO.map((e) => (
                     <option key={e} value={e}>{e.replace("_", " ")}</option>
                   ))}
                 </select>
