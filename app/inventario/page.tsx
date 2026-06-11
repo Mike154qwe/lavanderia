@@ -59,26 +59,28 @@ async function registrarEntregaParcial(formData: FormData) {
   const abonado = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
   if (pedido.total - abonado > 0 && abono <= 0) return;
 
-  if (abono > 0) await prisma.pago.create({ data: { pedidoId, valor: abono, metodo } });
+  await prisma.$transaction(async (tx) => {
+    if (abono > 0) await tx.pago.create({ data: { pedidoId, valor: abono, metodo } });
 
-  await prisma.entregaParcial.create({
-    data: { pedidoId, prendaId, cantidad, observacion: observacion || null },
-  });
+    await tx.entregaParcial.create({
+      data: { pedidoId, prendaId, cantidad, observacion: observacion || null },
+    });
 
-  const actualizado = await prisma.pedido.findUnique({
-    where: { id: pedidoId },
-    include: { prendas: { include: { entregasParciales: true } } },
-  });
+    const actualizado = await tx.pedido.findUnique({
+      where: { id: pedidoId },
+      include: { prendas: { include: { entregasParciales: true } } },
+    });
 
-  if (actualizado) {
-    const todoEntregado = actualizado.prendas.every((p: any) =>
-      p.entregasParciales.reduce((s: number, e: any) => s + e.cantidad, 0) >= p.cantidad
-    );
-    if (todoEntregado) {
-      await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
-      await prisma.historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
+    if (actualizado) {
+      const todoEntregado = actualizado.prendas.every((p) =>
+        p.entregasParciales.reduce((s, e) => s + e.cantidad, 0) >= p.cantidad
+      );
+      if (todoEntregado) {
+        await tx.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
+        await tx.historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
+      }
     }
-  }
+  });
 
   revalidatePath("/inventario");
   revalidatePath("/gerente");
@@ -90,8 +92,10 @@ async function cambiarEstado(formData: FormData) {
   const pedidoId    = Number(formData.get("pedidoId"));
   const nuevoEstado = String(formData.get("nuevoEstado"));
   if (!pedidoId) return;
-  await prisma.pedido.update({ where: { id: pedidoId }, data: { estado: nuevoEstado as any } });
-  await prisma.historialEstado.create({ data: { pedidoId, estado: nuevoEstado } });
+  await prisma.$transaction([
+    prisma.pedido.update({ where: { id: pedidoId }, data: { estado: nuevoEstado } }),
+    prisma.historialEstado.create({ data: { pedidoId, estado: nuevoEstado } }),
+  ]);
   revalidatePath("/inventario");
   revalidatePath("/gerente");
   redirect("/inventario?flash=Estado+actualizado");
