@@ -2,6 +2,7 @@
 import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
+import FlashMessage from "@/components/FlashMessage";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -18,7 +19,9 @@ async function registrarGastoEmpleado(formData: FormData) {
   const valor       = parseMoney(formData.get("valor"));
   const metodo      = String(formData.get("metodo") || "Efectivo") as MetodoPago;
   const responsable = String(formData.get("responsable") || "Empleado").trim();
-  if (!tipo || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
+  if (!tipo) redirect(`/gastos-empleado?error=${encodeURIComponent("Selecciona el tipo de gasto")}`);
+  if (valor <= 0) redirect(`/gastos-empleado?error=${encodeURIComponent("El valor debe ser mayor a 0")}`);
+  if (!METODOS_PAGO.includes(metodo)) return;
   await prisma.gastoCaja.create({
     data: { tipo, descripcion: descripcion || null, valor, metodo, responsable },
   });
@@ -37,7 +40,12 @@ const TIPOS = [
   { tipo: "Otro",           icon: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" },
 ];
 
-export default async function GastosEmpleadoPage() {
+export default async function GastosEmpleadoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flash?: string; error?: string }>;
+}) {
+  const { flash, error } = await searchParams;
   const hoy   = new Date();
   const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
   const fin    = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
@@ -51,6 +59,7 @@ export default async function GastosEmpleadoPage() {
 
   return (
     <div className="p-4 sm:p-6">
+      <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-5">

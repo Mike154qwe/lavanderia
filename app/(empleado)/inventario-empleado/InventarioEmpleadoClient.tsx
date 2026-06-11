@@ -4,6 +4,7 @@ import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
+import FlashMessage from "@/components/FlashMessage";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -18,12 +19,16 @@ function calc(p: Prenda)  {
 export default function InventarioEmpleadoClient({
   q,
   pedidos,
+  flash,
+  error,
   agregarAbonoEmpleado,
   retirarParcialEmpleado,
   entregarCompletoEmpleado,
 }: {
   q: string;
   pedidos: Pedido[];
+  flash?: string;
+  error?: string;
   agregarAbonoEmpleado:     (f: FormData) => void;
   retirarParcialEmpleado:   (f: FormData) => void;
   entregarCompletoEmpleado: (f: FormData) => void;
@@ -53,6 +58,7 @@ export default function InventarioEmpleadoClient({
 
   return (
     <div className="p-4 sm:p-6">
+      <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       {/* ── Buscador ─────────────────────────────────────── */}
       <div className="card p-5">

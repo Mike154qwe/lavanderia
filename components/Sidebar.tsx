@@ -11,6 +11,7 @@ const RUTAS_EMPLEADO = [
   "/entradas-salidas-empleado",
   "/gastos-empleado",
   "/empleado",
+  "/clientes-empleado",
 ];
 
 type NavItem = { label: string; href: string; icon: React.ReactNode };
@@ -89,6 +90,11 @@ const EMPLEADO_NAV: NavGroup[] = [
         label: "Inventario",
         href: "/inventario-empleado",
         icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,
+      },
+      {
+        label: "Clientes",
+        href: "/clientes-empleado",
+        icon: <Icon d={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"]} />,
       },
       {
         label: "Pedido rápido",
@@ -174,7 +180,7 @@ export default function Sidebar() {
 
       {/* Logout */}
       <div className="border-t border-white/[0.07] px-3 py-4">
-        <Link
+        <a
           href={logoutHref}
           className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-100"
         >
@@ -182,7 +188,7 @@ export default function Sidebar() {
             <Icon d={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"]} />
           </span>
           Cerrar sesión
-        </Link>
+        </a>
       </div>
     </aside>
   );

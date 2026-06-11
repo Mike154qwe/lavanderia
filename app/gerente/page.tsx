@@ -6,6 +6,7 @@ import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { money, fmt } from "@/lib/format";
+import PedidoLink from "@/components/PedidoLink";
 
 export const metadata: Metadata = { title: "Gerente" };
 
@@ -516,9 +517,7 @@ function PedidoRow({ pedido, fechaMovimiento }: { pedido: any; fechaMovimiento?:
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3.5">
         <div>
           <p className="font-bold text-gray-900">
-            <Link href={`/pedidos/${pedido.id}`} className="text-brand-500 hover:underline" onClick={(e) => e.stopPropagation()}>
-              #{fmt(pedido.id)}
-            </Link>
+            <PedidoLink id={pedido.id} />
             {" · "}{pedido.cliente.nombre}
           </p>
           <p className="mt-0.5 text-xs text-gray-400">
