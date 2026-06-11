@@ -129,66 +129,30 @@ async function retirarParcialEmpleado(formData: FormData) {
 
   if (saldo > 0 && abono <= 0) return;
 
-  if (abono > 0) {
-    await prisma.pago.create({
-      data: {
-        pedidoId,
-        valor: abono,
-        metodo,
-      },
-    });
-  }
-
-  await prisma.entregaParcial.create({
-    data: {
-      pedidoId,
-      prendaId,
-      cantidad,
-      observacion: observacion || null,
-    },
-  });
-
-  const actualizado = await prisma.pedido.findUnique({
-    where: {
-      id: pedidoId,
-    },
-    include: {
-      prendas: {
-        include: {
-          entregasParciales: true,
-        },
-      },
-    },
-  });
-
-  if (actualizado) {
-    const todoEntregado = actualizado.prendas.every((p: any) => {
-      const totalEntregado = p.entregasParciales.reduce(
-        (sum: number, entrega: any) => sum + entrega.cantidad,
-        0
-      );
-
-      return totalEntregado >= p.cantidad;
-    });
-
-    if (todoEntregado) {
-      await prisma.pedido.update({
-        where: {
-          id: pedidoId,
-        },
-        data: {
-          estado: "ENTREGADO",
-        },
-      });
-
-      await prisma.historialEstado.create({
-        data: {
-          pedidoId,
-          estado: "ENTREGADO",
-        },
-      });
+  await prisma.$transaction(async (tx) => {
+    if (abono > 0) {
+      await tx.pago.create({ data: { pedidoId, valor: abono, metodo } });
     }
-  }
+
+    await tx.entregaParcial.create({
+      data: { pedidoId, prendaId, cantidad, observacion: observacion || null },
+    });
+
+    const actualizado = await tx.pedido.findUnique({
+      where: { id: pedidoId },
+      include: { prendas: { include: { entregasParciales: true } } },
+    });
+
+    if (actualizado) {
+      const todoEntregado = actualizado.prendas.every((p) =>
+        p.entregasParciales.reduce((s, e) => s + e.cantidad, 0) >= p.cantidad
+      );
+      if (todoEntregado) {
+        await tx.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
+        await tx.historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
+      }
+    }
+  });
 
   revalidatePath("/inventario-empleado");
   revalidatePath("/inventario");
@@ -228,40 +192,21 @@ async function entregarCompletoEmpleado(formData: FormData) {
 
   if (saldo > 0) return;
 
-  for (const prenda of pedido.prendas) {
-    const entregadas = prenda.entregasParciales.reduce(
-      (sum: number, entrega: any) => sum + entrega.cantidad,
-      0
-    );
-
-    const pendientes = prenda.cantidad - entregadas;
-
-    if (pendientes > 0) {
-      await prisma.entregaParcial.create({
-        data: {
-          pedidoId,
-          prendaId: prenda.id,
-          cantidad: pendientes,
-          observacion: "Entrega completa",
-        },
-      });
+  await prisma.$transaction(async (tx) => {
+    for (const prenda of pedido.prendas) {
+      const entregadas = prenda.entregasParciales.reduce(
+        (sum, entrega) => sum + entrega.cantidad,
+        0
+      );
+      const pendientes = prenda.cantidad - entregadas;
+      if (pendientes > 0) {
+        await tx.entregaParcial.create({
+          data: { pedidoId, prendaId: prenda.id, cantidad: pendientes, observacion: "Entrega completa" },
+        });
+      }
     }
-  }
-
-  await prisma.pedido.update({
-    where: {
-      id: pedidoId,
-    },
-    data: {
-      estado: "ENTREGADO",
-    },
-  });
-
-  await prisma.historialEstado.create({
-    data: {
-      pedidoId,
-      estado: "ENTREGADO",
-    },
+    await tx.pedido.update({ where: { id: pedidoId }, data: { estado: "ENTREGADO" } });
+    await tx.historialEstado.create({ data: { pedidoId, estado: "ENTREGADO" } });
   });
 
   revalidatePath("/inventario-empleado");
