@@ -1,16 +1,40 @@
 import { prisma } from "@/lib/prisma";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import { money, formatPedido } from "@/lib/format";
+import bwipjs from "bwip-js/node";
 
 export const runtime = "nodejs";
 
-const MAGENTA = rgb(0.75, 0.05, 0.35);
-const ROJO    = rgb(0.8, 0, 0);
-const NEGRO   = rgb(0, 0, 0);
-const WIDTH   = 226; // pts — ancho ticket 80 mm
+const MAGENTA   = rgb(0.75, 0.05, 0.35);
+const ROJO      = rgb(0.8, 0, 0);
+const NEGRO     = rgb(0, 0, 0);
+const BLANCO    = rgb(1, 1, 1);
+const MAGENTA_L = rgb(0.98, 0.92, 0.96);
+const GRIS_L    = rgb(0.95, 0.95, 0.95);
+const WIDTH     = 226; // pts — ancho ticket 80 mm
+const BARCODE_H = 34;
+const PAD       = 12; // margen lateral izquierdo/derecho
+const INNER_W   = WIDTH - PAD * 2; // 202 pts — ancho útil de texto
+
+const TERMINOS =
+  "CONTRATO DE SERVICIO ENTREGA EMPRESA Y EL CLIENTE. " +
+  "Para entregar el trabajo exigimos este recibo. " +
+  "Toda perdida de ropa por caso fortuito como robo, incendio etc, " +
+  "esta a riesgo del cliente. " +
+  "Pasados 30 dias de la fecha de este recibo cesa la responsabilidad de la Empresa. " +
+  "No respondemos por dinero, joyas y demas objetos dejados en vestidos. " +
+  "Debido a inconsistencias de las telas, panos y colores, " +
+  "no respondemos por encogimiento ni descoloramiento. " +
+  "En caso de que una prenda sea perdida o cambiada, " +
+  "se respondera por el valor de adquirir veces su lavado. " +
+  "Art.2057 C.C. y Resol.1035 S.I.C. " +
+  "La aceptacion de este recibo da por aceptadas las condiciones de la Empresa.";
+
+const AVISO_EXTRAVIAR =
+  "AL EXTRAVIAR EL RECIBO, PRESENTAR ORIGINAL Y DEJAR FOTOCOPIA DE LA CEDULA.";
 
 
-/** Elimina tildes y caracteres no-ASCII para que Helvetica los renderice bien. */
+/** Elimina tildes y caracteres no-ASCII para que Helvetica los renderice. */
 function san(text: string): string {
   return text
     .normalize("NFD")
@@ -18,12 +42,29 @@ function san(text: string): string {
     .replace(/[^\x20-\x7E]/g, "?");
 }
 
-/** Parte un texto largo en líneas de máximo `max` caracteres (por palabra). */
+/** Wrap por ancho real en pts (para justificado preciso). */
+function wrapByWidth(text: string, f: PDFFont, size: number, maxW: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (f.widthOfTextAtSize(test, size) <= maxW) {
+      current = test;
+    } else {
+      if (current) lines.push(current);
+      current = word;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+/** Wrap por conteo de caracteres (para secciones no justificadas). */
 function wrapText(text: string, max = 36): string[] {
   const words = text.split(" ");
   const lines: string[] = [];
   let current = "";
-
   for (const word of words) {
     if ((current + " " + word).trim().length <= max) {
       current = (current + " " + word).trim();
@@ -32,52 +73,63 @@ function wrapText(text: string, max = 36): string[] {
       current = word.length > max ? word.slice(0, max) : word;
     }
   }
-
   if (current) lines.push(current);
   return lines;
 }
 
 /** Calcula la altura necesaria en pts para una copia del recibo. */
-function calcularAltura(prendas: any[], pagos: any[]): number {
+function calcularAltura(
+  prendas: any[],
+  pagos: any[],
+  normalFont: PDFFont,
+): number {
   let h = 0;
 
   // Cabecera fija
-  h += 14 + 30 + 12 + 12 + 12 + 6; // logo 5 líneas + gap
-  h += 14 + 20;                      // titulo + recibo No.
-  h += 18;                           // separador
-  h += 12 * 4;                       // fecha, hora, cliente, teléfono
-  h += 18;                           // separador
-  h += 14;                           // "PRENDAS / SERVICIOS"
+  h += 6;                            // franja top
+  h += 13 + 22 + 10 + 10 + 10 + 6; // logo + gap
+  h += 12 + 18;                      // titulo + recibo No.
+  h += BARCODE_H + 4;
+  h += 14;                           // sep
+  h += 12 * 4;                       // fecha, hora, cliente, tel
+  h += 14;                           // sep
+  h += 16;                           // sección prendas
 
-  // Prendas
   for (const p of prendas) {
-    h += 12; // tipo × cant
-    h += 12; // servicio
-    h += 12; // valor
+    h += 12 + 12 + 12;
     if (p.descripcion) {
-      h += 12; // "NOVEDADES:"
-      const lines = wrapText(san(p.descripcion), 38);
-      h += lines.length * 11;
+      h += 12;
+      h += wrapText(san(p.descripcion), 38).length * 11;
     }
-    h += 8; // espaciado entre prendas
+    h += 8;
   }
 
-  h += 18; // separador
-  h += 16 * 3; // TOTAL / ABONADO / SALDO
+  h += 14;       // sep
+  h += 14 * 3;  // TOTAL / ABONADO / SALDO
   h += 8;
-
-  // Pagos individuales
   if (pagos.length > 0) {
-    h += 12; // "PAGOS:"
+    h += 12;
     h += pagos.length * 12;
     h += 8;
   }
 
-  h += 18; // separador
-  h += 12 * 2; // aviso entrega
-  h += 14;
-  h += 11 * 5; // contrato
-  h += 30;     // margen inferior
+  // Pie
+  h += 14;        // sep
+  h += 10;        // gap antes banner
+  h += 36 + 8;   // banner + gap
+  h += 12;        // gap
+  h += 12;        // título "CONDICIONES"
+  h += 6;         // gap
+
+  // Términos justificados — estimación con wrap real
+  const terminosLines = wrapByWidth(san(TERMINOS), normalFont, 6, INNER_W);
+  h += terminosLines.length * 10;
+
+  // Caja extravío
+  const avisoLines = wrapByWidth(san(AVISO_EXTRAVIAR), normalFont, 6, INNER_W - 8);
+  h += 10 + avisoLines.length * 10 + 8 + 14; // gap + contenido + padding + gap final
+
+  h += 20; // margen inferior
 
   return Math.max(h, 400);
 }
@@ -110,15 +162,28 @@ export async function GET(
     const font   = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const bold   = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    const pageHeight = calcularAltura(pedido.prendas, pedido.pagos);
+    const pageHeight = calcularAltura(pedido.prendas, pedido.pagos, font);
+
+    const barcodePng = await bwipjs.toBuffer({
+      bcid:            "code128",
+      text:            formatPedido(pedido.id),
+      scale:           3,
+      height:          8,
+      includetext:     false,
+      backgroundcolor: "ffffff",
+    });
+    const barcodeImage = await pdfDoc.embedPng(barcodePng);
+    const barcodeW     = 200;
 
     function drawReceipt(titulo: string) {
       const page = pdfDoc.addPage([WIDTH, pageHeight]);
       let y = pageHeight - 18;
 
+      // ── Helpers ───────────────────────────────────────────────
+
       function draw(
         text: string,
-        x       = 12,
+        x       = PAD,
         size    = 8,
         isBold  = false,
         center  = false,
@@ -136,30 +201,86 @@ export async function GET(
         y -= size + 4;
       }
 
-      function drawLines(lines: string[], x = 12, size = 7, isBold = false) {
-        for (const l of lines) draw(l, x, size, isBold);
+      /** Título de sección con líneas decorativas a los lados. */
+      function sectionTitle(text: string, size = 7) {
+        const f = bold;
+        const w = f.widthOfTextAtSize(text, size);
+        const tx = (WIDTH - w) / 2;
+        const ly = y + size * 0.4;
+        const gap = 5;
+        page.drawLine({ start: { x: PAD, y: ly }, end: { x: tx - gap, y: ly }, thickness: 0.5, color: MAGENTA });
+        page.drawText(san(text), { x: tx, y, size, font: f, color: NEGRO });
+        page.drawLine({ start: { x: tx + w + gap, y: ly }, end: { x: WIDTH - PAD, y: ly }, thickness: 0.5, color: MAGENTA });
+        y -= size + 6;
+      }
+
+      /** Fila label (izquierda) + valor (derecha). */
+      function drawRow(label: string, value: string, size = 10, isBold = true, color = NEGRO) {
+        const f = isBold ? bold : font;
+        const vw = f.widthOfTextAtSize(san(value), size);
+        page.drawText(san(label), { x: PAD, y, size, font: f, color });
+        page.drawText(san(value), { x: WIDTH - PAD - vw, y, size, font: f, color });
+        y -= size + 4;
       }
 
       function sep() {
         page.drawLine({
-          start: { x: 10, y: y + 4 },
-          end:   { x: WIDTH - 10, y: y + 4 },
+          start: { x: PAD, y: y + 4 },
+          end:   { x: WIDTH - PAD, y: y + 4 },
           thickness: 0.5,
-          color: rgb(0.7, 0.7, 0.7),
+          color: MAGENTA,
         });
         y -= 10;
       }
 
+      /** Dibuja texto justificado. Último renglón: alineado a la izquierda. */
+      function drawJustified(text: string, size: number, isBold: boolean, color: any) {
+        const f = isBold ? bold : font;
+        const lines = wrapByWidth(text, f, size, INNER_W);
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const isLast = i === lines.length - 1;
+          const words = line.split(" ");
+          if (isLast || words.length <= 1) {
+            page.drawText(san(line), { x: PAD, y, size, font: f, color });
+          } else {
+            const textW = words.reduce((s, w) => s + f.widthOfTextAtSize(w, size), 0);
+            const spaceW = (INNER_W - textW) / (words.length - 1);
+            let cx = PAD;
+            for (const word of words) {
+              page.drawText(san(word), { x: cx, y, size, font: f, color });
+              cx += f.widthOfTextAtSize(word, size) + spaceW;
+            }
+          }
+          y -= size + 4;
+        }
+      }
+
+      // ── Franja superior ───────────────────────────────────────
+      page.drawRectangle({ x: 0, y: pageHeight - 6, width: WIDTH, height: 6, color: MAGENTA });
+
       // ── Cabecera ──────────────────────────────────────────────
-      draw("LAVASECO",                   12, 11, true,  true, MAGENTA);
-      draw("La Manuelita",               12, 20, true,  true, MAGENTA);
-      draw("Carrera 91 No129B-40",       12,  8, false, true, MAGENTA);
-      draw("310 761 98 46",              12,  8, false, true, MAGENTA);
-      draw("SERVICIO EXTRA EN UNA HORA", 12,  8, true,  true, MAGENTA);
+      draw("LAVASECO",                    PAD, 11, true,  true, MAGENTA);
+      draw("La Manuelita",                PAD, 18, true,  true, MAGENTA);
+      draw("Carrera 91 No129B-40",        PAD,  7, false, true, MAGENTA);
+      draw("310 761 98 46",               PAD,  9, true,  true, MAGENTA);
+      draw("SERVICIO EXTRA EN UNA HORA",  PAD,  7, true,  true, MAGENTA);
       y -= 4;
 
-      draw(titulo,                              12, 9,  true, true);
-      draw(`RECIBO No. ${formatPedido(pedido.id)}`, 12, 14, true, true);
+      sep();
+
+      draw(titulo,                                  PAD,  8, true,  true);
+      draw(`RECIBO No. ${formatPedido(pedido.id)}`, PAD, 14, true,  true);
+      y -= 4;
+
+      page.drawImage(barcodeImage, {
+        x:      (WIDTH - barcodeW) / 2,
+        y:      y - BARCODE_H,
+        width:  barcodeW,
+        height: BARCODE_H,
+      });
+      y -= BARCODE_H + 4;
+
       sep();
 
       // ── Datos del cliente ─────────────────────────────────────
@@ -170,59 +291,82 @@ export async function GET(
       sep();
 
       // ── Prendas ───────────────────────────────────────────────
-      draw("PRENDAS / SERVICIOS", 12, 9, true);
-      y -= 2;
+      sectionTitle("PRENDAS / SERVICIOS");
 
       pedido.prendas.forEach((p) => {
-        draw(`${p.cantidad} x ${p.tipo}`, 12, 8, true);
+        draw(`${p.cantidad} x ${p.tipo}`, PAD, 8, true);
         draw(`  Servicio: ${p.servicio}`);
         draw(`  Valor:    ${money(p.valor)}`);
-
         if (p.descripcion) {
-          draw("  NOVEDADES:", 12, 8, true, false, ROJO);
+          draw("  NOVEDADES:", PAD, 8, true, false, ROJO);
           const lines = wrapText(p.descripcion, 38);
-          drawLines(lines.map((l) => `  ${l}`), 12, 7);
+          for (const l of lines) draw(`  ${l}`, PAD, 7);
         }
-
         y -= 5;
       });
 
       sep();
 
       // ── Totales ───────────────────────────────────────────────
-      draw(`TOTAL:    ${money(pedido.total)}`,  12, 10, true);
-      draw(`ABONADO:  ${money(abonado)}`,        12, 10, true);
-      draw(
-        `SALDO:    ${money(Math.max(saldo, 0))}`,
-        12, 10, true, false,
-        saldo > 0 ? ROJO : NEGRO,
-      );
+      drawRow("TOTAL",   money(pedido.total));
+      drawRow("ABONADO", money(abonado));
 
-      // Detalle de pagos
+      // Fondo sutil para la fila SALDO
+      const saldoColor = saldo > 0 ? ROJO : NEGRO;
+      if (saldo > 0) {
+        page.drawRectangle({ x: PAD - 2, y: y - 2, width: INNER_W + 4, height: 16, color: rgb(1, 0.94, 0.94) });
+      } else {
+        page.drawRectangle({ x: PAD - 2, y: y - 2, width: INNER_W + 4, height: 16, color: GRIS_L });
+      }
+      drawRow("SALDO", money(Math.max(saldo, 0)), 10, true, saldoColor);
+
       if (pedido.pagos.length > 0) {
         y -= 4;
-        draw("PAGOS:", 12, 8, true);
+        draw("PAGOS:", PAD, 8, true);
         pedido.pagos.forEach((p) => {
-          draw(
-            `  ${p.metodo.padEnd(14)} ${money(p.valor)}`,
-            12, 8,
-          );
+          drawRow(`  ${p.metodo}`, money(p.valor), 8, false);
         });
       }
 
       sep();
 
-      // ── Pie ───────────────────────────────────────────────────
-      y -= 6;
-      draw("ENTREGA DESPUES DE 2 DIAS",  12, 8, true, true, MAGENTA);
-      draw("DEL DIA MARCADO",            12, 8, true, true, MAGENTA);
-      y -= 8;
+      // ── Pie: banner + términos justificados ───────────────────
+      y -= 10;
 
-      draw("CONTRATO DE SERVICIO",                     12, 7, true);
-      draw("Para entregar el trabajo exigimos este recibo.", 12, 6);
-      draw("No respondemos por dinero, joyas u objetos", 12, 6);
-      draw("dejados en las prendas. Pasados 30 dias",   12, 6);
-      draw("cesa la responsabilidad de la empresa.",    12, 6);
+      // Banner MAGENTA con texto blanco en 2 líneas grandes
+      const bannerH = 36;
+      page.drawRectangle({ x: 6, y: y - bannerH, width: WIDTH - 12, height: bannerH, color: MAGENTA });
+
+      const bl1 = "ENTREGA DESPUES DE 2 DIAS";
+      const bl2 = "DEL DIA MARCADO";
+      const bl1w = bold.widthOfTextAtSize(bl1, 10);
+      const bl2w = bold.widthOfTextAtSize(bl2, 10);
+      page.drawText(bl1, { x: (WIDTH - bl1w) / 2, y: y - 13, size: 10, font: bold, color: BLANCO });
+      page.drawText(bl2, { x: (WIDTH - bl2w) / 2, y: y - 27, size: 10, font: bold, color: BLANCO });
+      y -= bannerH + 8;
+
+      y -= 10;
+      sectionTitle("CONDICIONES DEL SERVICIO");
+      y -= 2;
+
+      // Párrafo justificado en MAGENTA
+      drawJustified(san(TERMINOS), 6, false, MAGENTA);
+
+      // Caja de aviso extravío
+      y -= 6;
+      const avisoLines = wrapByWidth(san(AVISO_EXTRAVIAR), bold, 6, INNER_W - 8);
+      const boxH = avisoLines.length * 10 + 10;
+      page.drawRectangle({
+        x: 6, y: y - boxH,
+        width: WIDTH - 12, height: boxH,
+        color: MAGENTA_L,
+        borderColor: MAGENTA,
+        borderWidth: 1,
+      });
+      y -= 7;
+      for (const linea of avisoLines) {
+        draw(linea, PAD + 2, 6, true, false, MAGENTA);
+      }
     }
 
     drawReceipt("COPIA CLIENTE");

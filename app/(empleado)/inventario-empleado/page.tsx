@@ -65,7 +65,8 @@ async function agregarAbonoEmpleado(formData: FormData) {
   const valor = parseMoney(formData.get("valor"));
   const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
 
-  if (!pedidoId || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
+  if (!pedidoId || !METODOS_PAGO.includes(metodo)) return;
+  if (valor <= 0) redirect(`/inventario-empleado?q=${pedidoId}&error=${encodeURIComponent("Ingresa un valor mayor a 0")}`);
 
   await prisma.pago.create({
     data: {
@@ -119,7 +120,7 @@ async function retirarParcialEmpleado(formData: FormData) {
 
   const pendientes = prenda.cantidad - entregadas;
 
-  if (cantidad > pendientes) return;
+  if (cantidad > pendientes) redirect(`/inventario-empleado?q=${pedidoId}&error=${encodeURIComponent("Cantidad supera las prendas pendientes")}`);
 
   const abonado = pedido.pagos.reduce(
     (sum: number, pago: any) => sum + pago.valor,
@@ -128,7 +129,7 @@ async function retirarParcialEmpleado(formData: FormData) {
 
   const saldo = pedido.total - abonado;
 
-  if (saldo > 0 && abono <= 0) return;
+  if (saldo > 0 && abono <= 0) redirect(`/inventario-empleado?q=${pedidoId}&error=${encodeURIComponent("Hay saldo pendiente — ingresa un abono")}`);
 
   await prisma.$transaction(async (tx) => {
     if (abono > 0) {
@@ -219,10 +220,12 @@ async function entregarCompletoEmpleado(formData: FormData) {
 export default async function InventarioEmpleadoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; flash?: string; error?: string }>;
 }) {
   const params = await searchParams;
   const q = params.q?.trim() || "";
+  const flash = params.flash;
+  const error = params.error;
 
   const pedidos = await buscarPedidos(q);
 
@@ -230,6 +233,8 @@ export default async function InventarioEmpleadoPage({
     <InventarioEmpleadoClient
       q={q}
       pedidos={pedidos}
+      flash={flash}
+      error={error}
       agregarAbonoEmpleado={agregarAbonoEmpleado}
       retirarParcialEmpleado={retirarParcialEmpleado}
       entregarCompletoEmpleado={entregarCompletoEmpleado}

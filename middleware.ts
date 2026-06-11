@@ -23,6 +23,7 @@ const rutasEmpleado = [
   "/gastos-empleado",
   "/empleado",
   "/recibos",
+  "/clientes-empleado",
 ];
 
 // Rutas accesibles con cualquiera de las dos sesiones
@@ -50,7 +51,7 @@ export function middleware(request: NextRequest) {
 
   // Rutas solo gerente
   const esRutaGerente =
-    rutasGerente.some((ruta) => pathname.startsWith(ruta)) ||
+    rutasGerente.some((ruta) => pathname === ruta || pathname.startsWith(ruta + "/")) ||
     // /pedidos/nuevo y /pedidos/<número> son de gerente
     (pathname.startsWith("/pedidos/") &&
       !pathname.startsWith("/pedidos/rapido"));
@@ -102,5 +103,6 @@ export const config = {
     "/movimientos/:path*",
     "/pedidos-antiguos/:path*",
     "/clientes/:path*",
+    "/clientes-empleado/:path*",
   ],
 };

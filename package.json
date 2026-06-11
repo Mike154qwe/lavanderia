@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bwip-js": "^4.11.1",
     "next": "latest",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.18.0",

@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import PedidoRapidoForm from "./PedidoRapidoForm";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
+import FlashMessage from "@/components/FlashMessage";
 
 function parseMoney(value: FormDataEntryValue | null) {
   return Number(String(value || "0").replace(/\D/g, ""));
@@ -15,7 +16,8 @@ async function guardarPedidoRapidoAction(formData: FormData) {
   const abono = parseMoney(formData.get("abono"));
   const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
 
-  if (!nombre || !telefono || !METODOS_PAGO.includes(metodo)) return;
+  if (!nombre || !telefono) redirect(`/pedidos/rapido?error=${encodeURIComponent("Nombre y teléfono son obligatorios")}`);
+  if (!METODOS_PAGO.includes(metodo)) return;
 
   const tipos = formData.getAll("tipo");
   const servicios = formData.getAll("servicio");
@@ -49,7 +51,7 @@ async function guardarPedidoRapidoAction(formData: FormData) {
     valor: number;
   }[];
 
-  if (prendas.length === 0) return;
+  if (prendas.length === 0) redirect(`/pedidos/rapido?error=${encodeURIComponent("Agrega al menos un ítem al pedido")}`);
 
   const total = prendas.reduce((sum, prenda) => sum + prenda.valor, 0);
 
@@ -86,8 +88,20 @@ async function guardarPedidoRapidoAction(formData: FormData) {
   redirect(`/recibos/${pedido.id}/pdf`);
 }
 
-export default function PedidoRapidoPage() {
+export default async function PedidoRapidoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; nombre?: string; telefono?: string }>;
+}) {
+  const { error, nombre, telefono } = await searchParams;
   return (
-    <PedidoRapidoForm guardarPedidoRapidoAction={guardarPedidoRapidoAction} />
+    <>
+      <FlashMessage message={error} type="error" />
+      <PedidoRapidoForm
+        guardarPedidoRapidoAction={guardarPedidoRapidoAction}
+        initialNombre={nombre}
+        initialTelefono={telefono}
+      />
+    </>
   );
 }
