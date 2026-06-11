@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { formatPedido } from "@/lib/format";
+import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
 async function registrarGasto(formData: FormData) {
   "use server";
@@ -9,11 +10,11 @@ async function registrarGasto(formData: FormData) {
   const tipo = String(formData.get("tipo"));
   const descripcion = String(formData.get("descripcion") || "");
   const valor = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
-  const metodo = String(formData.get("metodo") || "Efectivo");
+  const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
   const responsable = String(formData.get("responsable") || "");
   const fecha = String(formData.get("fecha"));
 
-  if (!tipo || valor <= 0) return;
+  if (!tipo || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
 
   await prisma.gastoCaja.create({
     data: {

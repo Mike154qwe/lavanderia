@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
+import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -15,9 +16,9 @@ async function registrarGastoEmpleado(formData: FormData) {
   const tipo        = String(formData.get("tipo") || "").trim();
   const descripcion = String(formData.get("descripcion") || "").trim();
   const valor       = parseMoney(formData.get("valor"));
-  const metodo      = String(formData.get("metodo") || "Efectivo");
+  const metodo      = String(formData.get("metodo") || "Efectivo") as MetodoPago;
   const responsable = String(formData.get("responsable") || "Empleado").trim();
-  if (!tipo || valor <= 0) return;
+  if (!tipo || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
   await prisma.gastoCaja.create({
     data: { tipo, descripcion: descripcion || null, valor, metodo, responsable },
   });
