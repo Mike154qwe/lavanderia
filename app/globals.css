@@ -186,6 +186,55 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
 
 /* ============================
+   ANIMATIONS
+============================ */
+
+@keyframes bubble-rise {
+  0%   { transform: translateY(0) scale(1);   opacity: 0; }
+  8%   { opacity: 0.7; }
+  92%  { opacity: 0.25; }
+  100% { transform: translateY(-110vh) scale(1.15); opacity: 0; }
+}
+
+@keyframes bubble-sway {
+  0%, 100% { margin-left: 0; }
+  50%       { margin-left: 18px; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(70,95,255,0.35); }
+  50%       { box-shadow: 0 0 0 10px rgba(70,95,255,0);   }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up  { animation: fade-up 0.5s ease both; }
+.animate-fade-up-2{ animation: fade-up 0.5s 0.1s ease both; }
+.animate-fade-up-3{ animation: fade-up 0.5s 0.2s ease both; }
+
+/* Burbuja de jabón */
+.soap-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%,
+    rgba(255,255,255,0.22) 0%,
+    rgba(255,255,255,0.04) 60%,
+    transparent 100%);
+  border: 1px solid rgba(255,255,255,0.14);
+  animation: bubble-rise var(--dur,10s) var(--delay,0s) ease-in infinite,
+             bubble-sway calc(var(--dur,10s) * 0.6) var(--delay,0s) ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ============================
    CARDS
 ============================ */
 

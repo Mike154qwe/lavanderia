@@ -133,17 +133,33 @@ export default function Sidebar() {
   const logoutHref = esEmpleado ? "/empleado-logout" : "/logout";
 
   return (
-    <aside className="flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto bg-[#0f1117]">
+    <aside
+      className="flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto"
+      style={{
+        background: "linear-gradient(180deg, #0d1119 0%, #0a0e16 100%)",
+        borderRight: "1px solid rgba(255,255,255,0.05)",
+      }}
+    >
       {/* Logo */}
-      <div className="flex items-center gap-3 border-b border-white/[0.07] px-5 py-5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-lg">
+      <div
+        className="flex items-center gap-3 px-5 py-5"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
+          style={{
+            background: "linear-gradient(145deg, rgba(70,95,255,0.4), rgba(70,95,255,0.15))",
+            border: "1px solid rgba(70,95,255,0.3)",
+            boxShadow: "0 0 12px rgba(70,95,255,0.2)",
+          }}
+        >
           🧺
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-white leading-tight">
+          <p className="truncate text-sm font-bold leading-tight text-white">
             La Manuelita
           </p>
-          <p className="text-xs text-slate-400">Lavaseco</p>
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Lavaseco</p>
         </div>
       </div>
 
@@ -151,7 +167,10 @@ export default function Sidebar() {
       <nav className="flex-1 space-y-5 px-3 py-5">
         {nav.map((grupo) => (
           <div key={grupo.grupo}>
-            <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            <p
+              className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.1em]"
+              style={{ color: "rgba(255,255,255,0.25)" }}
+            >
               {grupo.grupo}
             </p>
             <div className="space-y-0.5">
@@ -161,16 +180,37 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                    className="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150"
+                    style={
                       active
-                        ? "bg-brand-500 text-white shadow-sm"
-                        : "text-slate-400 hover:bg-white/[0.06] hover:text-slate-100"
-                    }`}
+                        ? {
+                            background: "linear-gradient(135deg, rgba(70,95,255,0.25), rgba(70,95,255,0.12))",
+                            color: "#ffffff",
+                            boxShadow: "0 0 0 1px rgba(70,95,255,0.25), 0 2px 8px rgba(70,95,255,0.12)",
+                          }
+                        : { color: "rgba(255,255,255,0.4)" }
+                    }
                   >
-                    <span className={active ? "text-white" : "text-slate-500 group-hover:text-slate-300"}>
+                    {/* Barra lateral de activo */}
+                    {active && (
+                      <span
+                        className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full"
+                        style={{ background: "#465fff", boxShadow: "0 0 6px #465fff" }}
+                      />
+                    )}
+                    <span
+                      style={
+                        active
+                          ? { color: "#93a8ff" }
+                          : { color: "rgba(255,255,255,0.25)" }
+                      }
+                      className="transition-colors group-hover:!text-white/60"
+                    >
                       {item.icon}
                     </span>
-                    {item.label}
+                    <span className="transition-colors group-hover:text-white/80">
+                      {item.label}
+                    </span>
                   </Link>
                 );
               })}
@@ -180,15 +220,22 @@ export default function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="border-t border-white/[0.07] px-3 py-4">
+      <div
+        className="px-3 py-4"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
         <a
           href={logoutHref}
-          className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-100"
+          className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all"
+          style={{ color: "rgba(255,255,255,0.3)" }}
         >
-          <span className="text-slate-500 group-hover:text-slate-300">
+          <span
+            className="transition-colors group-hover:text-white/50"
+            style={{ color: "rgba(255,255,255,0.2)" }}
+          >
             <Icon d={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"]} />
           </span>
-          Cerrar sesión
+          <span className="transition-colors group-hover:text-white/60">Cerrar sesión</span>
         </a>
       </div>
     </aside>
