@@ -24,6 +24,7 @@ const rutasEmpleado = [
   "/empleado",
   "/recibos",
   "/clientes-empleado",
+  "/entrega-empleado",
 ];
 
 // Rutas accesibles con cualquiera de las dos sesiones
@@ -104,5 +105,6 @@ export const config = {
     "/pedidos-antiguos/:path*",
     "/clientes/:path*",
     "/clientes-empleado/:path*",
+    "/entrega-empleado/:path*",
   ],
 };
