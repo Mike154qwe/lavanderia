@@ -25,12 +25,9 @@ const PRENDAS = [
 ];
 
 const SERVICIOS = [
-  { nombre: "Lavado",             emoji: "🫧", color: "blue"   },
-  { nombre: "Planchado",          emoji: "🔥", color: "orange" },
-  { nombre: "Lavado y planchado", emoji: "✨", color: "purple" },
-  { nombre: "Secado",             emoji: "💨", color: "sky"    },
-  { nombre: "Lavado en seco",     emoji: "🧴", color: "teal"   },
-  { nombre: "Tintura",            emoji: "🎨", color: "pink"   },
+  { nombre: "Lavado",    emoji: "🫧", color: "blue"   },
+  { nombre: "Planchado", emoji: "🔥", color: "orange" },
+  { nombre: "Tintura",   emoji: "🎨", color: "pink"   },
 ];
 
 const NOVEDADES = [
