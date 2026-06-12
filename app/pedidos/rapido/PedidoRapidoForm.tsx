@@ -120,6 +120,8 @@ export default function PedidoRapidoForm({
   const totalPrendas = items.reduce((s, i) => s + i.cantidad, 0);
   const saldo        = total - abono;
 
+  const valorTotal = cantidad * valor;
+
   function agregarItem() {
     if (!puedeAgregar) return;
     setItems((prev) => [
@@ -130,7 +132,7 @@ export default function PedidoRapidoForm({
         servicio,
         cantidad,
         descripcion: descripcionActual,
-        valor,
+        valor: valorTotal,
       },
     ]);
     setServicio("");
@@ -433,11 +435,18 @@ export default function PedidoRapidoForm({
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                       <StepCircle n={4} done={steps.valor} />
                       <div className="flex-1">
-                        <p className="text-sm font-black text-gray-800">Valor</p>
+                        <p className="text-sm font-black text-gray-800">Valor unitario</p>
                         {steps.valor && (
-                          <p className="text-xs font-bold text-emerald-600">{money(valor)}</p>
+                          <p className="text-xs font-bold text-emerald-600">
+                            {money(valor)} c/u
+                          </p>
                         )}
                       </div>
+                      {steps.valor && cantidad > 1 && (
+                        <span className="rounded-lg bg-brand-50 px-2 py-1 text-xs font-black text-brand-600">
+                          {cantidad} × {money(valor)} = {money(valorTotal)}
+                        </span>
+                      )}
                     </div>
                     <div className="p-4">
                       <div className="mb-3 grid grid-cols-4 gap-1.5">
@@ -465,7 +474,7 @@ export default function PedidoRapidoForm({
                           if (e.key === "Enter") { e.preventDefault(); if (puedeAgregar) agregarItem(); }
                         }}
                         className="w-full rounded-xl border-2 border-gray-200 p-2.5 text-base font-bold placeholder:text-gray-300 focus:border-brand-500 focus:outline-none"
-                        placeholder="Otro valor…"
+                        placeholder="Valor por unidad…"
                       />
                     </div>
                   </div>
@@ -536,12 +545,15 @@ export default function PedidoRapidoForm({
                     <span className="flex items-center justify-center gap-2">
                       <span className="text-lg">➕</span>
                       <span>
-                        Agregar
-                        {cantidad > 1 ? ` ${cantidad}×` : ""} {tipoFinal}
+                        Agregar {cantidad > 1 ? `${cantidad}× ` : ""}{tipoFinal}
                         <span className="mx-1.5 opacity-50">·</span>
                         {servicio}
                         <span className="mx-1.5 opacity-50">·</span>
-                        {money(valor)}
+                        {cantidad > 1 ? (
+                          <>{cantidad} × {money(valor)} = <strong>{money(valorTotal)}</strong></>
+                        ) : (
+                          money(valor)
+                        )}
                       </span>
                     </span>
                   ) : (
