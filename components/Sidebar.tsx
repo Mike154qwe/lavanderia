@@ -12,6 +12,7 @@ const RUTAS_EMPLEADO = [
   "/gastos-empleado",
   "/empleado",
   "/clientes-empleado",
+  "/entrega-empleado",
 ];
 
 type NavItem = { label: string; href: string; icon: React.ReactNode };
@@ -47,11 +48,6 @@ const GERENTE_NAV: NavGroup[] = [
         label: "Pedidos",
         href: "/pedidos",
         icon: <Icon d={["M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2", "M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2", "M9 12h6M9 16h4"]} />,
-      },
-      {
-        label: "Nuevo pedido",
-        href: "/pedidos/nuevo",
-        icon: <Icon d="M12 5v14M5 12h14" />,
       },
       {
         label: "Inventario",
@@ -100,6 +96,11 @@ const EMPLEADO_NAV: NavGroup[] = [
         label: "Pedido rápido",
         href: "/pedidos/rapido",
         icon: <Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
+      },
+      {
+        label: "Entrega / Cobro",
+        href: "/entrega-empleado",
+        icon: <Icon d={["M20 12V22H4V12", "M22 7H2v5h20V7z", "M12 22V7", "M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z", "M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"]} />,
       },
       {
         label: "Entradas / Salidas",
