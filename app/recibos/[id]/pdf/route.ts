@@ -155,18 +155,19 @@ export async function GET(
       return new Response("Pedido no encontrado", { status: 404 });
     }
 
-    const abonado = pedido.pagos.reduce((s, p) => s + p.valor, 0);
-    const saldo   = pedido.total - abonado;
+    const pedidoData = pedido;
+    const abonado = pedidoData.pagos.reduce((s, p) => s + p.valor, 0);
+    const saldo   = pedidoData.total - abonado;
 
     const pdfDoc = await PDFDocument.create();
     const font   = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const bold   = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    const pageHeight = calcularAltura(pedido.prendas, pedido.pagos, font);
+    const pageHeight = calcularAltura(pedidoData.prendas, pedidoData.pagos, font);
 
     const barcodePng = await bwipjs.toBuffer({
       bcid:            "code128",
-      text:            formatPedido(pedido.id),
+      text:            formatPedido(pedidoData.id),
       scale:           3,
       height:          8,
       includetext:     false,
@@ -270,7 +271,7 @@ export async function GET(
       sep();
 
       draw(titulo,                                  PAD,  8, true,  true);
-      draw(`RECIBO No. ${formatPedido(pedido.id)}`, PAD, 14, true,  true);
+      draw(`RECIBO No. ${formatPedido(pedidoData.id)}`, PAD, 14, true,  true);
       y -= 4;
 
       page.drawImage(barcodeImage, {
@@ -284,16 +285,16 @@ export async function GET(
       sep();
 
       // ── Datos del cliente ─────────────────────────────────────
-      draw(`Fecha:    ${pedido.createdAt.toLocaleDateString("es-CO")}`);
-      draw(`Hora:     ${pedido.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}`);
-      draw(`Cliente:  ${pedido.cliente.nombre}`);
-      draw(`Telefono: ${pedido.cliente.telefono ?? "No registrado"}`);
+      draw(`Fecha:    ${pedidoData.createdAt.toLocaleDateString("es-CO")}`);
+      draw(`Hora:     ${pedidoData.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}`);
+      draw(`Cliente:  ${pedidoData.cliente.nombre}`);
+      draw(`Telefono: ${pedidoData.cliente.telefono ?? "No registrado"}`);
       sep();
 
       // ── Prendas ───────────────────────────────────────────────
       sectionTitle("PRENDAS / SERVICIOS");
 
-      pedido.prendas.forEach((p) => {
+      pedidoData.prendas.forEach((p) => {
         draw(`${p.cantidad} x ${p.tipo}`, PAD, 8, true);
         draw(`  Servicio: ${p.servicio}`);
         draw(`  Valor:    ${money(p.valor)}`);
@@ -308,7 +309,7 @@ export async function GET(
       sep();
 
       // ── Totales ───────────────────────────────────────────────
-      drawRow("TOTAL",   money(pedido.total));
+      drawRow("TOTAL",   money(pedidoData.total));
       drawRow("ABONADO", money(abonado));
 
       // Fondo sutil para la fila SALDO
@@ -320,10 +321,10 @@ export async function GET(
       }
       drawRow("SALDO", money(Math.max(saldo, 0)), 10, true, saldoColor);
 
-      if (pedido.pagos.length > 0) {
+      if (pedidoData.pagos.length > 0) {
         y -= 4;
         draw("PAGOS:", PAD, 8, true);
-        pedido.pagos.forEach((p) => {
+        pedidoData.pagos.forEach((p) => {
           drawRow(`  ${p.metodo}`, money(p.valor), 8, false);
         });
       }
@@ -377,7 +378,7 @@ export async function GET(
     return new Response(pdf as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="recibo-${formatPedido(pedido.id)}.pdf"`,
+        "Content-Disposition": `inline; filename="recibo-${formatPedido(pedidoData.id)}.pdf"`,
       },
     });
   } catch (error) {
