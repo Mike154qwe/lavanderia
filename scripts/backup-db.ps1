@@ -46,4 +46,4 @@ function Hacer-Backup {
 
 # --- Ejecutar ambos backups ---
 Hacer-Backup -Destino $BACKUP_LOCAL -DiasConservar 30 -Etiqueta "LOCAL  "
-Hacer-Backup -Destino $BACKUP_NUBE  -DiasConservar 60 -Etiqueta "ONEDRIVE"
+Hacer-Backup -Destino $BACKUP_NUBE  -DiasConservar 14 -Etiqueta "ONEDRIVE"
