@@ -227,7 +227,11 @@ export default async function InventarioEmpleadoPage({
   const flash = params.flash;
   const error = params.error;
 
-  const pedidos = await buscarPedidos(q);
+  const rawPedidos = await buscarPedidos(q);
+  const pedidos = rawPedidos.map((p) => ({
+    ...p,
+    createdAt: p.createdAt.toISOString(),
+  }));
 
   return (
     <InventarioEmpleadoClient
