@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import type { Metadata } from "next";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
@@ -7,6 +6,14 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
+
+const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
+const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
+const PRENDA_EMOJI: Record<string, string> = {
+  Camisa: "👔", Pantalón: "👖", Chaqueta: "🧥", Cubrelecho: "🛏️",
+  Tenis: "👟", Traje: "🤵", Vestido: "👗", Cobija: "🧺", Tapete: "🟫",
+};
+function pEmoji(tipo: string) { return PRENDA_EMOJI[tipo] ?? "👕"; }
 
 export async function generateMetadata({
   params,
@@ -39,6 +46,64 @@ async function registrarPagoAction(formData: FormData) {
   if (!id || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
   await prisma.pago.create({ data: { pedidoId: id, valor, metodo } });
   redirect(`/pedidos/${id}?flash=Pago+registrado`);
+}
+
+async function editarPrendaAction(formData: FormData) {
+  "use server";
+  const pedidoId    = Number(formData.get("pedidoId"));
+  const prendaId    = Number(formData.get("prendaId"));
+  const tipo        = String(formData.get("tipo") || "").trim();
+  const servicio    = String(formData.get("servicio") || "").trim();
+  const cantidad    = Number(formData.get("cantidad") || "1");
+  const valor       = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
+  const descripcion = String(formData.get("descripcion") || "").trim();
+  if (!pedidoId || !prendaId || !tipo || !servicio || cantidad < 1 || valor < 0) return;
+  await prisma.$transaction(async (tx) => {
+    await tx.prenda.update({
+      where: { id: prendaId },
+      data: { tipo, servicio, cantidad, valor, descripcion: descripcion || null },
+    });
+    const prendas    = await tx.prenda.findMany({ where: { pedidoId } });
+    const nuevoTotal = prendas.reduce((s, p) => s + p.valor, 0);
+    await tx.pedido.update({ where: { id: pedidoId }, data: { total: nuevoTotal } });
+  });
+  redirect(`/pedidos/${pedidoId}?flash=Prenda+actualizada`);
+}
+
+async function agregarPrendaAction(formData: FormData) {
+  "use server";
+  const pedidoId    = Number(formData.get("pedidoId"));
+  const tipo        = String(formData.get("tipo") || "").trim();
+  const servicio    = String(formData.get("servicio") || "").trim();
+  const cantidad    = Number(formData.get("cantidad") || "1");
+  const valor       = Number(String(formData.get("valor") || "0").replace(/\D/g, ""));
+  const descripcion = String(formData.get("descripcion") || "").trim();
+  if (!pedidoId || !tipo || !servicio || cantidad < 1 || valor < 0) return;
+  await prisma.$transaction(async (tx) => {
+    await tx.prenda.create({
+      data: { pedidoId, tipo, servicio, cantidad, valor, descripcion: descripcion || null },
+    });
+    const prendas    = await tx.prenda.findMany({ where: { pedidoId } });
+    const nuevoTotal = prendas.reduce((s, p) => s + p.valor, 0);
+    await tx.pedido.update({ where: { id: pedidoId }, data: { total: nuevoTotal } });
+  });
+  redirect(`/pedidos/${pedidoId}?flash=Prenda+agregada`);
+}
+
+async function eliminarPrendaAction(formData: FormData) {
+  "use server";
+  const pedidoId = Number(formData.get("pedidoId"));
+  const prendaId = Number(formData.get("prendaId"));
+  if (!pedidoId || !prendaId) return;
+  const entregas = await prisma.entregaParcial.count({ where: { prendaId } });
+  if (entregas > 0) return; // ya hay retiros parciales, no se puede eliminar
+  await prisma.$transaction(async (tx) => {
+    await tx.prenda.delete({ where: { id: prendaId } });
+    const prendas    = await tx.prenda.findMany({ where: { pedidoId } });
+    const nuevoTotal = prendas.reduce((s, p) => s + p.valor, 0);
+    await tx.pedido.update({ where: { id: pedidoId }, data: { total: nuevoTotal } });
+  });
+  redirect(`/pedidos/${pedidoId}?flash=Prenda+eliminada`);
 }
 
 /* ── Page ──────────────────────────────────────────────────── */
@@ -158,46 +223,143 @@ export default async function DetallePedidoPage({
 
         {/* ── Prendas ─────────────────────────────────────── */}
         <div className="card overflow-hidden">
-          <div className="border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
-            <h2 className="font-black text-gray-900">Prendas</h2>
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
+            <h2 className="font-black text-gray-900">
+              Prendas
+              <span className="ml-2 text-sm font-normal text-gray-400">({pedido.prendas.length})</span>
+            </h2>
+            {!terminado && (
+              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600">
+                Toca una prenda para editar
+              </span>
+            )}
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-white/[0.07]">
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-400">Servicio</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-400">Prenda</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-400">Cant.</th>
-                  <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-400">Valor</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-white/[0.04]">
-                {pedido.prendas.map((p) => (
-                  <Fragment key={p.id}>
-                    <tr className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                      <td className="px-6 py-3.5">
-                        <span className="rounded-lg bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600 dark:bg-white/10 dark:text-gray-300">
-                          {p.servicio}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3.5 font-semibold text-gray-900">{p.tipo}</td>
-                      <td className="px-6 py-3.5 text-gray-500">×{p.cantidad}</td>
-                      <td className="px-6 py-3.5 text-right font-bold text-brand-500">{money(p.valor)}</td>
-                    </tr>
+
+          <div className="divide-y divide-gray-50 dark:divide-white/[0.04]">
+            {pedido.prendas.map((p) => (
+              <details key={p.id} className="group">
+                {/* Fila compacta */}
+                <summary className={`flex cursor-pointer list-none items-center gap-3 px-6 py-4 transition hover:bg-gray-50 group-open:bg-brand-50/40 dark:hover:bg-white/[0.02] dark:group-open:bg-brand-500/5 ${!terminado ? "" : "cursor-default"}`}>
+                  <span className="text-2xl leading-none">{pEmoji(p.tipo)}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-gray-900">{p.tipo}</span>
+                      <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-bold text-gray-500 dark:bg-white/10 dark:text-gray-400">
+                        {p.servicio}
+                      </span>
+                      <span className="text-sm text-gray-400">×{p.cantidad}</span>
+                    </div>
                     {p.descripcion && (
-                      <tr key={`${p.id}-obs`} className="bg-orange-50/50 dark:bg-orange-500/5">
-                        <td colSpan={4} className="px-6 pb-3 pt-0">
-                          <p className="text-xs font-semibold text-orange-700 dark:text-orange-400">
-                            ⚠️ {p.descripcion}
-                          </p>
-                        </td>
-                      </tr>
+                      <p className="mt-0.5 text-xs font-semibold text-orange-600 dark:text-orange-400">⚠️ {p.descripcion}</p>
                     )}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
+                  </div>
+                  <span className="shrink-0 font-black text-brand-500">{money(p.valor)}</span>
+                  {!terminado && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                      className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-open:rotate-180">
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  )}
+                </summary>
+
+                {/* Formulario de edición */}
+                {!terminado && (
+                  <div className="border-t border-brand-100 bg-brand-50/20 px-6 py-4 dark:border-brand-500/20 dark:bg-brand-500/5">
+                    <p className="mb-3 text-xs font-black uppercase tracking-widest text-brand-500">Editar prenda</p>
+                    <form action={editarPrendaAction} className="grid gap-3 sm:grid-cols-2">
+                      <input type="hidden" name="pedidoId" value={pedido.id} />
+                      <input type="hidden" name="prendaId" value={p.id} />
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-gray-500">Tipo de prenda</label>
+                        <select name="tipo" defaultValue={p.tipo} className="input-modern">
+                          {TIPOS_PRENDA.map((t) => <option key={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-gray-500">Servicio</label>
+                        <select name="servicio" defaultValue={p.servicio} className="input-modern">
+                          {SERVICIOS_PRENDA.map((s) => <option key={s}>{s}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-gray-500">Cantidad</label>
+                        <input name="cantidad" type="number" min="1" defaultValue={p.cantidad} required className="input-modern" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-gray-500">Valor total</label>
+                        <MoneyInput name="valor" defaultValue={p.valor} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="mb-1 block text-xs font-bold text-gray-500">Novedad / descripción</label>
+                        <input name="descripcion" defaultValue={p.descripcion ?? ""} placeholder="Opcional" className="input-modern" />
+                      </div>
+                      <div className="flex gap-2 sm:col-span-2">
+                        <button type="submit" className="btn-primary flex-1">
+                          Guardar cambios
+                        </button>
+                        <button
+                          type="submit"
+                          formAction={eliminarPrendaAction}
+                          className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </details>
+            ))}
           </div>
+
+          {/* Agregar nueva prenda */}
+          {!terminado && (
+            <details className="group border-t border-dashed border-gray-200 dark:border-white/10">
+              <summary className="flex cursor-pointer list-none items-center gap-2 px-6 py-4 text-sm font-bold text-brand-600 transition hover:bg-brand-50/40 dark:text-brand-400 dark:hover:bg-brand-500/5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Agregar prenda
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                  className="ml-auto h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </summary>
+              <div className="border-t border-brand-100 bg-brand-50/20 px-6 py-4 dark:border-brand-500/20 dark:bg-brand-500/5">
+                <p className="mb-3 text-xs font-black uppercase tracking-widest text-brand-500">Nueva prenda</p>
+                <form action={agregarPrendaAction} className="grid gap-3 sm:grid-cols-2">
+                  <input type="hidden" name="pedidoId" value={pedido.id} />
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-gray-500">Tipo de prenda</label>
+                    <select name="tipo" className="input-modern">
+                      {TIPOS_PRENDA.map((t) => <option key={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-gray-500">Servicio</label>
+                    <select name="servicio" className="input-modern">
+                      {SERVICIOS_PRENDA.map((s) => <option key={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-gray-500">Cantidad</label>
+                    <input name="cantidad" type="number" min="1" defaultValue={1} required className="input-modern" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-gray-500">Valor total</label>
+                    <MoneyInput name="valor" placeholder="Ej: 8.000" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="mb-1 block text-xs font-bold text-gray-500">Novedad / descripción</label>
+                    <input name="descripcion" placeholder="Opcional" className="input-modern" />
+                  </div>
+                  <button type="submit" className="btn-primary sm:col-span-2">
+                    Agregar prenda al pedido
+                  </button>
+                </form>
+              </div>
+            </details>
+          )}
         </div>
 
         {/* ── Pagos ───────────────────────────────────────── */}
