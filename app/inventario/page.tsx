@@ -7,6 +7,7 @@ import MoneyInput from "@/components/MoneyInput";
 import { EmptyState } from "@/components/EmptyState";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
+import BarcodeListener from "./BarcodeListener";
 
 export const metadata: Metadata = { title: "Inventario" };
 
@@ -117,15 +118,20 @@ async function cambiarEstado(formData: FormData) {
 export default async function InventarioPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; estado?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; estado?: string; page?: string; scan?: string }>;
 }) {
   const params       = await searchParams;
   const q            = params.q?.trim() || "";
   const estadoFiltro = params.estado || "TODOS";
   const currentPage  = Math.max(Number(params.page || "1"), 1);
+  const isScan       = params.scan === "1";
 
-  const baseWhere: any = { estado: { notIn: ["ENTREGADO", "CANCELADO"] } };
-  if (estadoFiltro === "RECIBIDO" || estadoFiltro === "LISTO") baseWhere.estado = estadoFiltro;
+  // En modo escaneo con código específico, mostrar todos los estados
+  // (permite encontrar pedidos ya entregados si el cliente vuelve con el recibo)
+  const baseWhere: any = (isScan && q)
+    ? {}
+    : { estado: { notIn: ["ENTREGADO", "CANCELADO"] } };
+  if (!isScan && (estadoFiltro === "RECIBIDO" || estadoFiltro === "LISTO")) baseWhere.estado = estadoFiltro;
   if (q) {
     const idNum = Number(q.replace(/^0+/, ""));
     baseWhere.OR = [
@@ -196,13 +202,16 @@ export default async function InventarioPage({
               {total} pedido{total !== 1 ? "s" : ""} activo{total !== 1 ? "s" : ""}
             </p>
           </div>
-          <Link
-            href="/pedidos/rapido"
-            className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Pedido rápido
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <BarcodeListener />
+            <Link
+              href="/pedidos/rapido"
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Pedido rápido
+            </Link>
+          </div>
         </div>
 
         {/* Búsqueda */}
@@ -255,6 +264,23 @@ export default async function InventarioPage({
         <KpiCard icon="✅" label="Listos para recoger" value={kpiListos}     color="green"  />
       </div>
 
+      {/* ── Banner de resultado de escaneo ──────────────── */}
+      {isScan && q && (
+        <div className={`flex items-center gap-3 rounded-2xl px-5 py-3 text-sm font-bold ${
+          pedidos.length > 0
+            ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+            : "bg-red-50 text-red-600 ring-1 ring-red-200"
+        }`}>
+          <span className="text-lg">{pedidos.length > 0 ? "✅" : "❌"}</span>
+          {pedidos.length > 0
+            ? `Recibo #${String(parseInt(q, 10)).padStart(5, "0")} encontrado — ${pedidos[0].cliente.nombre}`
+            : `No se encontró el recibo #${String(parseInt(q, 10)).padStart(5, "0")}`}
+          <Link href="/inventario" className="ml-auto rounded-xl bg-white/70 px-3 py-1 text-xs font-bold text-gray-500 hover:bg-white">
+            Ver todos
+          </Link>
+        </div>
+      )}
+
       {/* ── Tabla compacta ───────────────────────────────── */}
       <div className="card overflow-hidden">
         {pedidos.length === 0 ? (
@@ -289,6 +315,7 @@ export default async function InventarioPage({
                 agregarAbono={agregarAbono}
                 registrarEntregaParcial={registrarEntregaParcial}
                 cambiarEstado={cambiarEstado}
+                autoOpen={isScan && pedidos.length === 1}
               />
             ))}
           </div>
@@ -321,11 +348,12 @@ export default async function InventarioPage({
 
 /* ── FilaPedido — fila compacta con detalle expandible ─────── */
 
-function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEstado }: {
+function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEstado, autoOpen }: {
   pedido: any;
   agregarAbono: (f: FormData) => void;
   registrarEntregaParcial: (f: FormData) => void;
   cambiarEstado: (f: FormData) => void;
+  autoOpen?: boolean;
 }) {
   const abonado      = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
   const saldo        = pedido.total - abonado;
@@ -336,7 +364,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const estadoInfo   = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
-    <details className="group">
+    <details className="group" open={autoOpen}>
       {/* ── Fila compacta (siempre visible) ── */}
       <summary className="grid cursor-pointer list-none grid-cols-[56px_1fr_110px_80px_120px_90px_80px] items-center gap-x-3 px-4 py-3 transition hover:bg-gray-50 group-open:bg-brand-50">
 

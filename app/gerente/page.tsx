@@ -22,6 +22,20 @@ function sameDay(a: Date, b: Date) {
 function sumarMetodo(pagos: any[], metodo: string) {
   return pagos.filter((p) => p.metodo === metodo).reduce((s, p) => s + p.valor, 0);
 }
+/** Clave única por día: "YYYY-M-D" */
+function dayKey(d: Date): string {
+  const dd = new Date(d);
+  return `${dd.getFullYear()}-${dd.getMonth()}-${dd.getDate()}`;
+}
+/** Construye un Map<dayKey, count> a partir de un array con campo createdAt */
+function buildDayMap(rows: { createdAt: Date }[]): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const r of rows) {
+    const k = dayKey(r.createdAt);
+    m.set(k, (m.get(k) ?? 0) + 1);
+  }
+  return m;
+}
 
 /* ── Server action ─────────────────────────────────────────── */
 
@@ -130,13 +144,23 @@ export default async function GerentePage({
     select: { valor: true, createdAt: true },
   });
 
-  const diasEnMes    = hoy.getDate();
-  const ingresosDiarios = Array.from({ length: diasEnMes }, (_, i) => {
-    const dia = i + 1;
-    const fecha = new Date(hoy.getFullYear(), hoy.getMonth(), dia);
-    const total = pagosMes.filter((p: any) => sameDay(p.createdAt, fecha)).reduce((s: number, p: any) => s + p.valor, 0);
-    return { dia: String(dia), total };
-  });
+  // Agregar en Map<día_del_mes, total> — O(n) en vez de O(n×días)
+  const pagosMesMap = new Map<number, number>();
+  for (const p of pagosMes) {
+    const d = new Date(p.createdAt).getDate();
+    pagosMesMap.set(d, (pagosMesMap.get(d) ?? 0) + (p.valor as number));
+  }
+
+  const diasEnMes       = hoy.getDate();
+  const ingresosDiarios = Array.from({ length: diasEnMes }, (_, i) => ({
+    dia:   String(i + 1),
+    total: pagosMesMap.get(i + 1) ?? 0,
+  }));
+
+  // Maps para el calendario anual — O(n) una sola vez, lookup O(1) por celda
+  const pedidosAnoMap = buildDayMap(pedidosAno.map((p: any) => ({ createdAt: p.createdAt })));
+  const salidasAnoMap = buildDayMap(salidasAno.map((s: any) => ({ createdAt: s.createdAt })));
+  const gastosAnoMap  = buildDayMap(gastosAno.map((g: any)  => ({ createdAt: g.createdAt })));
 
   const metodosPagoData = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"].map(
     (m) => ({ metodo: m, total: sumarMetodo(pagosDia, m) })
@@ -369,9 +393,10 @@ export default async function GerentePage({
                   const fecha = new Date(year, mesIndex, dia);
                   const seleccionado = sameDay(fechaSeleccionada, fecha);
                   const esHoyFlag    = sameDay(fecha, hoy);
-                  const entradas     = pedidosAno.filter((p: any) => sameDay(p.createdAt, fecha)).length;
-                  const salidas      = salidasAno.filter((s: any) => sameDay(s.createdAt, fecha)).length;
-                  const gastos       = gastosAno.filter((g: any) => sameDay(g.createdAt, fecha)).length;
+                  const k        = dayKey(fecha);
+                  const entradas = pedidosAnoMap.get(k) ?? 0;
+                  const salidas  = salidasAnoMap.get(k) ?? 0;
+                  const gastos   = gastosAnoMap.get(k)  ?? 0;
                   const activo       = entradas > 0 || salidas > 0 || gastos > 0;
                   const fechaLink    = `${year}-${String(mesIndex + 1).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
 
