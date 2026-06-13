@@ -32,7 +32,7 @@ const rutasCompartidas = [
   "/pedidos",
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Páginas de login: siempre accesibles
