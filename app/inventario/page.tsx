@@ -255,31 +255,42 @@ export default async function InventarioPage({
         <KpiCard icon="✅" label="Listos para recoger" value={kpiListos}     color="green"  />
       </div>
 
-      {/* ── Lista ────────────────────────────────────────── */}
-      <div className="space-y-4">
-        {pedidos.map((pedido: any) => (
-          <PedidoCard
-            key={pedido.id}
-            pedido={pedido}
-            agregarAbono={agregarAbono}
-            registrarEntregaParcial={registrarEntregaParcial}
-            cambiarEstado={cambiarEstado}
+      {/* ── Tabla compacta ───────────────────────────────── */}
+      <div className="card overflow-hidden">
+        {pedidos.length === 0 ? (
+          <EmptyState
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
+                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            }
+            title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos activos"}
+            description={q || estadoFiltro !== "TODOS" ? "Prueba con otros filtros." : "Los pedidos que recibas aparecerán aquí."}
+            action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
           />
-        ))}
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {/* Encabezado */}
+            <div className="grid grid-cols-[56px_1fr_110px_80px_120px_90px_80px] gap-x-3 bg-gray-50 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-gray-400">
+              <span>#</span>
+              <span>Cliente</span>
+              <span>Estado</span>
+              <span className="text-center">Prendas</span>
+              <span className="text-right">Saldo</span>
+              <span className="text-center">Días</span>
+              <span />
+            </div>
 
-        {pedidos.length === 0 && (
-          <div className="card">
-            <EmptyState
-              icon={
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
-                  <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
-              }
-              title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos activos"}
-              description={q || estadoFiltro !== "TODOS" ? "Prueba con otros filtros." : "Los pedidos que recibas aparecerán aquí."}
-              action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
-            />
+            {pedidos.map((pedido: any) => (
+              <FilaPedido
+                key={pedido.id}
+                pedido={pedido}
+                agregarAbono={agregarAbono}
+                registrarEntregaParcial={registrarEntregaParcial}
+                cambiarEstado={cambiarEstado}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -305,6 +316,90 @@ export default async function InventarioPage({
         </div>
       )}
     </div>
+  );
+}
+
+/* ── FilaPedido — fila compacta con detalle expandible ─────── */
+
+function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEstado }: {
+  pedido: any;
+  agregarAbono: (f: FormData) => void;
+  registrarEntregaParcial: (f: FormData) => void;
+  cambiarEstado: (f: FormData) => void;
+}) {
+  const abonado      = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
+  const saldo        = pedido.total - abonado;
+  const totalPrendas = pedido.prendas.reduce((s: number, p: any) => s + p.cantidad, 0);
+  const totalEnt     = pedido.prendas.reduce((s: number, p: any) =>
+    s + p.entregasParciales.reduce((es: number, e: any) => es + e.cantidad, 0), 0);
+  const dias         = diasDesde(pedido.createdAt);
+  const estadoInfo   = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
+
+  return (
+    <details className="group">
+      {/* ── Fila compacta (siempre visible) ── */}
+      <summary className="grid cursor-pointer list-none grid-cols-[56px_1fr_110px_80px_120px_90px_80px] items-center gap-x-3 px-4 py-3 transition hover:bg-gray-50 group-open:bg-brand-50">
+
+        {/* # Recibo */}
+        <span className="text-xs font-black text-brand-500">#{fmt(pedido.id)}</span>
+
+        {/* Cliente */}
+        <div className="min-w-0">
+          <p className="truncate text-sm font-black text-gray-900">{pedido.cliente.nombre}</p>
+          <p className="truncate text-xs text-gray-400">{pedido.cliente.telefono ?? "—"}</p>
+        </div>
+
+        {/* Estado */}
+        <span className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
+          {pedido.estado}
+        </span>
+
+        {/* Prendas */}
+        <div className="text-center">
+          <span className="text-sm font-black text-gray-700">{totalEnt}/{totalPrendas}</span>
+          <div className="mx-auto mt-1 h-1 w-12 overflow-hidden rounded-full bg-gray-200">
+            <div
+              className={`h-full rounded-full ${totalEnt === totalPrendas ? "bg-green-500" : "bg-brand-500"}`}
+              style={{ width: `${totalPrendas > 0 ? (totalEnt / totalPrendas) * 100 : 0}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Saldo */}
+        <div className="text-right">
+          {saldo > 0 ? (
+            <span className="text-sm font-black text-red-600">{money(saldo)}</span>
+          ) : (
+            <span className="text-sm font-black text-green-600">✅ Pagado</span>
+          )}
+        </div>
+
+        {/* Días */}
+        <div className="text-center">
+          <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
+            {diasLabel(dias)}
+          </span>
+        </div>
+
+        {/* Flecha */}
+        <div className="flex justify-end">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
+            className="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+      </summary>
+
+      {/* ── Panel expandido (solo al abrir) ── */}
+      <div className="border-t border-brand-100 bg-brand-50/30">
+        <PedidoCard
+          pedido={pedido}
+          agregarAbono={agregarAbono}
+          registrarEntregaParcial={registrarEntregaParcial}
+          cambiarEstado={cambiarEstado}
+        />
+      </div>
+    </details>
   );
 }
 
