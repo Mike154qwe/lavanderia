@@ -136,7 +136,7 @@ export default async function MovimientoDiaPage({
                   key={pedido.id}
                   pedido={pedido}
                   tipo="Salida"
-                  fechaMovimiento={salida?.createdAt || pedido.updatedAt}
+                  fechaMovimiento={salida?.createdAt || pedido.createdAt}
                 />
               );
             })}
