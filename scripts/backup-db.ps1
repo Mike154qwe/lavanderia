@@ -5,10 +5,11 @@
 #    2. OneDrive\LaManuelita_Backups\  (nube, 60 dias)
 # =============================================================
 
-$DB_ORIGEN     = "C:\Users\mikev\Downloads\lavanderia-local-next-prisma-sqlite\lavanderia-local\prisma\dev.db"
-$BACKUP_LOCAL  = "C:\LaManuelita_Backups"
-$BACKUP_NUBE   = "$env:OneDrive\LaManuelita_Backups"
-$fecha         = Get-Date -Format "yyyy-MM-dd_HH-mm"
+$DB_ORIGEN      = "C:\Users\mikev\Downloads\lavanderia-local-next-prisma-sqlite\lavanderia-local\prisma\dev.db"
+$BACKUP_LOCAL   = "C:\LaManuelita_Backups"
+$BACKUP_ONEDRIVE = "$env:OneDrive\LaManuelita_Backups"
+$BACKUP_GDRIVE  = "G:\Mi unidad\LaManuelita_Backups"
+$fecha          = Get-Date -Format "yyyy-MM-dd_HH-mm"
 
 function Hacer-Backup {
     param(
@@ -44,6 +45,7 @@ function Hacer-Backup {
     Write-Host "[INFO] $Etiqueta : $total backups guardados" -ForegroundColor Cyan
 }
 
-# --- Ejecutar ambos backups ---
-Hacer-Backup -Destino $BACKUP_LOCAL -DiasConservar 30 -Etiqueta "LOCAL  "
-Hacer-Backup -Destino $BACKUP_NUBE  -DiasConservar 14 -Etiqueta "ONEDRIVE"
+# --- Ejecutar los tres backups ---
+Hacer-Backup -Destino $BACKUP_LOCAL    -DiasConservar 30 -Etiqueta "LOCAL   "
+Hacer-Backup -Destino $BACKUP_ONEDRIVE -DiasConservar 14 -Etiqueta "ONEDRIVE"
+Hacer-Backup -Destino $BACKUP_GDRIVE   -DiasConservar 14 -Etiqueta "GDRIVE  "
