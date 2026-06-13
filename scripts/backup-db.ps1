@@ -49,3 +49,15 @@ function Hacer-Backup {
 Hacer-Backup -Destino $BACKUP_LOCAL    -DiasConservar 30 -Etiqueta "LOCAL   "
 Hacer-Backup -Destino $BACKUP_ONEDRIVE -DiasConservar 14 -Etiqueta "ONEDRIVE"
 Hacer-Backup -Destino $BACKUP_GDRIVE   -DiasConservar 14 -Etiqueta "GDRIVE  "
+
+# --- Exportacion diaria (reporte + inventario en piso) ---
+Write-Host ""
+Write-Host "[EXPORT] Generando reportes CSV del dia..." -ForegroundColor Magenta
+$nodeExe    = (Get-Command node -ErrorAction SilentlyContinue).Source
+$exportScript = "C:\Users\mikev\Downloads\lavanderia-local-next-prisma-sqlite\lavanderia-local\scripts\export-dia.js"
+
+if ($nodeExe -and (Test-Path $exportScript)) {
+    & $nodeExe $exportScript
+} else {
+    Write-Host "[AVISO] No se encontro node.exe o el script de exportacion." -ForegroundColor Yellow
+}
