@@ -7,17 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Sede {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  direccion String?
+  createdAt DateTime @default(now())
+
+  clientes    Cliente[]
+  pedidos     Pedido[]
+  cierresCaja CierreCaja[]
+  gastosCaja  GastoCaja[]
+}
+
 model Cliente {
   id         Int      @id @default(autoincrement())
   nombre     String
   telefono   String?  @unique
   direccion  String?
   createdAt  DateTime @default(now())
+  sedeId     Int      @default(1)
 
   pedidos Pedido[]
+  sede    Sede     @relation(fields: [sedeId], references: [id])
 
   @@index([telefono])
   @@index([nombre])
+  @@index([sedeId])
 }
 
 model Pedido {
@@ -28,8 +43,10 @@ model Pedido {
   estado       String   @default("RECIBIDO")
   observacion  String?
   createdAt    DateTime @default(now())
+  sedeId       Int      @default(1)
 
   cliente Cliente @relation(fields: [clienteId], references: [id])
+  sede    Sede    @relation(fields: [sedeId], references: [id])
 
   prendas    Prenda[]
   pagos      Pago[]
@@ -39,6 +56,7 @@ model Pedido {
   @@index([estado])
   @@index([createdAt])
   @@index([clienteId])
+  @@index([sedeId])
 }
 
 model Prenda {
@@ -109,8 +127,12 @@ model GastoCaja {
   metodo       String
   responsable  String?
   createdAt    DateTime @default(now())
+  sedeId       Int      @default(1)
+
+  sede Sede @relation(fields: [sedeId], references: [id])
 
   @@index([createdAt])
+  @@index([sedeId])
 }
 
 model CierreCaja {
@@ -125,6 +147,10 @@ model CierreCaja {
   responsable      String?
   observacion      String?
   createdAt        DateTime @default(now())
+  sedeId           Int      @default(1)
+
+  sede Sede @relation(fields: [sedeId], references: [id])
 
   @@index([createdAt])
+  @@index([sedeId])
 }
