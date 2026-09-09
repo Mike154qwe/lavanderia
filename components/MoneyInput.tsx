@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MoneyInput({
   name,
   defaultValue,
+  value,
   placeholder,
 }: {
   name: string;
   defaultValue?: number;
+  /** Para autocompletar el campo desde afuera (ej. tarifario). Deja el
+   * campo intacto si es `undefined`; lo limpia si es `null`. El usuario
+   * puede seguir editando el valor libremente después. */
+  value?: number | null;
   placeholder?: string;
 }) {
   const [display, setDisplay] = useState(
@@ -20,6 +25,13 @@ export default function MoneyInput({
   const [realValue, setRealValue] = useState(
     defaultValue?.toString() || ""
   );
+
+  useEffect(() => {
+    if (value === undefined) return;
+
+    setRealValue(value === null ? "" : String(value));
+    setDisplay(value === null ? "" : value.toLocaleString("es-CO"));
+  }, [value]);
 
   function handleChange(value: string) {
     const onlyNumbers = value.replace(/\D/g, "");

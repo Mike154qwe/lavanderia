@@ -181,12 +181,22 @@ export default async function NuevoPedidoPage({
       })
     : null;
 
+  const tarifario = await prisma.tarifario.findMany({
+    orderBy: [{ categoria: "asc" }, { item: "asc" }],
+  });
+
   return (
     <NuevoPedidoForm
       q={q}
       currentPage={currentPage}
       totalPages={totalPages}
       totalClientes={totalClientes}
+      tarifario={tarifario.map((t) => ({
+        categoria: t.categoria,
+        item: t.item,
+        precioMin: t.precioMin,
+        precioMax: t.precioMax,
+      }))}
       clientes={clientes.map((cliente) => ({
         id: cliente.id,
         nombre: cliente.nombre,

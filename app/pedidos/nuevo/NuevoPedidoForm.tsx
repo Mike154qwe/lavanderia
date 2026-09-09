@@ -11,6 +11,24 @@ type Cliente = {
   direccion: string | null;
 };
 
+type TarifaItem = {
+  categoria: string;
+  item: string;
+  precioMin: number;
+  precioMax: number | null;
+};
+
+const PERSONALIZADA = "__personalizada__";
+
+function formatoPrecio(t: TarifaItem) {
+  const f = (n: number) => `$${n.toLocaleString("es-CO")}`;
+  return t.precioMax != null ? `${f(t.precioMin)} – ${f(t.precioMax)}` : f(t.precioMin);
+}
+
+function precioSugerido(t: TarifaItem) {
+  return t.precioMax != null ? Math.round((t.precioMin + t.precioMax) / 2) : t.precioMin;
+}
+
 export default function NuevoPedidoForm({
   q,
   currentPage,
@@ -18,6 +36,7 @@ export default function NuevoPedidoForm({
   totalClientes,
   clientes,
   clienteSeleccionado,
+  tarifario,
   crearClienteAction,
   guardarPedidoAction,
 }: {
@@ -27,17 +46,40 @@ export default function NuevoPedidoForm({
   totalClientes: number;
   clientes: Cliente[];
   clienteSeleccionado: Cliente | null;
+  tarifario: TarifaItem[];
   crearClienteAction: (formData: FormData) => void;
   guardarPedidoAction: (formData: FormData) => void;
 }) {
-  const [items, setItems] = useState([{ id: Date.now() }]);
+  const [items, setItems] = useState([
+    { id: Date.now(), categoria: "", precio: null as number | null },
+  ]);
+
+  const categorias = Array.from(new Set(tarifario.map((t) => t.categoria))).sort((a, b) =>
+    a.localeCompare(b, "es")
+  );
 
   function agregarServicio() {
-    setItems((prev) => [...prev, { id: Date.now() + Math.random() }]);
+    setItems((prev) => [
+      ...prev,
+      { id: Date.now() + Math.random(), categoria: "", precio: null },
+    ]);
   }
 
   function eliminarServicio(id: number) {
     setItems((prev) => prev.length === 1 ? prev : prev.filter((item) => item.id !== id));
+  }
+
+  function actualizarCategoria(id: number, categoria: string) {
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, categoria, precio: null } : it))
+    );
+  }
+
+  function seleccionarItem(id: number, categoria: string, itemNombre: string) {
+    const tarifa = tarifario.find((t) => t.categoria === categoria && t.item === itemNombre);
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, precio: tarifa ? precioSugerido(tarifa) : null } : it))
+    );
   }
 
   return (
@@ -229,7 +271,12 @@ export default function NuevoPedidoForm({
             </div>
 
             <div className="space-y-4">
-              {items.map((item, index) => (
+              {items.map((item, index) => {
+                const itemsCategoria = tarifario.filter((t) => t.categoria === item.categoria);
+                const esPersonalizada = item.categoria === PERSONALIZADA;
+                const mostrarSelectItem = item.categoria !== "" && !esPersonalizada;
+
+                return (
                 <div key={item.id} className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.06] dark:bg-white/[0.02]">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -249,7 +296,7 @@ export default function NuevoPedidoForm({
                     )}
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-[160px_1fr_110px_180px]">
+                  <div className="grid gap-3 sm:grid-cols-[140px_150px_1fr_90px_160px]">
                     <div>
                       <label className="mb-1 block text-xs font-semibold text-gray-400">Servicio</label>
                       <select name="servicio" required defaultValue="" className="input-modern">
@@ -263,13 +310,47 @@ export default function NuevoPedidoForm({
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-gray-400">Prenda</label>
-                      <input
-                        name="tipo"
-                        required
-                        placeholder="Ej: camisa, cobija, pantalón…"
+                      <label className="mb-1 block text-xs font-semibold text-gray-400">Categoría</label>
+                      <select
+                        value={item.categoria}
+                        onChange={(e) => actualizarCategoria(item.id, e.target.value)}
                         className="input-modern"
-                      />
+                      >
+                        <option value="" disabled>Categoría</option>
+                        <option value={PERSONALIZADA}>Personalizada</option>
+                        {categorias.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-gray-400">Prenda</label>
+                      {mostrarSelectItem ? (
+                        <select
+                          key={item.categoria}
+                          name="tipo"
+                          required
+                          defaultValue=""
+                          onChange={(e) => seleccionarItem(item.id, item.categoria, e.target.value)}
+                          className="input-modern"
+                        >
+                          <option value="" disabled>Ítem</option>
+                          {itemsCategoria.map((t) => (
+                            <option key={t.item} value={t.item}>
+                              {t.item} — {formatoPrecio(t)}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          key={item.categoria}
+                          name="tipo"
+                          required
+                          placeholder="Ej: camisa, cobija, pantalón…"
+                          className="input-modern"
+                        />
+                      )}
                     </div>
 
                     <div>
@@ -286,7 +367,7 @@ export default function NuevoPedidoForm({
 
                     <div>
                       <label className="mb-1 block text-xs font-semibold text-gray-400">Valor</label>
-                      <MoneyInput name="valor" placeholder="$ Valor total" />
+                      <MoneyInput name="valor" value={item.precio} placeholder="$ Valor total" />
                     </div>
                   </div>
 
@@ -302,7 +383,8 @@ export default function NuevoPedidoForm({
                     />
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pago y observación */}
