@@ -38,7 +38,6 @@ export default function NuevoPedidoForm({
   clienteSeleccionado,
   tarifario,
   crearClienteAction,
-  guardarPedidoAction,
 }: {
   q: string;
   currentPage: number;
@@ -48,7 +47,6 @@ export default function NuevoPedidoForm({
   clienteSeleccionado: Cliente | null;
   tarifario: TarifaItem[];
   crearClienteAction: (formData: FormData) => void;
-  guardarPedidoAction: (formData: FormData) => void;
 }) {
   const [items, setItems] = useState([
     { id: Date.now(), categoria: "", precio: null as number | null },
@@ -80,6 +78,48 @@ export default function NuevoPedidoForm({
     setItems((prev) =>
       prev.map((it) => (it.id === id ? { ...it, precio: tarifa ? precioSugerido(tarifa) : null } : it))
     );
+  }
+
+  async function handleSubmitPedido(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const servicios = formData.getAll("servicio");
+    const tipos = formData.getAll("tipo");
+    const descripciones = formData.getAll("descripcion");
+    const cantidades = formData.getAll("cantidad");
+    const valores = formData.getAll("valor");
+
+    const prendas = servicios.map((_, index) => ({
+      servicio: String(servicios[index] || ""),
+      tipo: String(tipos[index] || ""),
+      descripcion: String(descripciones[index] || ""),
+      cantidad: String(cantidades[index] || ""),
+      valor: String(valores[index] || ""),
+    }));
+
+    const payload = {
+      clienteId: String(formData.get("clienteId") || ""),
+      observacion: String(formData.get("observacion") || ""),
+      abono: String(formData.get("abono") || ""),
+      metodo: String(formData.get("metodo") || ""),
+      prendas,
+    };
+
+    const res = await fetch("/api/pedidos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      alert("No se pudo guardar el pedido. Intenta de nuevo.");
+      return;
+    }
+
+    const data = await res.json();
+    window.location.href = `/recibos/${data.id}/pdf`;
   }
 
   return (
@@ -230,7 +270,7 @@ export default function NuevoPedidoForm({
 
       {/* ── Formulario del pedido ─────────────────────────── */}
       {clienteSeleccionado ? (
-        <form action={guardarPedidoAction} className="card mt-5 overflow-hidden">
+        <form onSubmit={handleSubmitPedido} className="card mt-5 overflow-hidden">
           <input type="hidden" name="clienteId" value={clienteSeleccionado.id} />
 
           {/* Cliente seleccionado banner */}
