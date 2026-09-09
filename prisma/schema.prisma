@@ -19,6 +19,17 @@ model Sede {
   gastosCaja  GastoCaja[]
 }
 
+model Tarifario {
+  id        Int    @id @default(autoincrement())
+  categoria String
+  item      String
+  precioMin Int
+  precioMax Int?
+
+  @@unique([categoria, item])
+  @@index([categoria])
+}
+
 model Cliente {
   id         Int      @id @default(autoincrement())
   nombre     String
