@@ -4,10 +4,6 @@ import NuevoPedidoForm from "./NuevoPedidoForm";
 
 const CLIENTES_POR_PAGINA = 8;
 
-function parseMoney(value: FormDataEntryValue | null) {
-  return Number(String(value || "0").replace(/\D/g, ""));
-}
-
 async function crearClienteAction(formData: FormData) {
   "use server";
 
@@ -36,91 +32,6 @@ async function crearClienteAction(formData: FormData) {
   }
 
   redirect(`/pedidos/nuevo?clienteId=${cliente.id}`);
-}
-
-async function guardarPedidoAction(formData: FormData) {
-  "use server";
-
-  const clienteId = Number(formData.get("clienteId"));
-  const observacion = String(formData.get("observacion") || "").trim();
-  const abono = parseMoney(formData.get("abono"));
-  const metodo = String(formData.get("metodo") || "Efectivo");
-
-  if (!clienteId) return;
-
-  const servicios = formData.getAll("servicio");
-  const tipos = formData.getAll("tipo");
-  const descripciones = formData.getAll("descripcion");
-  const cantidades = formData.getAll("cantidad");
-  const valores = formData.getAll("valor");
-
-  const prendas = servicios
-    .map((_, index) => {
-      const servicio = String(servicios[index] || "").trim();
-      const tipo = String(tipos[index] || "").trim();
-      const descripcion = String(descripciones[index] || "").trim();
-      const cantidad = Number(cantidades[index] || 0);
-      const valor = parseMoney(valores[index]);
-
-      if (!servicio || !tipo || cantidad <= 0 || valor <= 0) return null;
-
-      return {
-        servicio,
-        tipo,
-        descripcion,
-        cantidad,
-        valor,
-      };
-    })
-    .filter(Boolean) as {
-    servicio: string;
-    tipo: string;
-    descripcion: string;
-    cantidad: number;
-    valor: number;
-  }[];
-
-  if (prendas.length === 0) return;
-
-  const total = prendas.reduce((sum, prenda) => sum + prenda.valor, 0);
-
-  const pedido = await prisma.pedido.create({
-    data: {
-      clienteId,
-      servicio: prendas.map((p) => p.servicio).join(", "),
-      total,
-      observacion: observacion || null,
-      estado: "RECIBIDO",
-
-      prendas: {
-        create: prendas.map((prenda) => ({
-          servicio: prenda.servicio,
-          tipo: prenda.tipo,
-          descripcion: prenda.descripcion || null,
-          cantidad: prenda.cantidad,
-          valor: prenda.valor,
-        })),
-      },
-
-      pagos:
-        abono > 0
-          ? {
-              create: {
-                metodo,
-                valor: abono,
-              },
-            }
-          : undefined,
-
-      historial: {
-        create: {
-          estado: "RECIBIDO",
-        },
-      },
-    },
-  });
-
-  redirect(`/recibos/${pedido.id}/pdf`);
 }
 
 export default async function NuevoPedidoPage({
@@ -214,7 +125,6 @@ export default async function NuevoPedidoPage({
           : null
       }
       crearClienteAction={crearClienteAction}
-      guardarPedidoAction={guardarPedidoAction}
     />
   );
 }
