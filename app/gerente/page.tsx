@@ -200,7 +200,7 @@ export default async function GerentePage({
             <Link href={`/gerente?year=${year - 1}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
               ← {year - 1}
             </Link>
-            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-black text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
               {year}
             </span>
             <Link href={`/gerente?year=${year + 1}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
@@ -217,7 +217,7 @@ export default async function GerentePage({
             <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
               {esHoy ? "Hoy" : "Día seleccionado"}
             </p>
-            <h2 className="mt-1 text-xl font-black capitalize text-gray-900">
+            <h2 className="mt-1 text-xl font-bold capitalize text-gray-900">
               {fechaSeleccionada.toLocaleDateString("es-CO", {
                 weekday: "long", year: "numeric", month: "long", day: "numeric",
               })}
@@ -274,7 +274,7 @@ export default async function GerentePage({
 
       {/* ── Facturación del día ───────────────────────────── */}
       <div className="card p-6">
-        <h2 className="mb-5 text-lg font-black text-gray-900">Facturación del día</h2>
+        <h2 className="mb-5 text-lg font-bold text-gray-900">Facturación del día</h2>
         <div className="grid gap-5 xl:grid-cols-2">
           <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
           <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />
@@ -285,7 +285,7 @@ export default async function GerentePage({
       <div className="card p-6">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-black text-gray-900">Cierre de caja</h2>
+            <h2 className="text-lg font-bold text-gray-900">Cierre de caja</h2>
             <p className="mt-0.5 text-sm text-gray-400">
               Toma los movimientos desde el último cierre hasta ahora.
             </p>
@@ -303,7 +303,7 @@ export default async function GerentePage({
             {cierresDia.map((cierre: any) => (
               <div key={cierre.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
                 <div>
-                  <p className="font-black text-gray-900">Cierre #{fmt(cierre.id)}</p>
+                  <p className="font-bold text-gray-900">Cierre #{fmt(cierre.id)}</p>
                   <p className="mt-0.5 text-xs text-gray-400">
                     {cierre.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {cierre.responsable || "Sin responsable"}
                   </p>
@@ -347,7 +347,7 @@ export default async function GerentePage({
       {/* ── Gastos del día ───────────────────────────────── */}
       <div className="card p-6">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-black text-gray-900">Gastos del día</h2>
+          <h2 className="text-lg font-bold text-gray-900">Gastos del día</h2>
           {gastosDia.length > 0 && (
             <span className="font-black text-red-500">-{money(totalGastos)}</span>
           )}
@@ -382,7 +382,7 @@ export default async function GerentePage({
                 {esMesActual && (
                   <span className="rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-bold text-white">Actual</span>
                 )}
-                <h2 className={`font-black ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-gray-900"}`}>
+                <h2 className={`font-bold ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-gray-900"}`}>
                   {mes} {year}
                 </h2>
               </div>
@@ -419,14 +419,14 @@ export default async function GerentePage({
                       className={`rounded-xl border p-2.5 transition ${cellClass}`}
                     >
                       <div className="flex items-start justify-between">
-                        <span className={`text-lg font-black leading-none ${
+                        <span className={`text-lg font-bold leading-none ${
                           seleccionado ? "text-brand-600 dark:text-brand-300"
                           : esHoyFlag   ? "text-orange-600 dark:text-orange-400"
                           : activo      ? "text-brand-500"
                           : "text-gray-400"
                         }`}>{dia}</span>
                         {esHoyFlag && (
-                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-black leading-none text-white">HOY</span>
+                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-bold leading-none text-white">HOY</span>
                         )}
                       </div>
                       {activo && (
@@ -524,7 +524,7 @@ function MovSection({
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-black text-gray-900">{title}</h2>
+        <h2 className="font-bold text-gray-900">{title}</h2>
         <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${badge}`}>{count}</span>
       </div>
       <div className="space-y-3">{children}</div>

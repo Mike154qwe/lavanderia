@@ -70,7 +70,7 @@ export default async function ClientesEmpleadoPage({
       {/* ── CTA nuevo cliente ─────────────────────────────── */}
       <Link
         href="/pedidos/rapido"
-        className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-black text-white transition hover:bg-brand-600 active:scale-[0.99]"
+        className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
       >
         <span>+ Crear cliente nuevo y recibo</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -112,7 +112,7 @@ export default async function ClientesEmpleadoPage({
               <div key={cliente.id} className="card p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <p className="text-lg font-black text-gray-900 truncate">
+                    <p className="text-lg font-bold text-gray-900 truncate">
                       {cliente.nombre}
                     </p>
                     <p className="text-sm text-gray-500">
@@ -146,7 +146,7 @@ export default async function ClientesEmpleadoPage({
 
                   <Link
                     href={urlNuevoPedido}
-                    className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-black text-white transition hover:bg-brand-600 active:scale-[0.98]"
+                    className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600 active:scale-[0.98]"
                   >
                     Nuevo pedido
                   </Link>

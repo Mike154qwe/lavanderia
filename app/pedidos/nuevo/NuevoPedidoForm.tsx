@@ -145,7 +145,7 @@ export default function NuevoPedidoForm({
         <div className="card p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-black text-gray-900">Clientes existentes</h2>
+              <h2 className="font-bold text-gray-900">Clientes existentes</h2>
               <p className="mt-0.5 text-xs text-gray-400">{totalClientes} registrados</p>
             </div>
             <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
@@ -177,7 +177,7 @@ export default function NuevoPedidoForm({
                       : "border-gray-100 hover:border-brand-300 hover:bg-brand-50 dark:border-white/[0.07] dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
                   }`}
                 >
-                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${
                     activo
                       ? "bg-brand-500 text-white"
                       : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"
@@ -241,7 +241,7 @@ export default function NuevoPedidoForm({
 
         {/* Crear cliente nuevo */}
         <div className="card p-6">
-          <h2 className="font-black text-gray-900">Crear cliente nuevo</h2>
+          <h2 className="font-bold text-gray-900">Crear cliente nuevo</h2>
           <p className="mt-0.5 text-xs text-gray-400">
             Si el cliente ya tiene teléfono registrado, se reutilizará.
           </p>
@@ -275,12 +275,12 @@ export default function NuevoPedidoForm({
 
           {/* Cliente seleccionado banner */}
           <div className="flex items-center gap-4 border-b border-gray-100 bg-brand-50 px-6 py-4 dark:border-white/[0.07] dark:bg-brand-500/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-sm font-black text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-sm font-bold text-white">
               {clienteSeleccionado.nombre.charAt(0).toUpperCase()}
             </div>
             <div>
               <p className="text-xs font-bold text-brand-600 dark:text-brand-400">Cliente seleccionado</p>
-              <p className="font-black text-gray-900">{clienteSeleccionado.nombre}</p>
+              <p className="font-bold text-gray-900">{clienteSeleccionado.nombre}</p>
               <p className="text-xs text-gray-400">
                 {clienteSeleccionado.telefono || "Sin teléfono"}
                 {clienteSeleccionado.direccion ? ` · ${clienteSeleccionado.direccion}` : ""}
@@ -297,7 +297,7 @@ export default function NuevoPedidoForm({
           <div className="p-6">
             {/* Prendas */}
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="font-black text-gray-900">Prendas y servicios</h2>
+              <h2 className="font-bold text-gray-900">Prendas y servicios</h2>
               <button
                 type="button"
                 onClick={agregarServicio}
@@ -320,7 +320,7 @@ export default function NuevoPedidoForm({
                 <div key={item.id} className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.06] dark:bg-white/[0.02]">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-500 text-xs font-black text-white">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-500 text-xs font-bold text-white">
                         {index + 1}
                       </span>
                       <span className="text-sm font-bold text-gray-700">Prenda / servicio</span>

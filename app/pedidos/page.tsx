@@ -187,7 +187,7 @@ export default async function PedidosPage({
                         <td className="px-5 py-4">
                           <Link
                             href={`/pedidos/${pedido.id}`}
-                            className="font-mono text-sm font-black text-brand-500 hover:underline"
+                            className="font-mono text-sm font-bold text-brand-500 hover:underline"
                           >
                             #{fmt(pedido.id)}
                           </Link>

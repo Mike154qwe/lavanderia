@@ -86,7 +86,7 @@ export default async function MovimientosPage({
           >
             ← {year - 1}
           </Link>
-          <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-black text-brand-600">
+          <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600">
             {year}
           </span>
           <Link
@@ -134,7 +134,7 @@ export default async function MovimientosPage({
       <div className="card p-6">
         <div className="mb-1 flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h2 className="font-black text-gray-900">Entradas vs Salidas por mes</h2>
+            <h2 className="font-bold text-gray-900">Entradas vs Salidas por mes</h2>
             <p className="mt-0.5 text-xs text-gray-400">
               Comparación mensual — pedidos recibidos y entregados en {year}
             </p>
@@ -176,7 +176,7 @@ export default async function MovimientosPage({
                         Actual
                       </span>
                     )}
-                    <h2 className={`text-lg font-black ${esMesActual ? "text-brand-700" : "text-gray-900"}`}>
+                    <h2 className={`text-lg font-bold ${esMesActual ? "text-brand-700" : "text-gray-900"}`}>
                       {mes} {year}
                     </h2>
                   </div>
@@ -242,7 +242,7 @@ export default async function MovimientosPage({
                       title={activo ? `${entradas} entrada${entradas !== 1 ? "s" : ""}, ${salidasDia} salida${salidasDia !== 1 ? "s" : ""}` : `Sin actividad`}
                     >
                       <div className="flex items-start justify-between">
-                        <span className={`text-base font-black leading-none ${
+                        <span className={`text-base font-bold leading-none ${
                           esHoyFlag ? "text-orange-600"
                           : activo   ? "text-brand-600"
                           : "text-gray-300"
@@ -250,7 +250,7 @@ export default async function MovimientosPage({
                           {dia}
                         </span>
                         {esHoyFlag && (
-                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-black leading-none text-white">
+                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-bold leading-none text-white">
                             HOY
                           </span>
                         )}
