@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import MoneyInput from "@/components/MoneyInput";
+import { encolarPedido, type PedidoPendiente } from "@/lib/offline-queue";
 
 type Cliente = {
   id: number;
@@ -99,7 +101,7 @@ export default function NuevoPedidoForm({
       valor: String(valores[index] || ""),
     }));
 
-    const payload = {
+    const payload: PedidoPendiente = {
       clienteId: String(formData.get("clienteId") || ""),
       observacion: String(formData.get("observacion") || ""),
       abono: String(formData.get("abono") || ""),
@@ -107,19 +109,38 @@ export default function NuevoPedidoForm({
       prendas,
     };
 
-    const res = await fetch("/api/pedidos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      alert("No se pudo guardar el pedido. Intenta de nuevo.");
+    // RNF02: si no hay conexión, ni siquiera intentamos el fetch — vamos
+    // directo a la cola local. Si sí hay conexión pero el fetch falla
+    // (servidor caído, red inestable a mitad de camino, etc.), el catch
+    // hace lo mismo. Un !res.ok (ej. 400 por datos inválidos) NO se encola:
+    // es un rechazo válido del servidor, no un problema de conectividad.
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      await guardarLocalmente(payload);
       return;
     }
 
-    const data = await res.json();
-    window.location.href = `/recibos/${data.id}/pdf`;
+    try {
+      const res = await fetch("/api/pedidos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        alert("No se pudo guardar el pedido. Intenta de nuevo.");
+        return;
+      }
+
+      const data = await res.json();
+      window.location.href = `/recibos/${data.id}/pdf`;
+    } catch {
+      await guardarLocalmente(payload);
+    }
+  }
+
+  async function guardarLocalmente(payload: PedidoPendiente) {
+    await encolarPedido(payload);
+    toast.success("Guardado localmente, se sincronizará cuando vuelva la conexión.");
   }
 
   return (
