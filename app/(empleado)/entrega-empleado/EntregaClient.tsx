@@ -123,28 +123,29 @@ export default function EntregaClient({
   const estadoInfo = pedido ? (ESTADO_STYLE[pedido.estado] ?? ESTADO_STYLE["RECIBIDO"]) : null;
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-lg px-4 py-6">
+    <div className="p-4 sm:p-6">
+      <div className="mx-auto max-w-lg">
 
         {/* ── HEADER ────────────────────────────────── */}
-        <div className="mb-5 text-center">
-          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-3xl shadow-lg">
+        <div className="mb-5">
+          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-[var(--radius-well)] bg-brand-500 text-3xl shadow-soft">
             🔫
           </div>
-          <h1 className="text-2xl font-black text-gray-900">Entrega y cobro</h1>
-          <p className="mt-0.5 text-sm text-gray-400">
+          <p className="page-kicker text-brand-500">Salida</p>
+          <h1 className="page-title">Entrega y cobro</h1>
+          <p className="page-subtitle">
             Escanea el recibo del cliente para continuar
           </p>
           <Link
             href="/inventario-empleado"
-            className="mt-3 inline-flex rounded-lg px-3 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+            className="mt-3 inline-flex rounded-[var(--radius-control)] px-3 py-1.5 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
           >
             ← Buscar / entregar
           </Link>
         </div>
 
         {/* ── INPUT ESCANEO ─────────────────────────── */}
-        <div className={`mb-5 overflow-hidden rounded-2xl bg-white shadow-sm ring-2 transition-all ${
+        <div className={`mb-5 card overflow-hidden ring-2 transition-all ${
           status === "loading" ? "ring-brand-300 animate-pulse" : "ring-brand-500"
         }`}>
           <div className="flex items-center gap-3 px-4 py-4">
@@ -179,12 +180,12 @@ export default function EntregaClient({
 
         {/* ── NOT FOUND ─────────────────────────────── */}
         {status === "not-found" && (
-          <div className="mb-4 flex items-center gap-3 rounded-2xl bg-red-50 px-5 py-4 ring-1 ring-red-200">
+          <div className="card mb-4 flex items-center gap-3 p-5">
             <span className="text-3xl">❌</span>
-            <div>
-              <p className="font-bold text-red-700">Recibo no encontrado</p>
-              <p className="text-sm text-red-400">
-                No existe el pedido <strong>{codigo}</strong>. Verifica el número.
+            <div className="text-left">
+              <p className="font-bold text-red-700 dark:text-red-400">Recibo no encontrado</p>
+              <p className="text-sm text-[color:var(--text-3)]">
+                No existe el pedido <strong className="text-[color:var(--text-1)]">{codigo}</strong>. Verifica el número.
               </p>
             </div>
           </div>
@@ -413,16 +414,16 @@ export default function EntregaClient({
 
         {/* ── ESTADO IDLE ───────────────────────────── */}
         {status === "idle" && (
-          <div className="mt-4 rounded-2xl border-2 border-dashed border-gray-200 px-6 py-10 text-center">
-            <p className="text-4xl">📄</p>
-            <p className="mt-3 font-bold text-gray-300">Esperando escaneo</p>
-            <p className="mt-1 text-xs text-gray-200">
+          <div className="card empty-state mt-4">
+            <p className="text-3xl">📄</p>
+            <p className="empty-state__title">Esperando escaneo</p>
+            <p className="empty-state__desc">
               Apunta la pistola al código de barras del recibo
             </p>
           </div>
         )}
 
       </div>
-    </main>
+    </div>
   );
 }

@@ -49,15 +49,15 @@ export default async function ClientesEmpleadoPage({
           { href: "/inventario-empleado", label: "Llegó a recoger" },
         ]}
       >
-        <form className="flex gap-2">
+        <form className="flex min-w-0 flex-col gap-2 sm:flex-row">
           <input
             name="q"
             defaultValue={q}
             autoFocus
             placeholder="Nombre o teléfono del cliente…"
-            className="input-modern flex-1 text-base font-semibold"
+            className="input-modern min-w-0 flex-1 text-base font-semibold"
           />
-          <button className="btn-primary px-5">
+          <button className="btn-primary px-5 sm:shrink-0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
@@ -107,12 +107,12 @@ export default async function ClientesEmpleadoPage({
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && clientes.length === 0 && (
-        <div className="card mt-4 p-8 text-center">
+        <div className="card empty-state mt-4">
           <p className="text-3xl">🔍</p>
-          <p className="mt-3 font-bold text-gray-600">
-            No se encontró cliente con "<span className="text-gray-900">{q}</span>".
+          <p className="empty-state__title">
+            No se encontró cliente con "<span className="text-[color:var(--text-1)]">{q}</span>".
           </p>
-          <p className="mt-1 text-sm text-gray-400">
+          <p className="empty-state__desc">
             ¿Es un cliente nuevo? Usa el botón de arriba para crear el recibo.
           </p>
         </div>

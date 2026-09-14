@@ -25,7 +25,7 @@ const TITULOS: Record<string, string> = {
 
 function ChevronIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" style={{ color: "var(--text-4)" }}>
       <path d="M9 18l6-6-6-6" />
     </svg>
   );
@@ -47,10 +47,10 @@ export default function AppHeader() {
   const esPedidoDetalle = /^\/pedidos\/\d+/.test(pathname);
 
   return (
-    <header className="sticky top-0 z-20 flex h-[60px] shrink-0 items-center border-b border-gray-200 bg-white/90 px-4 backdrop-blur-sm sm:px-6 dark:border-white/[0.07] dark:bg-[#0d1117]/90">
+    <header className="app-header sticky top-0 z-20 flex h-[60px] shrink-0 items-center px-4 sm:px-6">
       <button
         type="button"
-        className="mr-3 flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-600 md:hidden dark:border-white/10 dark:text-gray-300"
+        className="app-header-menu mr-3 flex h-9 w-9 items-center justify-center rounded-[var(--radius-well)] lg:hidden"
         aria-label="Abrir menú"
         onClick={() => setOpen(true)}
       >
@@ -61,18 +61,18 @@ export default function AppHeader() {
 
       {/* Breadcrumb */}
       <div className="flex min-w-0 items-center gap-2 text-sm">
-        <span className="hidden font-medium text-gray-400 sm:inline dark:text-gray-600">Lavaseco</span>
+        <span className="hidden font-medium sm:inline" style={{ color: "var(--text-4)" }}>Lavaseco</span>
         <span className="hidden sm:inline"><ChevronIcon /></span>
         {esPedidoDetalle ? (
           <>
-            <span className="font-medium text-gray-400 dark:text-gray-600">Pedidos</span>
+            <span className="font-medium" style={{ color: "var(--text-4)" }}>Pedidos</span>
             <ChevronIcon />
-            <span className="font-semibold text-gray-900 dark:text-gray-100">
+            <span className="truncate font-semibold" style={{ color: "var(--text-1)" }}>
               #{pathname.split("/")[2]?.padStart(5, "0")}
             </span>
           </>
         ) : (
-          <span className="truncate font-semibold text-gray-900 dark:text-gray-100">{titulo}</span>
+          <span className="truncate font-semibold" style={{ color: "var(--text-1)" }}>{titulo}</span>
         )}
       </div>
 
