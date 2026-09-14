@@ -173,18 +173,18 @@ export default function PedidoRapidoForm({
           ))}
 
           {/* ── HEADER ─────────────────────────────────────────── */}
-          <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+          <div className="mb-4 card overflow-hidden">
             <div className="h-1.5 bg-gradient-to-r from-teal-400 to-cyan-500" />
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-xl dark:bg-teal-500/15">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-well)] bg-teal-50 text-xl dark:bg-teal-500/15">
                 🧺
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+                <p className="page-kicker text-teal-600 dark:text-teal-400">
                   Entrada · dejar prendas
                 </p>
-                <h1 className="text-xl font-black leading-tight text-gray-900">
+                <h1 className="page-title !mt-0 !text-xl">
                   {paso === 1 ? "¿Quién trae las prendas?" : "Ingresa las prendas"}
                 </h1>
               </div>
