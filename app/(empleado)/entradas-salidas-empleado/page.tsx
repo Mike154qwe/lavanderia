@@ -71,11 +71,11 @@ export default async function EntradasSalidasEmpleadoPage({
       <div className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-teal-600 dark:text-teal-400">Mostrador</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">
+            <p className="page-kicker text-teal-600 dark:text-teal-400">Mostrador</p>
+            <h1 className="page-title">
               Entradas y salidas {year}
             </h1>
-            <p className="mt-0.5 text-sm text-gray-500">
+            <p className="page-subtitle">
               Toca un día para ver el detalle.
             </p>
             <EmpleadoLinks
@@ -98,7 +98,7 @@ export default async function EntradasSalidasEmpleadoPage({
         </div>
 
         {/* Filtros */}
-        <form className="mt-4 grid gap-3 sm:grid-cols-[1fr_160px_auto_auto]">
+        <form className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_160px_auto_auto]">
           <input
             name="q"
             defaultValue={q}
@@ -245,10 +245,10 @@ export default async function EntradasSalidasEmpleadoPage({
                       key={dia}
                       id={esHoyFlag ? "hoy" : undefined}
                       href={`/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${q}&tipo=${tipoFiltro}`}
-                      className={`rounded-xl border p-2.5 transition ${cellClass}`}
+                      className={`rounded-[var(--radius-well)] border p-1.5 transition sm:p-2.5 ${cellClass}`}
                     >
                       <div className="flex items-start justify-between">
-                        <span className={`text-lg font-bold leading-none ${
+                        <span className={`text-base font-bold leading-none sm:text-lg ${
                           seleccionado ? "text-brand-600 dark:text-brand-300"
                           : esHoyFlag   ? "text-orange-600 dark:text-orange-400"
                           : activo      ? "text-brand-500"

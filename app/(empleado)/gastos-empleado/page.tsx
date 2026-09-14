@@ -75,7 +75,7 @@ export default async function GastosEmpleadoPage({
 
         {/* ── Formulario ───────────────────────────────────── */}
         <form action={registrarGastoEmpleado} className="card p-5">
-          <h2 className="mb-4 font-bold text-gray-900">Nuevo gasto</h2>
+          <h2 className="mb-4 font-bold text-[color:var(--text-1)]">Nuevo gasto</h2>
 
           {/* Tipos (radio) */}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-3">
@@ -151,7 +151,7 @@ export default async function GastosEmpleadoPage({
         {/* ── Resumen del día ──────────────────────────────── */}
         <div className="card p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-bold text-gray-900">Resumen de hoy</h2>
+            <h2 className="font-bold text-[color:var(--text-1)]">Resumen de hoy</h2>
             <span className="font-black text-red-500">
               -{`$${totalGastos.toLocaleString("es-CO")}`}
             </span>
@@ -178,11 +178,9 @@ export default async function GastosEmpleadoPage({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-gray-200 py-10 text-center dark:border-white/10">
+            <div className="empty-state rounded-[var(--radius-well)] border border-dashed border-[color:var(--border-1)]">
               <p className="text-3xl">💸</p>
-              <p className="mt-2 text-sm font-semibold text-gray-400">
-                No hay gastos registrados hoy.
-              </p>
+              <p className="empty-state__title">No hay gastos registrados hoy.</p>
             </div>
           )}
         </div>
