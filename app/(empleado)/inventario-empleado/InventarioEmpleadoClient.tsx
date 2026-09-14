@@ -5,7 +5,7 @@ import MoneyInput from "@/components/MoneyInput";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
-import EmpleadoLinks from "@/components/EmpleadoLinks";
+import EmpleadoHero from "@/components/EmpleadoHero";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -62,26 +62,24 @@ export default function InventarioEmpleadoClient({
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       {/* ── Buscador ─────────────────────────────────────── */}
-      <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Buscar / entregar</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          Número de recibo, nombre o teléfono del cliente.
-        </p>
-        <EmpleadoLinks
-          extra={[
-            { href: "/entrega-empleado", label: "Entrega y cobro" },
-            { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
-            { href: "/clientes-empleado", label: "Clientes" },
-          ]}
-        />
-
-        <form className="mt-4 flex gap-2">
+      <EmpleadoHero
+        kicker="Salida"
+        title="Llegó a recoger"
+        subtitle="Busca el recibo, cobra el saldo y entrega las prendas."
+        icon="📦"
+        tone="indigo"
+        links={[
+          { href: "/entrega-empleado", label: "Escanear recibo" },
+          { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
+          { href: "/clientes-empleado", label: "Clientes" },
+        ]}
+      >
+        <form className="flex gap-2">
           <input
             name="q"
             defaultValue={q}
             autoFocus
-            placeholder="Ej: 00045 · María · 310..."
+            placeholder="Número de recibo, nombre o teléfono…"
             className="input-modern flex-1 text-base font-semibold"
           />
           <button className="btn-primary px-5">
@@ -90,13 +88,20 @@ export default function InventarioEmpleadoClient({
             </svg>
           </button>
         </form>
-
         {q && (
           <a href="/inventario-empleado" className="mt-3 inline-block text-sm font-semibold text-gray-400 hover:text-gray-600">
             ✕ Limpiar búsqueda
           </a>
         )}
-      </div>
+      </EmpleadoHero>
+
+      {!q && !pedido && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <HintCard n="1" title="Escribe el recibo" desc="El número de 5 dígitos, el nombre o el teléfono." />
+          <HintCard n="2" title="Cobra si hay saldo" desc="Si debe, registra el pago antes de entregar." />
+          <HintCard n="3" title="Entrega" desc="Parcial o completo. El gerente lo ve en el día." />
+        </div>
+      )}
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && pedidos.length === 0 && (
@@ -366,6 +371,18 @@ export default function InventarioEmpleadoClient({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function HintCard({ n, title, desc }: { n: string; title: string; desc: string }) {
+  return (
+    <div className="card p-4">
+      <p className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
+        {n}
+      </p>
+      <p className="mt-2 text-sm font-bold text-gray-900">{title}</p>
+      <p className="mt-0.5 text-xs text-gray-500">{desc}</p>
     </div>
   );
 }

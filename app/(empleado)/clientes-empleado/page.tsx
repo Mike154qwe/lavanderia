@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import EmpleadoLinks from "@/components/EmpleadoLinks";
+import EmpleadoHero from "@/components/EmpleadoHero";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -38,21 +38,18 @@ export default async function ClientesEmpleadoPage({
   return (
     <div className="p-4 sm:p-6">
 
-      {/* ── Cabecera ─────────────────────────────────────── */}
-      <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Clientes</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          Busca el cliente para crearle un pedido. Si es nuevo, créalo directo.
-        </p>
-        <EmpleadoLinks
-          extra={[
-            { href: "/pedidos/rapido", label: "Pedido rápido" },
-            { href: "/inventario-empleado", label: "Buscar / entregar" },
-          ]}
-        />
-
-        <form className="mt-4 flex gap-2">
+      <EmpleadoHero
+        kicker="Fichas"
+        title="Clientes"
+        subtitle="Busca a quien ya viene, o crea el recibo si es la primera vez."
+        icon="👤"
+        tone="aqua"
+        links={[
+          { href: "/pedidos/rapido", label: "Pedido rápido" },
+          { href: "/inventario-empleado", label: "Llegó a recoger" },
+        ]}
+      >
+        <form className="flex gap-2">
           <input
             name="q"
             defaultValue={q}
@@ -66,24 +63,47 @@ export default async function ClientesEmpleadoPage({
             </svg>
           </button>
         </form>
-
         {q && (
           <a href="/clientes-empleado" className="mt-2 inline-block text-sm font-semibold text-gray-400 hover:text-gray-600">
             ✕ Limpiar búsqueda
           </a>
         )}
-      </div>
+      </EmpleadoHero>
 
-      {/* ── CTA nuevo cliente ─────────────────────────────── */}
-      <Link
-        href="/pedidos/rapido"
-        className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
-      >
-        <span>+ Crear cliente nuevo y recibo</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </Link>
+      {!q && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="card p-5">
+            <p className="text-xs font-bold uppercase tracking-widest text-teal-600">Ya es cliente</p>
+            <p className="mt-1 font-bold text-gray-900">Escríbelo arriba</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Nombre o teléfono. Luego le creas un pedido nuevo.
+            </p>
+          </div>
+          <Link
+            href="/pedidos/rapido"
+            className="card p-5 transition hover:border-teal-300 hover:shadow-soft"
+          >
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Primera vez</p>
+            <p className="mt-1 font-bold text-gray-900">Crear cliente y recibo</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Nombre, teléfono y prendas en un solo flujo.
+            </p>
+            <p className="mt-3 text-sm font-bold text-brand-500">Ir al pedido rápido →</p>
+          </Link>
+        </div>
+      )}
+
+      {q && (
+        <Link
+          href="/pedidos/rapido"
+          className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
+        >
+          <span>+ Crear cliente nuevo y recibo</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </Link>
+      )}
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && clientes.length === 0 && (

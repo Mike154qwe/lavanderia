@@ -3,7 +3,7 @@ import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
-import EmpleadoLinks from "@/components/EmpleadoLinks";
+import EmpleadoHero from "@/components/EmpleadoHero";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -62,19 +62,14 @@ export default async function GastosEmpleadoPage({
     <div className="p-4 sm:p-6">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
-      {/* ── Cabecera ─────────────────────────────────────── */}
-      <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-red-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Gastos del día</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          Registra gastos para que aparezcan en el panel del gerente.
-        </p>
-        <EmpleadoLinks
-          extra={[
-            { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
-          ]}
-        />
-      </div>
+      <EmpleadoHero
+        kicker="Caja"
+        title="Gastos del día"
+        subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
+        icon="💵"
+        tone="amber"
+        links={[{ href: "/entradas-salidas-empleado", label: "Entradas y salidas" }]}
+      />
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
 

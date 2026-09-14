@@ -154,7 +154,7 @@ export default function PedidoRapidoForm({
   const servicioSeleccionado = SERVICIOS.find((s) => s.nombre === servicio);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="empleado-workspace min-h-full">
       <div className="mx-auto max-w-7xl px-4 py-5 lg:px-6">
         <form action={guardarPedidoRapidoAction}>
           {/* Hidden fields */}
@@ -173,20 +173,28 @@ export default function PedidoRapidoForm({
           ))}
 
           {/* ── HEADER ─────────────────────────────────────────── */}
-          <div className="mb-4 flex items-center justify-between rounded-2xl bg-white px-6 py-4 shadow-sm ring-1 ring-gray-100">
+          <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+            <div className="h-1.5 bg-gradient-to-r from-teal-400 to-cyan-500" />
+            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-xl shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-xl dark:bg-teal-500/15">
                 🧺
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
-                  Pedido rápido
+                <p className="text-xs font-bold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+                  Entrada · dejar prendas
                 </p>
                 <h1 className="text-xl font-black leading-tight text-gray-900">
                   {paso === 1 ? "¿Quién trae las prendas?" : "Ingresa las prendas"}
                 </h1>
               </div>
             </div>
+
+            <ol className="flex items-center gap-2">
+              <li className={`rounded-full px-2.5 py-1 text-xs font-bold ${paso === 1 ? "bg-teal-500 text-white" : "bg-teal-50 text-teal-700"}`}>1 Cliente</li>
+              <li className="text-gray-300">→</li>
+              <li className={`rounded-full px-2.5 py-1 text-xs font-bold ${paso === 2 ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-500"}`}>2 Prendas</li>
+            </ol>
 
             {paso === 1 && (
               <Link
@@ -215,13 +223,14 @@ export default function PedidoRapidoForm({
                 </button>
               </div>
             )}
+            </div>
           </div>
 
           {/* ── PASO 1: CLIENTE ─────────────────────────────────── */}
           {paso === 1 && (
             <div className="mx-auto max-w-lg rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100">
               <div className="mb-6 text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-4xl">
+                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-4xl dark:bg-teal-500/15">
                   👤
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">Datos del cliente</h2>
