@@ -63,11 +63,6 @@ export default function AppHeader() {
       {/* Right side */}
       <div className="ml-auto flex items-center gap-3">
         <ThemeToggle />
-
-        <div className="hidden items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-500 sm:flex dark:border-white/10 dark:bg-white/5 dark:text-gray-400">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-400" />
-          En línea
-        </div>
       </div>
     </header>
   );
