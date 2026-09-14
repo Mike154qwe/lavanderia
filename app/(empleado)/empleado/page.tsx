@@ -64,23 +64,22 @@ export default async function EmpleadoPage() {
   );
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="rounded-3xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
+    <div className="space-y-5 p-6">
+        <div className="card p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">
+              <h1 className="text-2xl font-black text-gray-900">
                 Operación diaria
               </h1>
 
-              <p className="mt-2 text-slate-500">
+              <p className="mt-1 text-sm text-gray-500">
                 Resumen de entradas y salidas del día.
               </p>
             </div>
 
             <Link
               href="/pedidos/nuevo"
-              className="rounded-2xl bg-teal-500 px-6 py-4 font-bold text-white shadow hover:bg-teal-600"
+              className="btn-primary"
             >
               Nueva entrada
             </Link>
@@ -130,8 +129,7 @@ export default async function EmpleadoPage() {
             )}
           </Panel>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }
 
@@ -149,26 +147,26 @@ function PedidoCard({ pedido }: { pedido: any }) {
   );
 
   return (
-    <div className="rounded-3xl border bg-slate-50 p-5">
+    <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.07] dark:bg-white/[0.02]">
       <div className="flex items-center justify-between">
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
           #{String(pedido.id).padStart(5, "0")}
         </span>
 
-        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-700">
+        <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
           {pedido.estado}
         </span>
       </div>
 
-      <h3 className="mt-4 text-xl font-bold text-slate-900">
+      <h3 className="mt-4 text-xl font-bold text-gray-900">
         {pedido.cliente.nombre}
       </h3>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Tel: {pedido.cliente.telefono || "No registrado"}
       </p>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Hora:{" "}
         {pedido.createdAt.toLocaleTimeString("es-CO", {
           hour: "2-digit",
@@ -176,7 +174,7 @@ function PedidoCard({ pedido }: { pedido: any }) {
         })}
       </p>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Prendas: {totalPrendas}
       </p>
 
@@ -201,9 +199,9 @@ function Kpi({
   color: string;
 }) {
   return (
-    <div className={`${color} rounded-3xl p-6 text-white shadow`}>
+    <div className={`${color} rounded-xl p-6 text-white`}>
       <p className="text-sm opacity-80">{title}</p>
-      <p className="mt-3 text-5xl font-bold">{value}</p>
+      <p className="mt-3 text-5xl font-black">{value}</p>
       <p className="mt-2 text-sm opacity-90">{detail}</p>
     </div>
   );
@@ -219,9 +217,9 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+    <div className="card p-6">
+      <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+      <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
       <div className="mt-5 space-y-4">{children}</div>
     </div>
   );
@@ -238,11 +236,11 @@ function Money({
 }) {
   return (
     <div className="rounded-2xl bg-white p-3">
-      <p className="text-xs text-slate-400">{label}</p>
+      <p className="text-xs text-gray-400">{label}</p>
 
       <p
-        className={`mt-1 font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
+        className={`mt-1 font-black ${
+          danger ? "text-red-600" : "text-brand-500"
         }`}
       >
         ${value.toLocaleString("es-CO")}
@@ -253,7 +251,7 @@ function Money({
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-slate-400">
+    <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400 dark:border-white/10">
       {text}
     </div>
   );

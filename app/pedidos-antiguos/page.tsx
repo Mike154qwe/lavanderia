@@ -44,16 +44,16 @@ export default async function PedidosAntiguosPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="card p-8">
+    <div className="space-y-5 p-6">
+      <section className="space-y-5">
+        <div className="card p-6">
           <div className="flex items-center justify-between gap-5">
             <div>
-              <h1 className="title-xl text-slate-900">
+              <h1 className="text-2xl font-black text-gray-900">
                 Pedidos antiguos
               </h1>
 
-              <p className="mt-2 text-slate-500">
+              <p className="mt-1 text-sm text-gray-500">
                 Pedidos con 3 meses o más en lavandería pendientes por recoger.
               </p>
             </div>
@@ -202,7 +202,7 @@ export default async function PedidosAntiguosPage() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
