@@ -5,6 +5,7 @@ import MoneyInput from "@/components/MoneyInput";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -63,10 +64,17 @@ export default function InventarioEmpleadoClient({
       {/* ── Buscador ─────────────────────────────────────── */}
       <div className="card p-5">
         <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Buscar pedido</h1>
+        <h1 className="mt-1 text-2xl font-black text-gray-900">Buscar / entregar</h1>
         <p className="mt-0.5 text-sm text-gray-500">
           Número de recibo, nombre o teléfono del cliente.
         </p>
+        <EmpleadoLinks
+          extra={[
+            { href: "/entrega-empleado", label: "Entrega y cobro" },
+            { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
+            { href: "/clientes-empleado", label: "Clientes" },
+          ]}
+        />
 
         <form className="mt-4 flex gap-2">
           <input

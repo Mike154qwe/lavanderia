@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
 export const metadata: Metadata = { title: "Entradas y salidas" };
 
@@ -77,6 +78,11 @@ export default async function EntradasSalidasEmpleadoPage({
             <p className="mt-0.5 text-sm text-gray-500">
               Toca un día para ver el detalle.
             </p>
+            <EmpleadoLinks
+              extra={[
+                { href: "/inventario-empleado", label: "Buscar / entregar" },
+              ]}
+            />
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/entradas-salidas-empleado?year=${year - 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">

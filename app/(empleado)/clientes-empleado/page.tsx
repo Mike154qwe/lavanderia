@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -44,6 +45,12 @@ export default async function ClientesEmpleadoPage({
         <p className="mt-0.5 text-sm text-gray-500">
           Busca el cliente para crearle un pedido. Si es nuevo, créalo directo.
         </p>
+        <EmpleadoLinks
+          extra={[
+            { href: "/pedidos/rapido", label: "Pedido rápido" },
+            { href: "/inventario-empleado", label: "Buscar / entregar" },
+          ]}
+        />
 
         <form className="mt-4 flex gap-2">
           <input

@@ -188,26 +188,11 @@ export default async function GerentePage({
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">Panel financiero</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Cierres de caja, pagos por método, entradas y salidas.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href={`/gerente?year=${year - 1}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              ← {year - 1}
-            </Link>
-            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-              {year}
-            </span>
-            <Link href={`/gerente?year=${year + 1}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              {year + 1} →
-            </Link>
-          </div>
-        </div>
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
+        <h1 className="mt-1 text-2xl font-black text-gray-900">Panel financiero</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          KPIs del día y cierre de caja. Las gráficas y el calendario quedan abajo, plegados.
+        </p>
       </div>
 
       {/* ── Día seleccionado ─────────────────────────────── */}
@@ -242,50 +227,14 @@ export default async function GerentePage({
           <KpiCard label="Gastos"          value={money(totalGastos)}   color="red"    icon="M17 7 7 17M7 7l10 10" danger />
           <KpiCard label="Caja esperada"   value={money(cajaEsperada)}  color="purple" icon="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </div>
-
-        {/* Charts */}
-        <div className="grid gap-4 p-5 lg:grid-cols-2">
-          <div className="rounded-xl border border-gray-100 p-5 dark:border-white/[0.07]">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Ingresos diarios</p>
-                <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  {new Date(hoy.getFullYear(), hoy.getMonth()).toLocaleDateString("es-CO", { month: "long", year: "numeric" })}
-                </p>
-              </div>
-              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-                {diasEnMes} días
-              </span>
-            </div>
-            <IngresosDiarios data={ingresosDiarios} />
-          </div>
-
-          <div className="rounded-xl border border-gray-100 p-5 dark:border-white/[0.07]">
-            <div className="mb-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Pagos por método</p>
-              <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                {fechaSeleccionada.toLocaleDateString("es-CO", { day: "numeric", month: "long" })}
-              </p>
-            </div>
-            <MetodosPago data={metodosPagoData} />
-          </div>
-        </div>
       </div>
 
-      {/* ── Facturación del día ───────────────────────────── */}
-      <div className="card p-6">
-        <h2 className="mb-5 text-lg font-bold text-gray-900">Facturación del día</h2>
-        <div className="grid gap-5 xl:grid-cols-2">
-          <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
-          <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />
-        </div>
-      </div>
-
-      {/* ── Cierre de caja ───────────────────────────────── */}
-      <div className="card p-6">
+      {/* ── Cierre de caja (acción principal) ─────────────── */}
+      <div className="card p-6 ring-2 ring-brand-200 dark:ring-brand-500/30">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Cierre de caja</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Acción principal</p>
+            <h2 className="mt-1 text-lg font-bold text-gray-900">Cierre de caja</h2>
             <p className="mt-0.5 text-sm text-gray-400">
               Toma los movimientos desde el último cierre hasta ahora.
             </p>
@@ -325,6 +274,15 @@ export default async function GerentePage({
             No hay cierres registrados este día.
           </p>
         )}
+      </div>
+
+      {/* ── Facturación del día ───────────────────────────── */}
+      <div className="card p-6">
+        <h2 className="mb-5 text-lg font-bold text-gray-900">Facturación del día</h2>
+        <div className="grid gap-5 xl:grid-cols-2">
+          <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
+          <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />
+        </div>
       </div>
 
       {/* ── Entradas y Salidas ───────────────────────────── */}
@@ -370,8 +328,56 @@ export default async function GerentePage({
         </div>
       </div>
 
-      {/* ── Calendario anual ─────────────────────────────── */}
-      <div className="space-y-4">
+      {/* ── Gráficas (secundario) ────────────────────────── */}
+      <details className="card overflow-hidden">
+        <summary className="cursor-pointer list-none px-6 py-4 text-sm font-bold text-gray-700 marker:content-none dark:text-gray-200">
+          Gráficas del mes
+          <span className="ml-2 text-xs font-semibold text-gray-400">secundario</span>
+        </summary>
+        <div className="grid gap-4 border-t border-gray-100 p-5 dark:border-white/[0.07] lg:grid-cols-2">
+          <div className="rounded-xl border border-gray-100 p-5 dark:border-white/[0.07]">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Ingresos diarios</p>
+                <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  {new Date(hoy.getFullYear(), hoy.getMonth()).toLocaleDateString("es-CO", { month: "long", year: "numeric" })}
+                </p>
+              </div>
+              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                {diasEnMes} días
+              </span>
+            </div>
+            <IngresosDiarios data={ingresosDiarios} />
+          </div>
+
+          <div className="rounded-xl border border-gray-100 p-5 dark:border-white/[0.07]">
+            <div className="mb-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Pagos por método</p>
+              <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
+                {fechaSeleccionada.toLocaleDateString("es-CO", { day: "numeric", month: "long" })}
+              </p>
+            </div>
+            <MetodosPago data={metodosPagoData} />
+          </div>
+        </div>
+      </details>
+
+      {/* ── Calendario anual (secundario) ────────────────── */}
+      <details className="space-y-4">
+        <summary className="card cursor-pointer list-none px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200">
+          Calendario anual {year}
+          <span className="ml-2 text-xs font-semibold text-gray-400">secundario</span>
+        </summary>
+        <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2 px-1">
+          <Link href={`/gerente?year=${year - 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
+            ← {year - 1}
+          </Link>
+          <span className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">{year}</span>
+          <Link href={`/gerente?year=${year + 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
+            {year + 1} →
+          </Link>
+        </div>
         {MESES.map((mes, mesIndex) => {
           const diasDelMes = new Date(year, mesIndex + 1, 0).getDate();
           const esMesActual = year === hoy.getFullYear() && mesIndex === hoy.getMonth();
@@ -443,7 +449,8 @@ export default async function GerentePage({
             </div>
           );
         })}
-      </div>
+        </div>
+      </details>
     </div>
   );
 }

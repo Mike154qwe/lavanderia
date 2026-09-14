@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { money } from "@/lib/format";
 
 export type PedidoEntrega = {
@@ -134,6 +135,12 @@ export default function EntregaClient({
           <p className="mt-0.5 text-sm text-gray-400">
             Escanea el recibo del cliente para continuar
           </p>
+          <Link
+            href="/inventario-empleado"
+            className="mt-3 inline-flex rounded-lg px-3 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+          >
+            ← Buscar / entregar
+          </Link>
         </div>
 
         {/* ── INPUT ESCANEO ─────────────────────────── */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { money } from "@/lib/format";
 
 type ItemPedido = {
@@ -186,6 +187,15 @@ export default function PedidoRapidoForm({
                 </h1>
               </div>
             </div>
+
+            {paso === 1 && (
+              <Link
+                href="/clientes-empleado"
+                className="rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+              >
+                Clientes
+              </Link>
+            )}
 
             {paso === 2 && (
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-2 ring-1 ring-gray-200">

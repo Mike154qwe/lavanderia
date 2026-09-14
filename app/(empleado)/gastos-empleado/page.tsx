@@ -3,6 +3,7 @@ import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -68,6 +69,11 @@ export default async function GastosEmpleadoPage({
         <p className="mt-0.5 text-sm text-gray-500">
           Registra gastos para que aparezcan en el panel del gerente.
         </p>
+        <EmpleadoLinks
+          extra={[
+            { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
+          ]}
+        />
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
