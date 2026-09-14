@@ -12,14 +12,14 @@ const TITULOS: Record<string, string> = {
   "/pedidos/nuevo":             "Nuevo pedido",
   "/pedidos/rapido":            "Pedido rápido",
   "/inventario":                "Inventario",
-  "/inventario-empleado":       "Buscar / entregar",
+  "/inventario-empleado":       "Llegó a recoger",
   "/pedidos-antiguos":          "Pedidos antiguos",
   "/movimientos":               "Movimientos",
   "/clientes":                  "Clientes",
   "/clientes-empleado":         "Clientes",
   "/entradas-salidas-empleado": "Entradas y salidas",
   "/gastos-empleado":           "Gastos del día",
-  "/empleado":                  "Inicio",
+  "/empleado":                  "Mostrador",
   "/entrega-empleado":          "Entrega y cobro",
 };
 

@@ -1,3 +1,3 @@
 export default function EmpleadoLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <div className="empleado-workspace">{children}</div>;
 }

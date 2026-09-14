@@ -85,13 +85,13 @@ const EMPLEADO_NAV: NavGroup[] = [
     grupo: "Mi trabajo",
     items: [
       {
-        label: "Pedido rápido",
+        label: "Llegó a dejar",
         href: "/pedidos/rapido",
         aliases: ["/clientes-empleado"],
         icon: <Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
       },
       {
-        label: "Buscar / entregar",
+        label: "Llegó a recoger",
         href: "/inventario-empleado",
         aliases: ["/entrega-empleado", "/entradas-salidas-empleado"],
         icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,

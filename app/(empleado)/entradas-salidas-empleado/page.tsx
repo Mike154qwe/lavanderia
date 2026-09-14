@@ -71,7 +71,7 @@ export default async function EntradasSalidasEmpleadoPage({
       <div className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-teal-600 dark:text-teal-400">Mostrador</p>
             <h1 className="mt-1 text-2xl font-black text-gray-900">
               Entradas y salidas {year}
             </h1>
@@ -80,7 +80,7 @@ export default async function EntradasSalidasEmpleadoPage({
             </p>
             <EmpleadoLinks
               extra={[
-                { href: "/inventario-empleado", label: "Buscar / entregar" },
+                { href: "/inventario-empleado", label: "Llegó a recoger" },
               ]}
             />
           </div>

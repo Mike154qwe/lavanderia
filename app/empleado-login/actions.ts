@@ -6,5 +6,5 @@ import { crearSesionEmpleado } from "@/lib/empleado-auth";
 export async function empleadoLoginAction() {
   await crearSesionEmpleado();
 
-  redirect("/pedidos/rapido");
+  redirect("/empleado");
 }
