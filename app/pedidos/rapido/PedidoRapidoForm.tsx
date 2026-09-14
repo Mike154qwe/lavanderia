@@ -228,7 +228,7 @@ export default function PedidoRapidoForm({
 
           {/* ── PASO 1: CLIENTE ─────────────────────────────────── */}
           {paso === 1 && (
-            <div className="mx-auto max-w-lg rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100">
+            <div className="card mx-auto max-w-lg p-8">
               <div className="mb-6 text-center">
                 <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-4xl dark:bg-teal-500/15">
                   👤
@@ -288,8 +288,8 @@ export default function PedidoRapidoForm({
               <div className="min-w-0 flex-1 space-y-3">
 
                 {/* ─── PASO 1: Tipo de prenda ─── */}
-                <div className={`rounded-2xl bg-white shadow-sm ring-1 transition-all ${
-                  steps.tipo ? "ring-emerald-200" : "ring-gray-100"
+                <div className={`card transition-all ${
+                  steps.tipo ? "ring-1 ring-emerald-200" : ""
                 }`}>
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                     <StepCircle n={1} done={steps.tipo} />
@@ -350,7 +350,7 @@ export default function PedidoRapidoForm({
                 </div>
 
                 {/* ─── PASO 2: Servicio ─── */}
-                <div className={`rounded-2xl bg-white shadow-sm ring-1 transition-all ${
+                <div className={`card transition-all ${
                   steps.servicio ? "ring-emerald-200" : "ring-gray-100"
                 }`}>
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
@@ -389,7 +389,7 @@ export default function PedidoRapidoForm({
                 <div className="grid grid-cols-2 gap-3">
 
                   {/* Cantidad */}
-                  <div className={`rounded-2xl bg-white shadow-sm ring-1 transition-all ${
+                  <div className={`card transition-all ${
                     steps.cantidad ? "ring-emerald-200" : "ring-gray-100"
                   }`}>
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
@@ -445,7 +445,7 @@ export default function PedidoRapidoForm({
                   </div>
 
                   {/* Valor */}
-                  <div className={`rounded-2xl bg-white shadow-sm ring-1 transition-all ${
+                  <div className={`card transition-all ${
                     steps.valor ? "ring-emerald-200" : "ring-gray-100"
                   }`}>
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
@@ -497,7 +497,7 @@ export default function PedidoRapidoForm({
                 </div>
 
                 {/* ─── Novedades (colapsable) ─── */}
-                <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+                <div className="card overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setShowNovedades((v) => !v)}
@@ -585,7 +585,7 @@ export default function PedidoRapidoForm({
 
               {/* ═══ COLUMNA DERECHA: Pedido en curso ════════════ */}
               <div className="w-full lg:w-72 lg:shrink-0 lg:sticky lg:top-6 lg:self-start">
-                <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+                <div className="card overflow-hidden">
 
                   {/* Header del panel */}
                   <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">

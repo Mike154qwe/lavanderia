@@ -38,12 +38,12 @@ export default function EmpleadoHero({
   const t = TONES[tone];
 
   return (
-    <div className="card overflow-hidden">
-      <div className={`h-1.5 ${t.bar}`} />
+    <div className="card">
+      <div className={`h-1.5 ${t.bar}`} style={{ borderRadius: "var(--radius-card) var(--radius-card) 0 0" }} />
       <div className="p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {icon && (
-            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-2xl ${t.icon}`}>
+            <div className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-well)] text-2xl ${t.icon}`}>
               {icon}
             </div>
           )}
