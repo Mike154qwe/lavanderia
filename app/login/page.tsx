@@ -129,13 +129,13 @@ export default async function LoginPage({
             {/* Logo móvil */}
             <div className="mb-8 flex items-center gap-3 lg:hidden">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-xl">🧺</div>
-              <p className="font-black text-gray-900">La Manuelita</p>
+              <p className="font-bold text-gray-900">La Manuelita</p>
             </div>
 
-            <p className="mb-1 text-xs font-black uppercase tracking-widest text-brand-500">
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-500">
               Acceso restringido
             </p>
-            <h2 className="text-3xl font-black leading-tight text-gray-900">
+            <h2 className="text-3xl font-bold leading-tight text-gray-900">
               Panel de gerente
             </h2>
             <p className="mt-2 text-sm text-gray-400">
@@ -151,7 +151,7 @@ export default async function LoginPage({
 
             <form action={loginAction} className="mt-8 space-y-4">
               <div>
-                <label className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-400">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">
                   Usuario
                 </label>
                 <div className="relative">
@@ -167,7 +167,7 @@ export default async function LoginPage({
               </div>
 
               <div>
-                <label className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-400">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">
                   Contraseña
                 </label>
                 <div className="relative">
@@ -184,7 +184,7 @@ export default async function LoginPage({
               </div>
 
               <button
-                className="mt-2 w-full rounded-2xl py-4 text-base font-black text-white shadow-lg transition active:scale-[0.99]"
+                className="mt-2 w-full rounded-2xl py-4 text-base font-bold text-white shadow-lg transition active:scale-[0.99]"
                 style={{
                   background: "linear-gradient(135deg, #465fff 0%, #3641f5 100%)",
                   boxShadow: "0 4px 20px rgba(70,95,255,0.35)",

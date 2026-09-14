@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { money } from "@/lib/format";
 
 export type PedidoEntrega = {
@@ -134,6 +135,12 @@ export default function EntregaClient({
           <p className="mt-0.5 text-sm text-gray-400">
             Escanea el recibo del cliente para continuar
           </p>
+          <Link
+            href="/inventario-empleado"
+            className="mt-3 inline-flex rounded-lg px-3 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+          >
+            ← Buscar / entregar
+          </Link>
         </div>
 
         {/* ── INPUT ESCANEO ─────────────────────────── */}
@@ -150,7 +157,7 @@ export default function EntregaClient({
                 if (e.key === "Enter") { e.preventDefault(); handleBuscar(); }
               }}
               disabled={isPending}
-              className="flex-1 text-2xl font-black tracking-widest placeholder:text-gray-200 focus:outline-none disabled:opacity-50"
+              className="flex-1 text-2xl font-bold tracking-widest placeholder:text-gray-200 focus:outline-none disabled:opacity-50"
               placeholder="00000"
               autoComplete="off"
               inputMode="numeric"
@@ -175,7 +182,7 @@ export default function EntregaClient({
           <div className="mb-4 flex items-center gap-3 rounded-2xl bg-red-50 px-5 py-4 ring-1 ring-red-200">
             <span className="text-3xl">❌</span>
             <div>
-              <p className="font-black text-red-700">Recibo no encontrado</p>
+              <p className="font-bold text-red-700">Recibo no encontrado</p>
               <p className="text-sm text-red-400">
                 No existe el pedido <strong>{codigo}</strong>. Verifica el número.
               </p>
@@ -187,7 +194,7 @@ export default function EntregaClient({
         {status === "success-entrega" && pedido && (
           <div className="mb-4 flex flex-col items-center gap-2 rounded-2xl bg-emerald-50 px-5 py-8 text-center ring-1 ring-emerald-200">
             <span className="text-5xl">✅</span>
-            <p className="text-xl font-black text-emerald-700">¡Entregado!</p>
+            <p className="text-xl font-bold text-emerald-700">¡Entregado!</p>
             <p className="text-sm font-bold text-emerald-600">
               Pedido #{pedido.codigoFormateado} — {pedido.cliente.nombre}
             </p>
@@ -199,7 +206,7 @@ export default function EntregaClient({
         {status === "success-pago" && pedido && (
           <div className="mb-2 flex items-center gap-3 rounded-2xl bg-emerald-50 px-5 py-3 ring-1 ring-emerald-200">
             <span className="text-2xl">💰</span>
-            <p className="font-black text-emerald-700">Pago registrado correctamente</p>
+            <p className="font-bold text-emerald-700">Pago registrado correctamente</p>
           </div>
         )}
 
@@ -210,17 +217,17 @@ export default function EntregaClient({
             {/* Encabezado del pedido */}
             <div className={`flex items-center justify-between px-5 py-4 ${estadoInfo.bg}`}>
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
                   Pedido
                 </p>
-                <p className="text-2xl font-black text-gray-900">
+                <p className="text-2xl font-bold text-gray-900">
                   #{pedido.codigoFormateado}
                 </p>
                 <p className="text-xs text-gray-400">{pedido.fechaFormateada}</p>
               </div>
               <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${estadoInfo.bg} ring-1 ring-current/20`}>
                 <span className={`h-2 w-2 rounded-full ${estadoInfo.dot}`} />
-                <span className={`text-sm font-black ${estadoInfo.text}`}>
+                <span className={`text-sm font-bold ${estadoInfo.text}`}>
                   {estadoInfo.label}
                 </span>
               </div>
@@ -230,7 +237,7 @@ export default function EntregaClient({
             {(pedido.estado === "RECIBIDO" || pedido.estado === "EN_PROCESO") && (
               <div className="flex items-center gap-2 border-b border-yellow-100 bg-yellow-50 px-5 py-2.5">
                 <span>⚠️</span>
-                <p className="text-xs font-black text-yellow-700">
+                <p className="text-xs font-bold text-yellow-700">
                   Este pedido aún no está listo para entrega
                 </p>
               </div>
@@ -248,27 +255,27 @@ export default function EntregaClient({
 
             {/* Cliente */}
             <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-black text-brand-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-bold text-brand-600">
                 {pedido.cliente.nombre.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="font-black text-gray-900">{pedido.cliente.nombre}</p>
+                <p className="font-bold text-gray-900">{pedido.cliente.nombre}</p>
                 <p className="text-sm text-gray-400">📞 {pedido.cliente.telefono || "Sin teléfono"}</p>
               </div>
             </div>
 
             {/* Prendas */}
             <div className="border-b border-gray-100">
-              <p className="px-5 pt-3 text-xs font-black uppercase tracking-widest text-gray-400">
+              <p className="px-5 pt-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                 Prendas
               </p>
               <div className="divide-y divide-gray-50 pb-1">
                 {pedido.prendas.map((p, i) => (
                   <div key={i} className="flex items-start justify-between px-5 py-2.5">
                     <div className="flex-1">
-                      <p className="text-sm font-black text-gray-900">
+                      <p className="text-sm font-bold text-gray-900">
                         {p.cantidad > 1 && (
-                          <span className="mr-1 font-black text-brand-500">{p.cantidad}×</span>
+                          <span className="mr-1 font-bold text-brand-500">{p.cantidad}×</span>
                         )}
                         {p.tipo}
                       </p>
@@ -295,12 +302,12 @@ export default function EntregaClient({
               </div>
               {pedido.saldo > 0 ? (
                 <div className="mt-1 flex items-center justify-between rounded-xl bg-red-50 px-3 py-2.5 ring-1 ring-red-200">
-                  <span className="font-black text-red-600">Saldo pendiente</span>
+                  <span className="font-bold text-red-600">Saldo pendiente</span>
                   <span className="text-xl font-black text-red-600">{money(pedido.saldo)}</span>
                 </div>
               ) : (
                 <div className="mt-1 flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 ring-1 ring-emerald-200">
-                  <span className="font-black text-emerald-600">✅ Pagado completo</span>
+                  <span className="font-bold text-emerald-600">✅ Pagado completo</span>
                   <span className="font-black text-emerald-600">{money(pedido.total)}</span>
                 </div>
               )}
@@ -309,10 +316,10 @@ export default function EntregaClient({
             {/* Formulario de cobro (expandible) */}
             {showPago && (
               <div className="border-b border-gray-100 bg-gray-50 px-5 py-4">
-                <p className="mb-3 text-sm font-black text-gray-700">💰 Registrar cobro</p>
+                <p className="mb-3 text-sm font-bold text-gray-700">💰 Registrar cobro</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-xs font-black uppercase tracking-wider text-gray-400">
+                    <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-400">
                       Valor a cobrar
                     </label>
                     <input
@@ -324,7 +331,7 @@ export default function EntregaClient({
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-black uppercase tracking-wider text-gray-400">
+                    <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-400">
                       Método
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -333,7 +340,7 @@ export default function EntregaClient({
                           key={m}
                           type="button"
                           onClick={() => setPagoMetodo(m)}
-                          className={`rounded-xl border-2 py-2 text-xs font-black transition ${
+                          className={`rounded-xl border-2 py-2 text-xs font-bold transition ${
                             pagoMetodo === m
                               ? "border-brand-500 bg-brand-500 text-white"
                               : "border-gray-200 text-gray-600 hover:border-brand-300"
@@ -348,7 +355,7 @@ export default function EntregaClient({
                     <button
                       type="button"
                       onClick={() => setShowPago(false)}
-                      className="flex-1 rounded-xl border-2 border-gray-200 py-2.5 text-sm font-black text-gray-500 transition hover:bg-gray-100"
+                      className="flex-1 rounded-xl border-2 border-gray-200 py-2.5 text-sm font-bold text-gray-500 transition hover:bg-gray-100"
                     >
                       Cancelar
                     </button>
@@ -356,7 +363,7 @@ export default function EntregaClient({
                       type="button"
                       onClick={handlePago}
                       disabled={isPending || pagoValor <= 0}
-                      className="flex-1 rounded-xl bg-brand-500 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+                      className="flex-1 rounded-xl bg-brand-500 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
                     >
                       {isPending ? "Guardando…" : `Confirmar ${money(pagoValor)}`}
                     </button>
@@ -373,7 +380,7 @@ export default function EntregaClient({
                     type="button"
                     onClick={() => { setShowPago(true); setPagoValor(pedido.saldo); }}
                     disabled={isPending}
-                    className="flex-1 rounded-xl bg-gray-900 py-3.5 text-sm font-black text-white shadow-sm transition hover:bg-gray-700 disabled:opacity-50"
+                    className="flex-1 rounded-xl bg-gray-900 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-gray-700 disabled:opacity-50"
                   >
                     💰 Cobrar {money(pedido.saldo)}
                   </button>
@@ -382,7 +389,7 @@ export default function EntregaClient({
                   type="button"
                   onClick={handleEntrega}
                   disabled={isPending}
-                  className="flex-1 rounded-xl bg-brand-500 py-3.5 text-sm font-black text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.99] disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-brand-500 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.99] disabled:opacity-50"
                 >
                   {isPending ? "Guardando…" : "✅ Marcar entregado"}
                 </button>
@@ -395,7 +402,7 @@ export default function EntregaClient({
                 <button
                   type="button"
                   onClick={reset}
-                  className="w-full rounded-xl border-2 border-gray-200 py-3 text-sm font-black text-gray-500 transition hover:bg-gray-50"
+                  className="w-full rounded-xl border-2 border-gray-200 py-3 text-sm font-bold text-gray-500 transition hover:bg-gray-50"
                 >
                   🔍 Escanear otro recibo
                 </button>
@@ -408,7 +415,7 @@ export default function EntregaClient({
         {status === "idle" && (
           <div className="mt-4 rounded-2xl border-2 border-dashed border-gray-200 px-6 py-10 text-center">
             <p className="text-4xl">📄</p>
-            <p className="mt-3 font-black text-gray-300">Esperando escaneo</p>
+            <p className="mt-3 font-bold text-gray-300">Esperando escaneo</p>
             <p className="mt-1 text-xs text-gray-200">
               Apunta la pistola al código de barras del recibo
             </p>

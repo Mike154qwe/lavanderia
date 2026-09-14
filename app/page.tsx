@@ -56,184 +56,165 @@ async function crearPedido(formData: FormData) {
 
 export default function NuevoPedidoPage() {
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="mx-auto max-w-5xl rounded-3xl bg-white p-8 shadow">
-          <h1 className="text-4xl font-bold text-slate-900">Nuevo pedido</h1>
-          <p className="mt-2 text-slate-500">
-            Registra cliente, servicio, prenda, valor final y abono.
-          </p>
+    <div className="space-y-5 p-6">
+      <div className="card mx-auto max-w-5xl p-6">
+        <h1 className="text-2xl font-black text-gray-900">Nuevo pedido</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Registra cliente, servicio, prenda, valor final y abono.
+        </p>
 
-          <form action={crearPedido} className="mt-8 grid gap-8">
-            <div className="rounded-3xl border bg-slate-50 p-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Datos del cliente
-              </h2>
+        <form action={crearPedido} className="mt-6 grid gap-5">
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.07] dark:bg-white/[0.02]">
+            <h2 className="text-lg font-bold text-gray-900">Datos del cliente</h2>
 
-              <div className="mt-5 grid gap-5 md:grid-cols-3">
-                <div>
-                  <label className="block text-sm font-medium">
-                    Nombre del cliente
-                  </label>
-                  <input
-                    name="nombreCliente"
-                    required
-                    className="mt-1 w-full rounded-xl border p-3"
-                    placeholder="Ej: María González"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">Teléfono</label>
-                  <input
-                    name="telefono"
-                    className="mt-1 w-full rounded-xl border p-3"
-                    placeholder="Ej: 3001234567"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">Dirección</label>
-                  <input
-                    name="direccion"
-                    className="mt-1 w-full rounded-xl border p-3"
-                    placeholder="Opcional"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border bg-slate-50 p-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Datos del servicio
-              </h2>
-
-              <div className="mt-5 grid gap-5 md:grid-cols-3">
-                <div>
-                  <label className="block text-sm font-medium">Servicio</label>
-                  <select
-                    name="servicio"
-                    required
-                    className="mt-1 w-full rounded-xl border p-3"
-                  >
-                    <option value="">Seleccione servicio</option>
-                    <option value="Lavado">Lavado</option>
-                    <option value="Planchado">Planchado</option>
-                    <option value="Tintura">Tintura</option>
-                    <option value="Lavado + Planchado">
-                      Lavado + Planchado
-                    </option>
-                    <option value="Solo secado">Solo secado</option>
-                    <option value="Lavado delicado">Lavado delicado</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">
-                    Tipo de prenda
-                  </label>
-                  <input
-                    name="tipoPrenda"
-                    required
-                    className="mt-1 w-full rounded-xl border p-3"
-                    placeholder="Ej: Camisa, pantalón, vestido"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">Cantidad</label>
-                  <input
-                    name="cantidad"
-                    type="number"
-                    defaultValue="1"
-                    min="1"
-                    required
-                    className="mt-1 w-full rounded-xl border p-3"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label className="block text-sm font-medium">
-                  Descripción de la prenda
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Nombre del cliente
                 </label>
                 <input
-                  name="descripcion"
-                  className="mt-1 w-full rounded-xl border p-3"
-                  placeholder="Color, material, observaciones visibles"
+                  name="nombreCliente"
+                  required
+                  className="input-modern"
+                  placeholder="Ej: María González"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">Teléfono</label>
+                <input
+                  name="telefono"
+                  className="input-modern"
+                  placeholder="Ej: 3001234567"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">Dirección</label>
+                <input
+                  name="direccion"
+                  className="input-modern"
+                  placeholder="Opcional"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.07] dark:bg-white/[0.02]">
+            <h2 className="text-lg font-bold text-gray-900">Datos del servicio</h2>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">Servicio</label>
+                <select name="servicio" required className="input-modern">
+                  <option value="">Seleccione servicio</option>
+                  <option value="Lavado">Lavado</option>
+                  <option value="Planchado">Planchado</option>
+                  <option value="Tintura">Tintura</option>
+                  <option value="Lavado + Planchado">Lavado + Planchado</option>
+                  <option value="Solo secado">Solo secado</option>
+                  <option value="Lavado delicado">Lavado delicado</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Tipo de prenda
+                </label>
+                <input
+                  name="tipoPrenda"
+                  required
+                  className="input-modern"
+                  placeholder="Ej: Camisa, pantalón, vestido"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">Cantidad</label>
+                <input
+                  name="cantidad"
+                  type="number"
+                  defaultValue="1"
+                  min="1"
+                  required
+                  className="input-modern"
                 />
               </div>
             </div>
 
-            <div className="rounded-3xl border bg-slate-50 p-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Pago y saldo
-              </h2>
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Descripción de la prenda
+              </label>
+              <input
+                name="descripcion"
+                className="input-modern"
+                placeholder="Color, material, observaciones visibles"
+              />
+            </div>
+          </div>
 
-              <div className="mt-5 grid gap-5 md:grid-cols-3">
-                <div>
-                  <label className="block text-sm font-medium">
-                    Valor final
-                  </label>
-                  <input
-                    name="total"
-                    type="number"
-                    min="0"
-                    step="1000"
-                    required
-                    className="mt-1 w-full rounded-xl border p-3"
-                    placeholder="Ej: 25000"
-                  />
-                </div>
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.07] dark:bg-white/[0.02]">
+            <h2 className="text-lg font-bold text-gray-900">Pago y saldo</h2>
 
-                <div>
-                  <label className="block text-sm font-medium">
-                    Abono inicial
-                  </label>
-                  <input
-                    name="abono"
-                    type="number"
-                    min="0"
-                    step="1000"
-                    defaultValue="0"
-                    className="mt-1 w-full rounded-xl border p-3"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">
-                    Método de pago
-                  </label>
-                  <select
-                    name="metodoPago"
-                    className="mt-1 w-full rounded-xl border p-3"
-                  >
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Nequi">Nequi</option>
-                    <option value="Daviplata">Daviplata</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                  </select>
-                </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Valor final
+                </label>
+                <input
+                  name="total"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  required
+                  className="input-modern"
+                  placeholder="Ej: 25000"
+                />
               </div>
 
-              <div className="mt-5">
-                <label className="block text-sm font-medium">Observación</label>
-                <textarea
-                  name="observacion"
-                  className="mt-1 w-full rounded-xl border p-3"
-                  placeholder="Notas adicionales del pedido"
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Abono inicial
+                </label>
+                <input
+                  name="abono"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  defaultValue="0"
+                  className="input-modern"
                 />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Método de pago
+                </label>
+                <select name="metodoPago" className="input-modern">
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Nequi">Nequi</option>
+                  <option value="Daviplata">Daviplata</option>
+                  <option value="Transferencia">Transferencia</option>
+                  <option value="Tarjeta">Tarjeta</option>
+                </select>
               </div>
             </div>
 
-            <button className="rounded-2xl bg-teal-500 px-6 py-4 text-lg font-bold text-white shadow hover:bg-teal-600">
-              Guardar pedido
-            </button>
-          </form>
-        </div>
-      </section>
-    </main>
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-400">Observación</label>
+              <textarea
+                name="observacion"
+                className="textarea-modern"
+                placeholder="Notas adicionales del pedido"
+              />
+            </div>
+          </div>
+
+          <button className="btn-primary">Guardar pedido</button>
+        </form>
+      </div>
+    </div>
   );
 }

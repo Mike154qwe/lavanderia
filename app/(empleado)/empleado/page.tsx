@@ -1,260 +1,85 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 
-export default async function EmpleadoPage() {
-  const hoy = new Date();
-
-  const inicioHoy = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate()
-  );
-
-  const finHoy = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate() + 1
-  );
-
-  const pedidos = await prisma.pedido.findMany({
-    include: {
-      cliente: true,
-      prendas: true,
-      pagos: true,
-      historial: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  const entradasHoy = pedidos.filter(
-    (pedido) =>
-      pedido.createdAt >= inicioHoy &&
-      pedido.createdAt < finHoy
-  );
-
-  const salidasHoy = pedidos.filter((pedido) =>
-    (pedido as any).historial.some(
-      (h: any) =>
-        h.estado === "ENTREGADO" &&
-        h.createdAt >= inicioHoy &&
-        h.createdAt < finHoy
-    )
-  );
-
-  const prendasEntradas = entradasHoy.reduce(
-    (sum, pedido) =>
-      sum +
-      pedido.prendas.reduce(
-        (s, prenda) => s + prenda.cantidad,
-        0
-      ),
-    0
-  );
-
-  const prendasSalidas = salidasHoy.reduce(
-    (sum, pedido) =>
-      sum +
-      pedido.prendas.reduce(
-        (s, prenda) => s + prenda.cantidad,
-        0
-      ),
-    0
-  );
-
+export default function EmpleadoPage() {
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="rounded-3xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">
-                Operación diaria
-              </h1>
-
-              <p className="mt-2 text-slate-500">
-                Resumen de entradas y salidas del día.
-              </p>
-            </div>
-
-            <Link
-              href="/pedidos/nuevo"
-              className="rounded-2xl bg-teal-500 px-6 py-4 font-bold text-white shadow hover:bg-teal-600"
-            >
-              Nueva entrada
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Kpi
-            title="Entradas hoy"
-            value={entradasHoy.length}
-            detail={`${prendasEntradas} prendas recibidas`}
-            color="bg-blue-600"
-          />
-
-          <Kpi
-            title="Salidas hoy"
-            value={salidasHoy.length}
-            detail={`${prendasSalidas} prendas entregadas`}
-            color="bg-emerald-600"
-          />
-        </div>
-
-        <div className="mt-8 grid gap-8 xl:grid-cols-2">
-          <Panel
-            title="Entradas de hoy"
-            subtitle="Pedidos recibidos durante el día"
-          >
-            {entradasHoy.map((pedido) => (
-              <PedidoCard key={pedido.id} pedido={pedido} />
-            ))}
-
-            {entradasHoy.length === 0 && (
-              <Empty text="No hay entradas registradas hoy." />
-            )}
-          </Panel>
-
-          <Panel
-            title="Salidas de hoy"
-            subtitle="Pedidos entregados durante el día"
-          >
-            {salidasHoy.map((pedido) => (
-              <PedidoCard key={pedido.id} pedido={pedido} />
-            ))}
-
-            {salidasHoy.length === 0 && (
-              <Empty text="No hay salidas registradas hoy." />
-            )}
-          </Panel>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function PedidoCard({ pedido }: { pedido: any }) {
-  const abonado = pedido.pagos.reduce(
-    (sum: number, pago: any) => sum + pago.valor,
-    0
-  );
-
-  const saldo = pedido.total - abonado;
-
-  const totalPrendas = pedido.prendas.reduce(
-    (sum: number, prenda: any) => sum + prenda.cantidad,
-    0
-  );
-
-  return (
-    <div className="rounded-3xl border bg-slate-50 p-5">
-      <div className="flex items-center justify-between">
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
-          #{String(pedido.id).padStart(5, "0")}
-        </span>
-
-        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-700">
-          {pedido.estado}
-        </span>
+    <div className="space-y-5 p-6">
+      <div className="card p-6">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
+        <h1 className="mt-1 text-2xl font-black text-gray-900">¿Qué vas a hacer?</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Tres acciones del día. Clientes y entradas/salidas están dentro de esas pantallas.
+        </p>
       </div>
 
-      <h3 className="mt-4 text-xl font-bold text-slate-900">
-        {pedido.cliente.nombre}
-      </h3>
+      <div className="grid gap-4 md:grid-cols-3">
+        <ActionCard
+          href="/pedidos/rapido"
+          title="Pedido rápido"
+          desc="Registrar las prendas que entran"
+          emoji="⚡"
+        />
+        <ActionCard
+          href="/inventario-empleado"
+          title="Buscar / entregar"
+          desc="Buscar recibo, cobrar y entregar"
+          emoji="🔍"
+        />
+        <ActionCard
+          href="/gastos-empleado"
+          title="Gastos del día"
+          desc="Registrar salidas de caja"
+          emoji="💵"
+        />
+      </div>
 
-      <p className="mt-1 text-sm text-slate-500">
-        Tel: {pedido.cliente.telefono || "No registrado"}
-      </p>
-
-      <p className="mt-1 text-sm text-slate-500">
-        Hora:{" "}
-        {pedido.createdAt.toLocaleTimeString("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </p>
-
-      <p className="mt-1 text-sm text-slate-500">
-        Prendas: {totalPrendas}
-      </p>
-
-      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-        <Money label="Total" value={pedido.total} />
-        <Money label="Abono" value={abonado} />
-        <Money label="Saldo" value={saldo} danger={saldo > 0} />
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/clientes-empleado"
+          className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-600 dark:border-white/10 dark:text-gray-300"
+        >
+          Clientes
+        </Link>
+        <Link
+          href="/entradas-salidas-empleado"
+          className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-600 dark:border-white/10 dark:text-gray-300"
+        >
+          Entradas y salidas
+        </Link>
+        <Link
+          href="/entrega-empleado"
+          className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-600 dark:border-white/10 dark:text-gray-300"
+        >
+          Entrega y cobro
+        </Link>
       </div>
     </div>
   );
 }
 
-function Kpi({
+function ActionCard({
+  href,
   title,
-  value,
-  detail,
-  color,
+  desc,
+  emoji,
 }: {
+  href: string;
   title: string;
-  value: number;
-  detail: string;
-  color: string;
+  desc: string;
+  emoji: string;
 }) {
   return (
-    <div className={`${color} rounded-3xl p-6 text-white shadow`}>
-      <p className="text-sm opacity-80">{title}</p>
-      <p className="mt-3 text-5xl font-bold">{value}</p>
-      <p className="mt-2 text-sm opacity-90">{detail}</p>
-    </div>
-  );
-}
-
-function Panel({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
-      <div className="mt-5 space-y-4">{children}</div>
-    </div>
-  );
-}
-
-function Money({
-  label,
-  value,
-  danger,
-}: {
-  label: string;
-  value: number;
-  danger?: boolean;
-}) {
-  return (
-    <div className="rounded-2xl bg-white p-3">
-      <p className="text-xs text-slate-400">{label}</p>
-
-      <p
-        className={`mt-1 font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
-        }`}
-      >
-        ${value.toLocaleString("es-CO")}
-      </p>
-    </div>
-  );
-}
-
-function Empty({ text }: { text: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-slate-400">
-      {text}
-    </div>
+    <Link
+      href={href}
+      className="card flex flex-col gap-3 p-6 transition hover:border-brand-300 hover:shadow-soft dark:hover:border-brand-500/40"
+    >
+      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl dark:bg-brand-500/15">
+        {emoji}
+      </span>
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+        <p className="mt-1 text-sm text-gray-500">{desc}</p>
+      </div>
+      <span className="mt-auto text-sm font-semibold text-brand-500">Abrir →</span>
+    </Link>
   );
 }

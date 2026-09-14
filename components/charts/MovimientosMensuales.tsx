@@ -17,7 +17,7 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
-      <p className="mb-1.5 text-xs font-black text-gray-500">{label}</p>
+      <p className="mb-1.5 text-xs font-bold text-gray-500">{label}</p>
       {payload.map((p: any) => (
         <p key={p.name} className="text-sm font-bold" style={{ color: p.color }}>
           {p.name === "entradas" ? "↑ Entradas" : "↓ Salidas"}: {p.value}

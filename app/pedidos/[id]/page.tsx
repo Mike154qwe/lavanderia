@@ -178,11 +178,11 @@ export default async function DetallePedidoPage({
 
           {/* Cliente */}
           <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-black text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
               {inicial}
             </div>
             <div>
-              <p className="font-black text-gray-900">{pedido.cliente.nombre}</p>
+              <p className="font-bold text-gray-900">{pedido.cliente.nombre}</p>
               <p className="mt-0.5 text-sm text-gray-400">
                 {pedido.cliente.telefono
                   ? <a href={`tel:${pedido.cliente.telefono}`} className="hover:text-brand-500">{pedido.cliente.telefono}</a>
@@ -224,7 +224,7 @@ export default async function DetallePedidoPage({
         {/* ── Prendas ─────────────────────────────────────── */}
         <div className="card overflow-hidden">
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
-            <h2 className="font-black text-gray-900">
+            <h2 className="font-bold text-gray-900">
               Prendas
               <span className="ml-2 text-sm font-normal text-gray-400">({pedido.prendas.length})</span>
             </h2>
@@ -265,7 +265,7 @@ export default async function DetallePedidoPage({
                 {/* Formulario de edición */}
                 {!terminado && (
                   <div className="border-t border-brand-100 bg-brand-50/20 px-6 py-4 dark:border-brand-500/20 dark:bg-brand-500/5">
-                    <p className="mb-3 text-xs font-black uppercase tracking-widest text-brand-500">Editar prenda</p>
+                    <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-500">Editar prenda</p>
                     <form action={editarPrendaAction} className="grid gap-3 sm:grid-cols-2">
                       <input type="hidden" name="pedidoId" value={pedido.id} />
                       <input type="hidden" name="prendaId" value={p.id} />
@@ -326,7 +326,7 @@ export default async function DetallePedidoPage({
                 </svg>
               </summary>
               <div className="border-t border-brand-100 bg-brand-50/20 px-6 py-4 dark:border-brand-500/20 dark:bg-brand-500/5">
-                <p className="mb-3 text-xs font-black uppercase tracking-widest text-brand-500">Nueva prenda</p>
+                <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-500">Nueva prenda</p>
                 <form action={agregarPrendaAction} className="grid gap-3 sm:grid-cols-2">
                   <input type="hidden" name="pedidoId" value={pedido.id} />
                   <div>
@@ -366,7 +366,7 @@ export default async function DetallePedidoPage({
         <div className="card overflow-hidden">
           <div className="border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
             <div className="flex items-center justify-between">
-              <h2 className="font-black text-gray-900">Pagos</h2>
+              <h2 className="font-bold text-gray-900">Pagos</h2>
               {totalPagado > 0 && (
                 <span className="font-black text-green-600 dark:text-green-400">{money(totalPagado)} recibido</span>
               )}
@@ -419,7 +419,7 @@ export default async function DetallePedidoPage({
         {/* ── Estado ──────────────────────────────────────── */}
         {!terminado && (
           <div className="card p-6">
-            <h2 className="mb-4 font-black text-gray-900">Cambiar estado</h2>
+            <h2 className="mb-4 font-bold text-gray-900">Cambiar estado</h2>
 
             <div className="flex flex-wrap gap-3">
               {pedido.estado === "RECIBIDO" && (
@@ -461,7 +461,7 @@ export default async function DetallePedidoPage({
         {/* ── Historial ───────────────────────────────────── */}
         {pedido.historial.length > 0 && (
           <div className="card p-6">
-            <h2 className="mb-4 font-black text-gray-900">Historial</h2>
+            <h2 className="mb-4 font-bold text-gray-900">Historial</h2>
             <ol className="relative border-l border-gray-200 pl-5 dark:border-white/10">
               {pedido.historial.map((h, i) => (
                 <li key={h.id} className={`pb-4 ${i === pedido.historial.length - 1 ? "pb-0" : ""}`}>

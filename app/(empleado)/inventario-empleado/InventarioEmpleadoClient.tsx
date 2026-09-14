@@ -5,6 +5,7 @@ import MoneyInput from "@/components/MoneyInput";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -63,10 +64,17 @@ export default function InventarioEmpleadoClient({
       {/* ── Buscador ─────────────────────────────────────── */}
       <div className="card p-5">
         <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Buscar pedido</h1>
+        <h1 className="mt-1 text-2xl font-black text-gray-900">Buscar / entregar</h1>
         <p className="mt-0.5 text-sm text-gray-500">
           Número de recibo, nombre o teléfono del cliente.
         </p>
+        <EmpleadoLinks
+          extra={[
+            { href: "/entrega-empleado", label: "Entrega y cobro" },
+            { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
+            { href: "/clientes-empleado", label: "Clientes" },
+          ]}
+        />
 
         <form className="mt-4 flex gap-2">
           <input
@@ -104,7 +112,7 @@ export default function InventarioEmpleadoClient({
       {/* ── Lista de resultados ──────────────────────────── */}
       {!pedido && pedidos.length > 1 && (
         <div className="card mt-4 p-5">
-          <h2 className="mb-4 font-black text-gray-900">
+          <h2 className="mb-4 font-bold text-gray-900">
             {pedidos.length} resultados — selecciona el pedido
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -119,7 +127,7 @@ export default function InventarioEmpleadoClient({
                   className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-left transition hover:border-brand-300 hover:bg-brand-50 dark:border-white/[0.07] dark:bg-white/[0.02]"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-lg font-black text-gray-900">#{fmt(item.id)}</span>
+                    <span className="font-mono text-lg font-bold text-gray-900">#{fmt(item.id)}</span>
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[item.estado] ?? "bg-gray-100 text-gray-600"}`}>
                       {item.estado}
                     </span>
@@ -147,12 +155,12 @@ export default function InventarioEmpleadoClient({
             <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-5 dark:border-white/[0.07]">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-2xl font-black text-gray-900">#{fmt(pedido.id)}</span>
+                  <span className="font-mono text-2xl font-bold text-gray-900">#{fmt(pedido.id)}</span>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-600"}`}>
                     {pedido.estado}
                   </span>
                 </div>
-                <p className="mt-1 text-lg font-black text-gray-800">{pedido.cliente.nombre}</p>
+                <p className="mt-1 text-lg font-bold text-gray-800">{pedido.cliente.nombre}</p>
                 <p className="text-sm text-gray-400">
                   {pedido.cliente.telefono ?? "Sin teléfono"} ·{" "}
                   {new Date(pedido.createdAt).toLocaleDateString("es-CO")}
@@ -191,7 +199,7 @@ export default function InventarioEmpleadoClient({
             <div className="card overflow-hidden border-red-200 dark:border-red-500/20">
               <div className="flex items-center justify-between gap-4 border-b border-red-100 bg-red-50 px-5 py-4 dark:border-red-500/20 dark:bg-red-500/10">
                 <div>
-                  <p className="font-black text-red-600 dark:text-red-400">Saldo pendiente</p>
+                  <p className="font-bold text-red-600 dark:text-red-400">Saldo pendiente</p>
                   <p className="mt-0.5 text-sm text-red-500 dark:text-red-400">
                     Para entregar todo debes saldar primero.
                   </p>
@@ -225,7 +233,7 @@ export default function InventarioEmpleadoClient({
           {/* Prendas */}
           <div className="card p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-black text-gray-900">Prendas del pedido</h2>
+              <h2 className="font-bold text-gray-900">Prendas del pedido</h2>
               <span className="text-sm font-semibold text-gray-400">
                 {prendasPendientes} pendiente{prendasPendientes !== 1 ? "s" : ""}
               </span>
@@ -250,7 +258,7 @@ export default function InventarioEmpleadoClient({
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <p className="font-black text-gray-900">{prenda.tipo}</p>
+                        <p className="font-bold text-gray-900">{prenda.tipo}</p>
                         <p className="text-sm text-gray-500">{prenda.servicio}</p>
                         <p className="mt-1 text-sm">
                           <span className="text-gray-400">Recibidas {prenda.cantidad}</span>
@@ -271,7 +279,7 @@ export default function InventarioEmpleadoClient({
                       <div className="shrink-0 text-right">
                         <p className="font-black text-brand-500">{money(prenda.valor)}</p>
                         {done ? (
-                          <p className="mt-2 text-sm font-black text-green-600">✅ Entregada</p>
+                          <p className="mt-2 text-sm font-bold text-green-600">✅ Entregada</p>
                         ) : (
                           <button
                             type="button"
@@ -344,7 +352,7 @@ export default function InventarioEmpleadoClient({
             {saldo <= 0 && prendasPendientes > 0 && (
               <form action={entregarCompletoEmpleado} className="mt-5">
                 <input type="hidden" name="pedidoId" value={pedido.id} />
-                <button className="w-full rounded-xl bg-green-500 py-5 text-xl font-black text-white shadow-sm transition hover:bg-green-600 active:scale-[0.99]">
+                <button className="w-full rounded-xl bg-green-500 py-5 text-xl font-bold text-white shadow-sm transition hover:bg-green-600 active:scale-[0.99]">
                   📦 Entregar todo el pedido
                 </button>
               </form>

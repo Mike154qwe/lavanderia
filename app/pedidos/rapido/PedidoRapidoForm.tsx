@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { money } from "@/lib/format";
 
 type ItemPedido = {
@@ -58,7 +59,7 @@ const SERVICIO_COLORS_IDLE: Record<string, string> = {
 function StepCircle({ n, done }: { n: number; done: boolean }) {
   return (
     <div
-      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black transition-colors ${
+      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
         done
           ? "bg-emerald-500 text-white"
           : "bg-gray-200 text-gray-500"
@@ -178,7 +179,7 @@ export default function PedidoRapidoForm({
                 🧺
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-brand-500">
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
                   Pedido rápido
                 </p>
                 <h1 className="text-xl font-black leading-tight text-gray-900">
@@ -187,19 +188,28 @@ export default function PedidoRapidoForm({
               </div>
             </div>
 
+            {paso === 1 && (
+              <Link
+                href="/clientes-empleado"
+                className="rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+              >
+                Clientes
+              </Link>
+            )}
+
             {paso === 2 && (
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-2 ring-1 ring-gray-200">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-black text-brand-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">
                   {nombre.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-black leading-tight text-gray-800">{nombre}</p>
+                  <p className="text-sm font-bold leading-tight text-gray-800">{nombre}</p>
                   <p className="text-xs text-gray-400">{telefono}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPaso(1)}
-                  className="ml-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-black text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+                  className="ml-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
                 >
                   Cambiar
                 </button>
@@ -214,7 +224,7 @@ export default function PedidoRapidoForm({
                 <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-4xl">
                   👤
                 </div>
-                <h2 className="text-2xl font-black text-gray-900">Datos del cliente</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Datos del cliente</h2>
                 <p className="mt-1 text-sm text-gray-400">
                   Ingresa el nombre y teléfono para continuar
                 </p>
@@ -254,7 +264,7 @@ export default function PedidoRapidoForm({
                 type="button"
                 disabled={!nombre.trim() || !telefono.trim()}
                 onClick={() => setPaso(2)}
-                className="mt-6 w-full rounded-2xl bg-brand-500 py-4 text-lg font-black text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                className="mt-6 w-full rounded-2xl bg-brand-500 py-4 text-lg font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
               >
                 Continuar → Agregar prendas
               </button>
@@ -275,7 +285,7 @@ export default function PedidoRapidoForm({
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                     <StepCircle n={1} done={steps.tipo} />
                     <div className="flex-1">
-                      <p className="text-sm font-black text-gray-800">Tipo de prenda</p>
+                      <p className="text-sm font-bold text-gray-800">Tipo de prenda</p>
                       {steps.tipo && (
                         <p className="text-xs font-bold text-emerald-600">
                           Seleccionado: {tipoFinal}
@@ -283,7 +293,7 @@ export default function PedidoRapidoForm({
                       )}
                     </div>
                     {steps.tipo && !steps.servicio && (
-                      <span className="animate-pulse rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-black text-brand-600">
+                      <span className="animate-pulse rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-bold text-brand-600">
                         siguiente →
                       </span>
                     )}
@@ -302,7 +312,7 @@ export default function PedidoRapidoForm({
                           }`}
                         >
                           <span className="text-2xl leading-none">{p.emoji}</span>
-                          <span className="text-xs font-black leading-tight">{p.nombre}</span>
+                          <span className="text-xs font-bold leading-tight">{p.nombre}</span>
                         </button>
                       ))}
                       <button
@@ -315,7 +325,7 @@ export default function PedidoRapidoForm({
                         }`}
                       >
                         <span className="text-2xl leading-none">✏️</span>
-                        <span className="text-xs font-black leading-tight">Otro</span>
+                        <span className="text-xs font-bold leading-tight">Otro</span>
                       </button>
                     </div>
                     {tipo === "__otro__" && (
@@ -337,7 +347,7 @@ export default function PedidoRapidoForm({
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                     <StepCircle n={2} done={steps.servicio} />
                     <div className="flex-1">
-                      <p className="text-sm font-black text-gray-800">Servicio</p>
+                      <p className="text-sm font-bold text-gray-800">Servicio</p>
                       {steps.servicio && (
                         <p className="text-xs font-bold text-emerald-600">
                           {servicioSeleccionado?.emoji} {servicio}
@@ -359,7 +369,7 @@ export default function PedidoRapidoForm({
                           }`}
                         >
                           <span className="text-2xl leading-none">{s.emoji}</span>
-                          <span className="text-xs font-black leading-tight">{s.nombre}</span>
+                          <span className="text-xs font-bold leading-tight">{s.nombre}</span>
                         </button>
                       ))}
                     </div>
@@ -375,7 +385,7 @@ export default function PedidoRapidoForm({
                   }`}>
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                       <StepCircle n={3} done={steps.cantidad} />
-                      <p className="text-sm font-black text-gray-800">Cantidad</p>
+                      <p className="text-sm font-bold text-gray-800">Cantidad</p>
                     </div>
                     <div className="p-4">
                       {/* Accesos rápidos */}
@@ -385,7 +395,7 @@ export default function PedidoRapidoForm({
                             key={c}
                             type="button"
                             onClick={() => setCantidad(c)}
-                            className={`rounded-lg border-2 py-1.5 text-sm font-black transition active:scale-[0.96] ${
+                            className={`rounded-lg border-2 py-1.5 text-sm font-bold transition active:scale-[0.96] ${
                               cantidad === c
                                 ? "border-brand-500 bg-brand-500 text-white"
                                 : "border-gray-200 text-gray-700 hover:border-brand-300 hover:bg-brand-50"
@@ -400,7 +410,7 @@ export default function PedidoRapidoForm({
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl font-black text-gray-700 transition hover:bg-gray-200 active:scale-95"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl font-bold text-gray-700 transition hover:bg-gray-200 active:scale-95"
                         >
                           −
                         </button>
@@ -412,12 +422,12 @@ export default function PedidoRapidoForm({
                           onKeyDown={(e) => {
                             if (e.key === "Enter") { e.preventDefault(); if (puedeAgregar) agregarItem(); }
                           }}
-                          className="w-full rounded-xl border-2 border-gray-200 py-2 text-center text-2xl font-black focus:border-brand-500 focus:outline-none"
+                          className="w-full rounded-xl border-2 border-gray-200 py-2 text-center text-2xl font-bold focus:border-brand-500 focus:outline-none"
                         />
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => c + 1)}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-xl font-black text-white transition hover:bg-brand-600 active:scale-95"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-white transition hover:bg-brand-600 active:scale-95"
                         >
                           +
                         </button>
@@ -432,7 +442,7 @@ export default function PedidoRapidoForm({
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
                       <StepCircle n={4} done={steps.valor} />
                       <div className="flex-1">
-                        <p className="text-sm font-black text-gray-800">Valor unitario</p>
+                        <p className="text-sm font-bold text-gray-800">Valor unitario</p>
                         {steps.valor && (
                           <p className="text-xs font-bold text-emerald-600">
                             {money(valor)} c/u
@@ -440,7 +450,7 @@ export default function PedidoRapidoForm({
                         )}
                       </div>
                       {steps.valor && cantidad > 1 && (
-                        <span className="rounded-lg bg-brand-50 px-2 py-1 text-xs font-black text-brand-600">
+                        <span className="rounded-lg bg-brand-50 px-2 py-1 text-xs font-bold text-brand-600">
                           {cantidad} × {money(valor)} = {money(valorTotal)}
                         </span>
                       )}
@@ -452,7 +462,7 @@ export default function PedidoRapidoForm({
                             key={v}
                             type="button"
                             onClick={() => setValor(v)}
-                            className={`rounded-lg border-2 py-1.5 text-xs font-black transition active:scale-[0.96] ${
+                            className={`rounded-lg border-2 py-1.5 text-xs font-bold transition active:scale-[0.96] ${
                               valor === v
                                 ? "border-brand-500 bg-brand-500 text-white"
                                 : "border-gray-200 text-gray-700 hover:border-brand-300 hover:bg-brand-50"
@@ -486,7 +496,7 @@ export default function PedidoRapidoForm({
                   >
                     <span className="text-lg">⚠️</span>
                     <div className="flex-1">
-                      <p className="text-sm font-black text-gray-600">Novedades de la prenda</p>
+                      <p className="text-sm font-bold text-gray-600">Novedades de la prenda</p>
                       <p className="text-xs text-gray-400">
                         {descripcionActual
                           ? descripcionActual
@@ -532,7 +542,7 @@ export default function PedidoRapidoForm({
                   type="button"
                   onClick={agregarItem}
                   disabled={!puedeAgregar}
-                  className={`w-full rounded-2xl py-4 text-base font-black shadow-md transition active:scale-[0.99] ${
+                  className={`w-full rounded-2xl py-4 text-base font-bold shadow-md transition active:scale-[0.99] ${
                     puedeAgregar
                       ? "bg-gray-900 text-white hover:bg-gray-700"
                       : "cursor-not-allowed bg-gray-100 text-gray-400"
@@ -572,10 +582,10 @@ export default function PedidoRapidoForm({
                   <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="text-base">🧾</span>
-                      <p className="text-sm font-black text-gray-700">Pedido</p>
+                      <p className="text-sm font-bold text-gray-700">Pedido</p>
                     </div>
                     {totalPrendas > 0 && (
-                      <span className="rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-black text-white">
+                      <span className="rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-bold text-white">
                         {totalPrendas} {totalPrendas === 1 ? "prenda" : "prendas"}
                       </span>
                     )}
@@ -592,13 +602,13 @@ export default function PedidoRapidoForm({
                     <div className="max-h-80 divide-y divide-gray-50 overflow-y-auto">
                       {items.map((item, idx) => (
                         <div key={item.id} className="flex items-start gap-2 px-4 py-2.5">
-                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-black text-gray-500">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-500">
                             {idx + 1}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-black leading-tight text-gray-900">
+                            <p className="text-sm font-bold leading-tight text-gray-900">
                               {item.cantidad > 1 && (
-                                <span className="mr-1 font-black text-brand-500">{item.cantidad}×</span>
+                                <span className="mr-1 font-bold text-brand-500">{item.cantidad}×</span>
                               )}
                               {item.tipo}
                             </p>
@@ -629,14 +639,14 @@ export default function PedidoRapidoForm({
                     <>
                       <div className="border-t border-gray-100 bg-brand-50 px-4 py-3">
                         <div className="flex items-center justify-between">
-                          <p className="text-xs font-black uppercase tracking-wide text-brand-600">Total</p>
+                          <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Total</p>
                           <p className="text-2xl font-black text-brand-700">{money(total)}</p>
                         </div>
                       </div>
 
                       <div className="space-y-3 p-4">
                         <div>
-                          <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-gray-400">
+                          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
                             💵 Abono inicial
                           </label>
                           <input
@@ -649,13 +659,13 @@ export default function PedidoRapidoForm({
                         </div>
 
                         <div>
-                          <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-gray-400">
+                          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
                             Método de pago
                           </label>
                           <select
                             value={metodo}
                             onChange={(e) => setMetodo(e.target.value)}
-                            className="w-full rounded-xl border-2 border-gray-200 p-2.5 text-sm font-black focus:border-brand-500 focus:outline-none"
+                            className="w-full rounded-xl border-2 border-gray-200 p-2.5 text-sm font-bold focus:border-brand-500 focus:outline-none"
                           >
                             <option value="Efectivo">💵 Efectivo</option>
                             <option value="Nequi">📱 Nequi</option>
@@ -679,7 +689,7 @@ export default function PedidoRapidoForm({
 
                         <button
                           type="submit"
-                          className="w-full rounded-2xl bg-brand-500 py-3.5 text-sm font-black text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99]"
+                          className="w-full rounded-2xl bg-brand-500 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99]"
                         >
                           ✅ Confirmar e imprimir recibo
                         </button>
@@ -692,7 +702,7 @@ export default function PedidoRapidoForm({
                       <button
                         type="submit"
                         disabled
-                        className="w-full cursor-not-allowed rounded-2xl bg-gray-100 py-3.5 text-sm font-black text-gray-300"
+                        className="w-full cursor-not-allowed rounded-2xl bg-gray-100 py-3.5 text-sm font-bold text-gray-300"
                       >
                         Confirmar e imprimir recibo
                       </button>
