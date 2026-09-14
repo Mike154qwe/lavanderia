@@ -4,11 +4,11 @@ export default function EmpleadoPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+        <p className="page-kicker text-teal-600 dark:text-teal-400">
           Mostrador
         </p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">¿Qué necesita el cliente?</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="page-title">¿Qué necesita el cliente?</h1>
+        <p className="page-subtitle">
           Dos caminos. Elige según llegó a dejar o a recoger.
         </p>
       </div>
@@ -37,8 +37,8 @@ export default function EmpleadoPage() {
       </div>
 
       <div>
-        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">También</p>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <p className="mb-3 page-kicker">También</p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <SideLink href="/gastos-empleado" emoji="💵" title="Gastos del día" desc="Jabones, insumos, pagos" />
           <SideLink href="/clientes-empleado" emoji="👤" title="Clientes" desc="Buscar o crear ficha" />
           <SideLink href="/entradas-salidas-empleado" emoji="📋" title="Entradas y salidas" desc="Qué entró y salió hoy" />
@@ -82,7 +82,7 @@ function PathCard({
       />
       <div className="flex items-start gap-4">
         <span
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl ${
+          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-3xl ${
             aqua ? "bg-teal-50 dark:bg-teal-500/15" : "bg-brand-50 dark:bg-brand-500/15"
           }`}
         >
@@ -90,14 +90,14 @@ function PathCard({
         </span>
         <div className="min-w-0">
           <p
-            className={`text-xs font-bold uppercase tracking-widest ${
+            className={`page-kicker ${
               aqua ? "text-teal-600 dark:text-teal-400" : "text-brand-500"
             }`}
           >
             {kicker}
           </p>
-          <h2 className="mt-1 text-xl font-bold text-gray-900">{title}</h2>
-          <p className="mt-1 text-sm text-gray-500">{desc}</p>
+          <h2 className="mt-1 text-xl font-bold text-[color:var(--text-1)]">{title}</h2>
+          <p className="page-subtitle">{desc}</p>
         </div>
       </div>
 
@@ -147,9 +147,9 @@ function SideLink({
       className="card flex items-center gap-3 p-4 transition hover:border-teal-300 hover:shadow-soft dark:hover:border-teal-500/40"
     >
       <span className="text-2xl">{emoji}</span>
-      <span>
-        <span className="block text-sm font-bold text-gray-900">{title}</span>
-        <span className="block text-xs text-gray-500">{desc}</span>
+      <span className="min-w-0">
+        <span className="block text-sm font-bold text-[color:var(--text-1)]">{title}</span>
+        <span className="block text-xs text-[color:var(--text-3)]">{desc}</span>
       </span>
     </Link>
   );

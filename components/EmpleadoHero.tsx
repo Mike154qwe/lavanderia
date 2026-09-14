@@ -43,14 +43,14 @@ export default function EmpleadoHero({
       <div className="p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {icon && (
-            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl ${t.icon}`}>
+            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-2xl ${t.icon}`}>
               {icon}
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className={`text-xs font-bold uppercase tracking-widest ${t.kicker}`}>{kicker}</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">{title}</h1>
-            <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+            <p className={`page-kicker ${t.kicker}`}>{kicker}</p>
+            <h1 className="page-title">{title}</h1>
+            <p className="page-subtitle">{subtitle}</p>
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export default function EmpleadoHero({
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-600 ring-1 ring-gray-200 transition hover:bg-teal-50 hover:text-teal-700 hover:ring-teal-200 dark:bg-white/5 dark:text-gray-300 dark:ring-white/10"
+                className="rounded-full bg-[color:var(--surface-2)] px-3 py-1.5 text-xs font-semibold text-[color:var(--text-2)] ring-1 ring-[color:var(--border-1)] transition hover:bg-teal-50 hover:text-teal-700 hover:ring-teal-200 dark:bg-white/5 dark:text-[color:var(--text-2)] dark:ring-white/10"
               >
                 {link.label}
               </Link>

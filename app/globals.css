@@ -439,6 +439,8 @@ input:focus, select:focus, textarea:focus {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+.page-kicker:where(:not([class*="text-"])) {
   color: var(--text-3);
 }
 
@@ -448,6 +450,8 @@ input:focus, select:focus, textarea:focus {
   line-height: 1.15;
   font-weight: 800;
   letter-spacing: -0.02em;
+}
+.page-title:where(:not([class*="text-"])) {
   color: var(--text-1);
 }
 
@@ -455,6 +459,8 @@ input:focus, select:focus, textarea:focus {
   margin-top: 4px;
   font-size: 14px;
   line-height: 1.45;
+}
+.page-subtitle:where(:not([class*="text-"])) {
   color: var(--text-3);
 }
 
