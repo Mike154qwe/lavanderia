@@ -21,7 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarNavContext.Provider value={{ open, setOpen }}>
-      <div className="flex h-screen overflow-hidden">{children}</div>
+      <div className="app-shell flex h-screen overflow-hidden">{children}</div>
     </SidebarNavContext.Provider>
   );
 }

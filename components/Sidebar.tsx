@@ -105,9 +105,8 @@ const EMPLEADO_NAV: NavGroup[] = [
   },
 ];
 
-const INACTIVO = "rgba(255,255,255,0.72)";
-const INACTIVO_ICONO = "rgba(255,255,255,0.7)";
 const GRUPO = "rgba(255,255,255,0.45)";
+const INACTIVO_ICONO = "rgba(255,255,255,0.7)";
 
 function isActive(item: NavItem, pathname: string): boolean {
   if (pathname === item.href) return true;
@@ -139,33 +138,19 @@ export default function Sidebar() {
         <button
           type="button"
           aria-label="Cerrar menú"
-          className="fixed inset-0 z-30 bg-black/45 md:hidden"
+          className="fixed inset-0 z-30 bg-black/45 lg:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto transition-transform duration-200 md:static md:translate-x-0 ${
+        className={`app-sidebar fixed inset-y-0 left-0 z-40 flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto transition-transform duration-200 lg:static lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{
-          background: "linear-gradient(180deg, #0d1119 0%, #0a0e16 100%)",
-          borderRight: "1px solid rgba(255,255,255,0.05)",
-        }}
       >
         {/* Logo */}
-        <div
-          className="flex items-center gap-3 px-5 py-5"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        >
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-            style={{
-              background: "linear-gradient(145deg, rgba(70,95,255,0.4), rgba(70,95,255,0.15))",
-              border: "1px solid rgba(70,95,255,0.3)",
-              boxShadow: "0 0 12px rgba(70,95,255,0.2)",
-            }}
-          >
+        <div className="app-sidebar-rule flex items-center gap-3 border-b px-5 py-5">
+          <div className="app-sidebar-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-lg">
             🧺
           </div>
           <div className="min-w-0">
@@ -193,16 +178,9 @@ export default function Sidebar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150"
-                      style={
-                        active
-                          ? {
-                              background: "linear-gradient(135deg, rgba(70,95,255,0.25), rgba(70,95,255,0.12))",
-                              color: "#ffffff",
-                              boxShadow: "0 0 0 1px rgba(70,95,255,0.25), 0 2px 8px rgba(70,95,255,0.12)",
-                            }
-                          : { color: INACTIVO }
-                      }
+                      className={`group relative flex items-center gap-3 rounded-[var(--radius-well)] px-3 py-2.5 text-sm font-semibold transition-all duration-150 ${
+                        active ? "app-nav-active" : "app-nav-link"
+                      }`}
                     >
                       {active && (
                         <span
@@ -228,14 +206,10 @@ export default function Sidebar() {
         </nav>
 
         {/* Logout */}
-        <div
-          className="px-3 py-4"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-        >
+        <div className="app-sidebar-rule border-t px-3 py-4">
           <a
             href={logoutHref}
-            className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all"
-            style={{ color: INACTIVO }}
+            className="app-nav-link group flex items-center gap-3 rounded-[var(--radius-well)] px-3 py-2.5 text-sm font-semibold transition-all"
           >
             <span
               className="transition-colors group-hover:text-white"
