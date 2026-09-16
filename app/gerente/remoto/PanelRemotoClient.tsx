@@ -14,6 +14,7 @@ import {
 export default function PanelRemotoClient() {
   const [datos, setDatos] = useState<PanelRemotoData | null>(null);
   const [actualizadoEn, setActualizadoEn] = useState<number | null>(null);
+  const [esCache, setEsCache] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +30,7 @@ export default function PanelRemotoClient() {
 
         setDatos(frescos);
         setActualizadoEn(Date.now());
+        setEsCache(false);
         await guardarCacheRemoto(clave, frescos);
       } catch {
         const cache = await leerCacheRemoto<PanelRemotoData>(clave);
@@ -37,6 +39,7 @@ export default function PanelRemotoClient() {
         if (cache) {
           setDatos(cache.datos);
           setActualizadoEn(cache.actualizadoEn);
+          setEsCache(true);
         } else {
           setError("Sin conexión y no hay datos guardados todavía para hoy.");
         }
@@ -75,11 +78,16 @@ export default function PanelRemotoClient() {
   return (
     <div className="space-y-5 p-6">
       <div className="card p-6">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Panel remoto</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Solo lectura · movimientos del día y último cierre de caja, desde cualquier lugar.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
+            <h1 className="mt-1 text-2xl font-black text-gray-900">Panel remoto</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Solo lectura · movimientos del día y último cierre de caja, desde cualquier lugar.
+            </p>
+          </div>
+          <ActualizacionBadge actualizadoEn={actualizadoEn} esCache={esCache} />
+        </div>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-2">
@@ -111,6 +119,34 @@ export default function PanelRemotoClient() {
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+function ActualizacionBadge({ actualizadoEn, esCache }: { actualizadoEn: number | null; esCache: boolean }) {
+  if (!actualizadoEn) return null;
+
+  const texto = new Date(actualizadoEn).toLocaleString("es-CO", {
+    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+
+  if (esCache) {
+    return (
+      <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+          <path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.7 3.86a2 2 0 0 0-3.4 0Z" />
+        </svg>
+        Sin conexión · Última actualización: {texto}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-bold text-green-700 dark:bg-green-500/15 dark:text-green-400">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+      Última actualización: {texto}
     </div>
   );
 }
