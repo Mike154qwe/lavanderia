@@ -96,11 +96,6 @@ const EMPLEADO_NAV: NavGroup[] = [
         aliases: ["/entrega-empleado", "/entradas-salidas-empleado"],
         icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,
       },
-      {
-        label: "Gastos del día",
-        href: "/gastos-empleado",
-        icon: <Icon d={["M12 1v22", "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"]} />,
-      },
     ],
   },
 ];
