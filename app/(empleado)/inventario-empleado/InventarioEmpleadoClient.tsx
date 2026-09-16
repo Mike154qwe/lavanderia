@@ -70,7 +70,7 @@ export default function InventarioEmpleadoClient({
         tone="indigo"
         links={[
           { href: "/entrega-empleado", label: "Escanear recibo" },
-          { href: "/entradas-salidas-empleado", label: "Entradas y salidas" },
+          { href: "/entradas-salidas-empleado", label: "Lo de hoy" },
           { href: "/clientes-empleado", label: "Clientes" },
         ]}
       >
