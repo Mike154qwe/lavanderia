@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-export default function EmpleadoPage() {
+export default async function EmpleadoPage() {
+  const [listos, enPiso] = await Promise.all([
+    prisma.pedido.count({ where: { estado: "LISTO" } }),
+    prisma.pedido.count({ where: { estado: { notIn: ["ENTREGADO", "CANCELADO"] } } }),
+  ]);
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
       <div>
@@ -33,6 +39,21 @@ export default function EmpleadoPage() {
           desc="Buscar el recibo, cobrar el saldo y entregar."
           steps={["Buscar", "Cobrar", "Entregar"]}
           cta="Buscar pedido"
+        />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <StatTile
+          label="Listos por recoger"
+          value={listos}
+          tone="indigo"
+          emptyText="No hay pedidos listos por recoger"
+        />
+        <StatTile
+          label="Pendientes en piso"
+          value={enPiso}
+          tone="aqua"
+          emptyText="No hay pedidos pendientes en piso"
         />
       </div>
 
@@ -130,6 +151,38 @@ function PathCard({
         {cta} →
       </p>
     </Link>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  tone,
+  emptyText,
+}: {
+  label: string;
+  value: number;
+  tone: "aqua" | "indigo";
+  emptyText: string;
+}) {
+  const aqua = tone === "aqua";
+
+  if (value === 0) {
+    return (
+      <div className="card flex items-center gap-3 p-4">
+        <span className="text-2xl">✅</span>
+        <p className="text-sm font-semibold text-[color:var(--text-3)]">{emptyText}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-4">
+      <p className="page-kicker">{label}</p>
+      <p className={`mt-1 text-2xl font-black ${aqua ? "text-teal-600 dark:text-teal-400" : "text-brand-500"}`}>
+        {value}
+      </p>
+    </div>
   );
 }
 
