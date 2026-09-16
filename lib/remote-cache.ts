@@ -1,4 +1,4 @@
-import { createStore, get, set } from "idb-keyval";
+import { createStore, del, get, set } from "idb-keyval";
 
 // Cambio de alcance (confirmado con la gerente): el registro de pedidos
 // corre en un único dispositivo local, así que nunca hay una red que se
@@ -30,4 +30,25 @@ export async function guardarCacheRemoto<T>(clave: string, datos: T): Promise<vo
 /** Lee la última copia guardada bajo `clave`, o undefined si nunca se guardó. */
 export async function leerCacheRemoto<T>(clave: string): Promise<CacheRemoto<T> | undefined> {
   return get<CacheRemoto<T>>(clave, store);
+}
+
+/** Borra la copia guardada bajo `clave`, si existe. */
+export async function borrarCacheRemoto(clave: string): Promise<void> {
+  await del(clave, store);
+}
+
+/** Formatea `actualizadoEn` para mostrar en el panel remoto, o un fallback si no hay dato. */
+export function etiquetaUltimaActualizacion(actualizadoEn: number | null | undefined): string {
+  if (!actualizadoEn) {
+    return "Sin datos en caché";
+  }
+
+  const fecha = new Date(actualizadoEn);
+  if (Number.isNaN(fecha.getTime())) {
+    return "Sin datos en caché";
+  }
+
+  return fecha.toLocaleString("es-CO", {
+    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
 }

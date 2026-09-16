@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-// RNF02: esta ruta reemplaza al server action guardarPedidoAction para que la
-// escritura pueda interceptarse/encolarse cuando no hay conexión. Misma lógica,
-// solo cambia la forma de recibir los datos (JSON) y de responder (JSON + status).
+// RNF02: el servidor Next.js y SQLite viven en el mismo PC. La disponibilidad
+// de escritura no depende de una red entre el navegador y el servidor, así que
+// una cola de escrituras en el cliente se descartó por topología de un solo
+// dispositivo. Esta ruta recibe el pedido en JSON y lo persiste en SQLite.
 
 function parseMoney(value: unknown) {
   return Number(String(value ?? "0").replace(/\D/g, ""));

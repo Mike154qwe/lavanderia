@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { money, fmt } from "@/lib/format";
-import { guardarCacheRemoto, leerCacheRemoto } from "@/lib/remote-cache";
+import { guardarCacheRemoto, leerCacheRemoto, etiquetaUltimaActualizacion } from "@/lib/remote-cache";
 import {
   traerPanelRemotoDeFirestore,
   claveCachePanelRemoto,
@@ -126,9 +126,7 @@ export default function PanelRemotoClient() {
 function ActualizacionBadge({ actualizadoEn, esCache }: { actualizadoEn: number | null; esCache: boolean }) {
   if (!actualizadoEn) return null;
 
-  const texto = new Date(actualizadoEn).toLocaleString("es-CO", {
-    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
-  });
+  const texto = etiquetaUltimaActualizacion(actualizadoEn);
 
   if (esCache) {
     return (
