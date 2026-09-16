@@ -71,8 +71,11 @@ function PathCard({
   return (
     <Link
       href={href}
-      className={`card group relative overflow-hidden p-6 transition hover:shadow-soft ${
-        aqua ? "hover:border-teal-300 dark:hover:border-teal-500/40" : "hover:border-brand-300 dark:hover:border-brand-500/40"
+      aria-label={`${title}: ${cta}`}
+      className={`card group relative overflow-hidden p-6 outline-none transition hover:shadow-soft active:scale-[0.995] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg)] ${
+        aqua
+          ? "hover:border-teal-300 focus-visible:ring-teal-400 dark:hover:border-teal-500/40"
+          : "hover:border-brand-300 focus-visible:ring-brand-400 dark:hover:border-brand-500/40"
       }`}
     >
       <div
