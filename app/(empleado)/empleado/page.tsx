@@ -41,7 +41,7 @@ export default function EmpleadoPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <SideLink href="/gastos-empleado" emoji="💵" title="Gastos del día" desc="Jabones, insumos, pagos" />
           <SideLink href="/clientes-empleado" emoji="👤" title="Clientes" desc="Buscar o crear ficha" />
-          <SideLink href="/entradas-salidas-empleado" emoji="📋" title="Entradas y salidas" desc="Qué entró y salió hoy" />
+          <SideLink href="/entradas-salidas-empleado" emoji="📋" title="Lo de hoy" desc="Qué entró y qué salió hoy" />
         </div>
       </div>
     </div>
