@@ -7,6 +7,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { money, fmt } from "@/lib/format";
 import PedidoLink from "@/components/PedidoLink";
+import {
+  formatearFecha,
+  guardarPanelRemotoEnFirestore,
+  type MovimientoRemoto,
+  type PanelRemotoData,
+} from "@/lib/panel-remoto";
 
 export const metadata: Metadata = { title: "Gerente" };
 
@@ -71,6 +77,62 @@ async function hacerCierreCaja(formData: FormData) {
   const cierre = await prisma.cierreCaja.create({
     data: { efectivo, nequi, daviplata, transferencia, tarjeta, gastos: totalGastos, totalCaja, responsable, observacion: observacion || null },
   });
+
+  // Respaldo en la nube para el panel remoto de la gerente (lib/panel-remoto.ts).
+  // Va en su propio try/catch: el cierre local ya quedó guardado, así que un
+  // fallo de red aquí no debe afectar el flujo ni revertir nada.
+  try {
+    const [pedidosDia, salidasDia] = await Promise.all([
+      prisma.pedido.findMany({
+        where: { createdAt: { gte: inicioHoy, lt: finHoy } },
+        include: { cliente: true, pagos: true },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.historialEstado.findMany({
+        where: { estado: "ENTREGADO", createdAt: { gte: inicioHoy, lt: finHoy } },
+        include: { pedido: { include: { cliente: true, pagos: true } } },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
+
+    const entradas: MovimientoRemoto[] = pedidosDia.map((p: any) => ({
+      pedidoId: p.id,
+      cliente: p.cliente.nombre,
+      total: p.total,
+      abonado: p.pagos.reduce((s: number, pg: any) => s + pg.valor, 0),
+      hora: p.createdAt.toISOString(),
+    }));
+
+    const salidas: MovimientoRemoto[] = salidasDia.map((s: any) => ({
+      pedidoId: s.pedido.id,
+      cliente: s.pedido.cliente.nombre,
+      total: s.pedido.total,
+      abonado: s.pedido.pagos.reduce((sum: number, pg: any) => sum + pg.valor, 0),
+      hora: s.createdAt.toISOString(),
+    }));
+
+    const panelData: PanelRemotoData = {
+      fecha: formatearFecha(ahora),
+      entradas,
+      salidas,
+      cierre: {
+        id: cierre.id,
+        efectivo,
+        nequi,
+        daviplata,
+        transferencia,
+        tarjeta,
+        gastos: totalGastos,
+        totalCaja,
+        responsable: cierre.responsable,
+        createdAt: cierre.createdAt.toISOString(),
+      },
+    };
+
+    await guardarPanelRemotoEnFirestore(panelData);
+  } catch (err) {
+    console.error("No se pudo sincronizar el cierre de caja con Firestore (panelRemoto):", err);
+  }
 
   revalidatePath("/gerente");
   redirect(`/cierres-caja/${cierre.id}/ticket`);
