@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
 import EmpleadoLinks from "@/components/EmpleadoLinks";
 
-export const metadata: Metadata = { title: "Entradas y salidas" };
+export const metadata: Metadata = { title: "Lo de hoy" };
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 function sameDay(a: Date, b: Date) {
@@ -73,10 +73,10 @@ export default async function EntradasSalidasEmpleadoPage({
           <div>
             <p className="page-kicker text-teal-600 dark:text-teal-400">Mostrador</p>
             <h1 className="page-title">
-              Entradas y salidas {year}
+              Lo de hoy {year}
             </h1>
             <p className="page-subtitle">
-              Toca un día para ver el detalle.
+              Qué entró y qué salió hoy. Toca un día para ver el detalle.
             </p>
             <EmpleadoLinks
               extra={[
