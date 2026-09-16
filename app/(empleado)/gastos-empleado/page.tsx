@@ -68,7 +68,7 @@ export default async function GastosEmpleadoPage({
         subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
         icon="💵"
         tone="amber"
-        links={[{ href: "/entradas-salidas-empleado", label: "Entradas y salidas" }]}
+        links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
       />
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
