@@ -51,9 +51,19 @@ export function fechaHoy(): string {
   return formatearFecha(new Date());
 }
 
-/** Trae los datos del día desde Firestore. Lanza si el documento no existe o falla la red. */
+/**
+ * Trae los datos del día desde Firestore. Lanza si el documento no existe, si
+ * falla la red, o si el SDK resolvió desde su propia caché interna en vez del
+ * servidor (getDoc() no lanza en ese caso — hay que revisar snap.metadata.fromCache
+ * explícitamente). Ese último caso se trata igual que un fallo de red: el llamador
+ * debe caer a leerCacheRemoto() en vez de mostrar los datos como frescos.
+ */
 export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelRemotoData> {
   const snap = await getDoc(doc(db, COLECCION, fecha));
+
+  if (snap.metadata.fromCache) {
+    throw new Error(`Datos de ${fecha} vinieron de la caché interna de Firestore, no del servidor`);
+  }
 
   if (!snap.exists()) {
     throw new Error(`No hay datos en Firestore para ${fecha}`);
