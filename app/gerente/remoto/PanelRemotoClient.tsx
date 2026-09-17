@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { money, fmt } from "@/lib/format";
 import { guardarCacheRemoto, leerCacheRemoto, etiquetaUltimaActualizacion } from "@/lib/remote-cache";
 import {
@@ -16,43 +16,51 @@ export default function PanelRemotoClient() {
   const [actualizadoEn, setActualizadoEn] = useState<number | null>(null);
   const [esCache, setEsCache] = useState(false);
   const [cargando, setCargando] = useState(true);
+  const [actualizando, setActualizando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelado = false;
+  const cargar = useCallback(async () => {
     const fecha = fechaHoy();
     const clave = claveCachePanelRemoto(fecha);
 
-    async function cargar() {
-      try {
-        const frescos = await traerPanelRemotoDeFirestore(fecha);
-        if (cancelado) return;
+    try {
+      const frescos = await traerPanelRemotoDeFirestore(fecha);
+      setDatos(frescos);
+      setActualizadoEn(Date.now());
+      setEsCache(false);
+      setError(null);
+      await guardarCacheRemoto(clave, frescos);
+    } catch {
+      const cache = await leerCacheRemoto<PanelRemotoData>(clave);
 
-        setDatos(frescos);
-        setActualizadoEn(Date.now());
-        setEsCache(false);
-        await guardarCacheRemoto(clave, frescos);
-      } catch {
-        const cache = await leerCacheRemoto<PanelRemotoData>(clave);
-        if (cancelado) return;
-
-        if (cache) {
-          setDatos(cache.datos);
-          setActualizadoEn(cache.actualizadoEn);
-          setEsCache(true);
-        } else {
-          setError("Sin conexión y no hay datos guardados todavía para hoy.");
-        }
-      } finally {
-        if (!cancelado) setCargando(false);
+      if (cache) {
+        setDatos(cache.datos);
+        setActualizadoEn(cache.actualizadoEn);
+        setEsCache(true);
+        setError(null);
+      } else {
+        setError("Sin conexión y no hay datos guardados todavía para hoy.");
       }
     }
+  }, []);
 
-    cargar();
+  useEffect(() => {
+    let cancelado = false;
+
+    cargar().finally(() => {
+      if (!cancelado) setCargando(false);
+    });
+
     return () => {
       cancelado = true;
     };
-  }, []);
+  }, [cargar]);
+
+  async function handleActualizar() {
+    setActualizando(true);
+    await cargar();
+    setActualizando(false);
+  }
 
   if (cargando) {
     return (
@@ -86,7 +94,26 @@ export default function PanelRemotoClient() {
               Solo lectura · movimientos del día y último cierre de caja, desde cualquier lugar.
             </p>
           </div>
-          <ActualizacionBadge actualizadoEn={actualizadoEn} esCache={esCache} />
+          <div className="flex items-center gap-2">
+            <ActualizacionBadge actualizadoEn={actualizadoEn} esCache={esCache} />
+            <button
+              type="button"
+              onClick={handleActualizar}
+              disabled={actualizando}
+              className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+            >
+              <svg
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                className={`h-3.5 w-3.5 ${actualizando ? "animate-spin" : ""}`}
+              >
+                <path d="M21 2v6h-6" />
+                <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                <path d="M3 22v-6h6" />
+                <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+              </svg>
+              {actualizando ? "Actualizando…" : "Actualizar"}
+            </button>
+          </div>
         </div>
       </div>
 
