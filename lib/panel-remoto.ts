@@ -52,13 +52,20 @@ export function fechaHoy(): string {
 }
 
 /**
- * Trae los datos del día desde Firestore. Lanza si el documento no existe, si
- * falla la red, o si el SDK resolvió desde su propia caché interna en vez del
- * servidor (getDoc() no lanza en ese caso — hay que revisar snap.metadata.fromCache
- * explícitamente). Ese último caso se trata igual que un fallo de red: el llamador
- * debe caer a leerCacheRemoto() en vez de mostrar los datos como frescos.
+ * Trae los datos del día desde Firestore. Tres resultados posibles, a propósito
+ * distinguibles por el llamador (no los tres colapsados en un solo throw):
+ *  - Devuelve los datos si el documento existe y la lectura fue real (server, no
+ *    caché del SDK).
+ *  - Devuelve null si la lectura fue real (con conexión, fromCache: false) pero el
+ *    documento no existe — estado válido ("sin cierre registrado hoy todavía"),
+ *    no un fallo. Antes esto lanzaba el mismo error genérico que un fallo de red,
+ *    así que cargar() en PanelRemotoClient.tsx no podía distinguirlos.
+ *  - Lanza si falla la red, o si el SDK resolvió desde su propia caché interna en
+ *    vez del servidor (getDoc() no lanza en ese caso — hay que revisar
+ *    snap.metadata.fromCache explícitamente). Ese caso sí se trata igual que un
+ *    fallo de red: el llamador debe caer a leerCacheRemoto().
  */
-export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelRemotoData> {
+export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelRemotoData | null> {
   const snap = await getDoc(doc(db, COLECCION, fecha));
 
   if (snap.metadata.fromCache) {
@@ -66,7 +73,7 @@ export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelR
   }
 
   if (!snap.exists()) {
-    throw new Error(`No hay datos en Firestore para ${fecha}`);
+    return null;
   }
 
   return snap.data() as PanelRemotoData;

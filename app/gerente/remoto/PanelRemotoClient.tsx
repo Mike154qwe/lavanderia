@@ -15,6 +15,7 @@ export default function PanelRemotoClient() {
   const [datos, setDatos] = useState<PanelRemotoData | null>(null);
   const [actualizadoEn, setActualizadoEn] = useState<number | null>(null);
   const [esCache, setEsCache] = useState(false);
+  const [sinDatosHoy, setSinDatosHoy] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [actualizando, setActualizando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,9 +26,22 @@ export default function PanelRemotoClient() {
 
     try {
       const frescos = await traerPanelRemotoDeFirestore(fecha);
+
+      if (frescos === null) {
+        // Con conexión real, pero todavía no hay cierre registrado hoy —
+        // no es un fallo, es el estado normal de un día que apenas empieza.
+        setDatos(null);
+        setActualizadoEn(null);
+        setEsCache(false);
+        setSinDatosHoy(true);
+        setError(null);
+        return;
+      }
+
       setDatos(frescos);
       setActualizadoEn(Date.now());
       setEsCache(false);
+      setSinDatosHoy(false);
       setError(null);
       await guardarCacheRemoto(clave, frescos);
     } catch {
@@ -37,6 +51,7 @@ export default function PanelRemotoClient() {
         setDatos(cache.datos);
         setActualizadoEn(cache.actualizadoEn);
         setEsCache(true);
+        setSinDatosHoy(false);
         setError(null);
       } else {
         setError("Sin conexión y no hay datos guardados todavía para hoy.");
@@ -81,7 +96,7 @@ export default function PanelRemotoClient() {
     );
   }
 
-  const { entradas, salidas, cierre } = datos!;
+  const estado: EstadoPanel = sinDatosHoy ? "sin-datos" : esCache ? "cache" : "fresco";
 
   return (
     <div className="space-y-5 p-6">
@@ -95,7 +110,7 @@ export default function PanelRemotoClient() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <ActualizacionBadge actualizadoEn={actualizadoEn} esCache={esCache} />
+            <EstadoBadge estado={estado} actualizadoEn={actualizadoEn} />
             <button
               type="button"
               onClick={handleActualizar}
@@ -117,45 +132,70 @@ export default function PanelRemotoClient() {
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
-        <MovSection title="Entradas del día" count={entradas.length} color="blue" movimientos={entradas} />
-        <MovSection title="Salidas del día" count={salidas.length} color="green" movimientos={salidas} />
-      </div>
-
-      <div className="card p-6">
-        <h2 className="mb-4 text-lg font-black text-gray-900">Último cierre de caja</h2>
-        {cierre ? (
-          <div className="rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
-            <p className="font-black text-gray-900">Cierre #{fmt(cierre.id)}</p>
-            <p className="mt-0.5 text-xs text-gray-400">
-              {new Date(cierre.createdAt).toLocaleString("es-CO")} · {cierre.responsable || "Sin responsable"}
-            </p>
-            <p className="mt-2 text-lg font-black text-brand-500">Total caja: {money(cierre.totalCaja)}</p>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-              <Dato label="Efectivo" valor={cierre.efectivo} />
-              <Dato label="Nequi" valor={cierre.nequi} />
-              <Dato label="Daviplata" valor={cierre.daviplata} />
-              <Dato label="Transferencia" valor={cierre.transferencia} />
-              <Dato label="Tarjeta" valor={cierre.tarjeta} />
-              <Dato label="Gastos" valor={-cierre.gastos} />
-            </div>
-          </div>
-        ) : (
-          <p className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm font-semibold text-gray-400 dark:border-white/10">
-            No hay cierres registrados este día.
+      {sinDatosHoy || !datos ? (
+        <div className="card p-6 text-center">
+          <p className="font-bold text-gray-900">Sin cierre registrado hoy todavía</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Apenas se haga el primer cierre de caja del día va a aparecer acá.
           </p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-5 xl:grid-cols-2">
+            <MovSection title="Entradas del día" count={datos.entradas.length} color="blue" movimientos={datos.entradas} />
+            <MovSection title="Salidas del día" count={datos.salidas.length} color="green" movimientos={datos.salidas} />
+          </div>
+
+          <div className="card p-6">
+            <h2 className="mb-4 text-lg font-black text-gray-900">Último cierre de caja</h2>
+            {datos.cierre ? (
+              <div className="rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
+                <p className="font-black text-gray-900">Cierre #{fmt(datos.cierre.id)}</p>
+                <p className="mt-0.5 text-xs text-gray-400">
+                  {new Date(datos.cierre.createdAt).toLocaleString("es-CO")} · {datos.cierre.responsable || "Sin responsable"}
+                </p>
+                <p className="mt-2 text-lg font-black text-brand-500">Total caja: {money(datos.cierre.totalCaja)}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+                  <Dato label="Efectivo" valor={datos.cierre.efectivo} />
+                  <Dato label="Nequi" valor={datos.cierre.nequi} />
+                  <Dato label="Daviplata" valor={datos.cierre.daviplata} />
+                  <Dato label="Transferencia" valor={datos.cierre.transferencia} />
+                  <Dato label="Tarjeta" valor={datos.cierre.tarjeta} />
+                  <Dato label="Gastos" valor={-datos.cierre.gastos} />
+                </div>
+              </div>
+            ) : (
+              <p className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm font-semibold text-gray-400 dark:border-white/10">
+                No hay cierres registrados este día.
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function ActualizacionBadge({ actualizadoEn, esCache }: { actualizadoEn: number | null; esCache: boolean }) {
+type EstadoPanel = "fresco" | "cache" | "sin-datos";
+
+function EstadoBadge({ estado, actualizadoEn }: { estado: EstadoPanel; actualizadoEn: number | null }) {
+  if (estado === "sin-datos") {
+    return (
+      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-bold text-gray-600 dark:bg-white/10 dark:text-gray-300">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4M12 8h.01" />
+        </svg>
+        Sin cierre registrado hoy todavía
+      </div>
+    );
+  }
+
   if (!actualizadoEn) return null;
 
   const texto = etiquetaUltimaActualizacion(actualizadoEn);
 
-  if (esCache) {
+  if (estado === "cache") {
     return (
       <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
