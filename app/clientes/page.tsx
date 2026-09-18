@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { EmptyState } from "@/components/EmptyState";
+import { sanearNombre, sanearTelefono, sanearDireccion } from "@/lib/validacion-cliente";
 
 export const metadata: Metadata = { title: "Clientes" };
 
 async function crearCliente(formData: FormData) {
   "use server";
-  const nombre    = String(formData.get("nombre") || "").trim();
-  const telefono  = String(formData.get("telefono") || "").trim() || null;
-  const direccion = String(formData.get("direccion") || "").trim() || null;
+  const nombre    = sanearNombre(String(formData.get("nombre") || ""));
+  const telefono  = sanearTelefono(String(formData.get("telefono") || ""));
+  const direccion = sanearDireccion(String(formData.get("direccion") || ""));
   if (!nombre) return;
   try {
     await prisma.cliente.create({ data: { nombre, telefono, direccion } });

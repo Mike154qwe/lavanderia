@@ -1,14 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { sanearNombre, sanearTelefono, sanearDireccion } from "@/lib/validacion-cliente";
 
 async function crearCliente(formData: FormData) {
   "use server";
 
   await prisma.cliente.create({
     data: {
-      nombre: String(formData.get("nombre")),
-      telefono: String(formData.get("telefono") || ""),
-      direccion: String(formData.get("direccion") || ""),
+      nombre: sanearNombre(String(formData.get("nombre") || "")),
+      telefono: sanearTelefono(String(formData.get("telefono") || "")),
+      direccion: sanearDireccion(String(formData.get("direccion") || "")),
     },
   });
 

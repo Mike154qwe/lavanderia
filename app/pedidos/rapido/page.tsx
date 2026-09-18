@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import PedidoRapidoForm from "./PedidoRapidoForm";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
+import { sanearNombre, sanearTelefono } from "@/lib/validacion-cliente";
 
 function parseMoney(value: FormDataEntryValue | null) {
   return Number(String(value || "0").replace(/\D/g, ""));
@@ -11,8 +12,8 @@ function parseMoney(value: FormDataEntryValue | null) {
 async function guardarPedidoRapidoAction(formData: FormData) {
   "use server";
 
-  const nombre = String(formData.get("nombre") || "").trim();
-  const telefono = String(formData.get("telefono") || "").trim();
+  const nombre = sanearNombre(String(formData.get("nombre") || ""));
+  const telefono = sanearTelefono(String(formData.get("telefono") || ""));
   const abono = parseMoney(formData.get("abono"));
   const metodo = String(formData.get("metodo") || "Efectivo") as MetodoPago;
 
