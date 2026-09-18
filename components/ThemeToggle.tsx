@@ -21,7 +21,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-      className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-gray-300 hover:text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200"
+      className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-well)] border border-[color:var(--border-1)] bg-[color:color-mix(in_srgb,var(--surface)_65%,transparent)] text-[color:var(--text-3)] transition hover:border-[color:var(--border-2)] hover:text-[color:var(--text-1)]"
     >
       {dark ? (
         /* Sol */

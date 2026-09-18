@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import AppHeader from "@/components/AppHeader";
+import AppShell from "@/components/AppShell";
 import { FlashToast } from "@/components/FlashToast";
 import { Toaster } from "sonner";
 
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense>
           <FlashToast />
         </Suspense>
-        <div className="flex h-screen overflow-hidden">
+        <AppShell>
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <AppHeader />
@@ -38,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
           </div>
-        </div>
+        </AppShell>
       </body>
     </html>
   );
