@@ -4,6 +4,20 @@ import type { NextRequest } from "next/server";
 const GERENTE_COOKIE = "lavaseco_auth";
 const EMPLEADO_COOKIE = "lavaseco_empleado_auth";
 
+// Mismo AUTH_SECRET que lib/auth.ts, sin valor por defecto (RNF04) -- ver ese
+// archivo para la razón y cómo regenerarlo. Este middleware es lo que de
+// verdad protege /gerente/*, así que no puede quedarse con un fallback
+// adivinable tampoco.
+const AUTH_SECRET: string = (() => {
+  const valor = process.env.AUTH_SECRET;
+  if (!valor) {
+    throw new Error(
+      "AUTH_SECRET no está definido. Configúralo en .env antes de iniciar la aplicación — no hay valor por defecto por seguridad (RNF04)."
+    );
+  }
+  return valor;
+})();
+
 // Solo requieren cookie de gerente
 const rutasGerente = [
   "/gerente",
@@ -43,11 +57,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const secret = process.env.AUTH_SECRET || "secret";
   const gerenteToken = request.cookies.get(GERENTE_COOKIE)?.value;
   const empleadoToken = request.cookies.get(EMPLEADO_COOKIE)?.value;
 
-  const gerenteOk = gerenteToken === secret;
+  const gerenteOk = gerenteToken === AUTH_SECRET;
   const empleadoOk = empleadoToken === "empleado_activo";
 
   // Rutas solo gerente

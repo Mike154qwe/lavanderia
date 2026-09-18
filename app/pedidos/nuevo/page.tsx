@@ -1,15 +1,16 @@
 ﻿import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import NuevoPedidoForm from "./NuevoPedidoForm";
+import { sanearNombre, sanearTelefono, sanearDireccion } from "@/lib/validacion-cliente";
 
 const CLIENTES_POR_PAGINA = 8;
 
 async function crearClienteAction(formData: FormData) {
   "use server";
 
-  const nombre = String(formData.get("nombre") || "").trim();
-  const telefono = String(formData.get("telefono") || "").trim();
-  const direccion = String(formData.get("direccion") || "").trim();
+  const nombre = sanearNombre(String(formData.get("nombre") || ""));
+  const telefono = sanearTelefono(String(formData.get("telefono") || ""));
+  const direccion = sanearDireccion(String(formData.get("direccion") || ""));
 
   if (!nombre) return;
 
@@ -25,8 +26,8 @@ async function crearClienteAction(formData: FormData) {
     cliente = await prisma.cliente.create({
       data: {
         nombre,
-        telefono: telefono || null,
-        direccion: direccion || null,
+        telefono,
+        direccion,
       },
     });
   }
