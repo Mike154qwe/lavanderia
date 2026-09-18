@@ -149,14 +149,14 @@ export default async function DiaFinanzasPage({
   );
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="card p-8">
+    <div className="space-y-5 p-6">
+      <section className="space-y-5">
+        <div className="card p-6">
           <div className="flex items-start justify-between gap-5">
             <div>
-              <h1 className="title-xl text-slate-900">Finanzas del día</h1>
+              <h1 className="text-2xl font-black text-gray-900">Finanzas del día</h1>
 
-              <p className="mt-2 text-slate-500">
+              <p className="mt-1 text-sm text-gray-500">
                 {fecha.toLocaleDateString("es-CO", {
                   weekday: "long",
                   year: "numeric",
@@ -184,7 +184,7 @@ export default async function DiaFinanzasPage({
             {q && (
               <Link
                 href={`/gerente/dia/${fechaParam}`}
-                className="rounded-2xl bg-slate-200 px-6 py-4 font-bold text-slate-700 hover:bg-slate-300"
+                className="btn-dark"
               >
                 Limpiar
               </Link>
@@ -201,7 +201,7 @@ export default async function DiaFinanzasPage({
 
         <div className="mt-8 grid gap-8 xl:grid-cols-2">
           <div className="card p-8">
-            <h2 className="title-lg text-slate-900">Registrar gasto de caja</h2>
+            <h2 className="text-lg font-bold text-gray-900">Registrar gasto de caja</h2>
 
             <form action={registrarGasto} className="mt-6 grid gap-4">
               <input type="hidden" name="fecha" value={fechaParam} />
@@ -238,14 +238,14 @@ export default async function DiaFinanzasPage({
 
               <input name="responsable" placeholder="Responsable" className="input-modern" />
 
-              <button className="rounded-2xl bg-red-500 px-6 py-4 font-bold text-white hover:bg-red-600">
+              <button className="rounded-[10px] bg-red-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-red-600">
                 Registrar gasto
               </button>
             </form>
           </div>
 
           <div className="card p-8">
-            <h2 className="title-lg text-slate-900">Cierre de caja</h2>
+            <h2 className="text-lg font-bold text-gray-900">Cierre de caja</h2>
 
             <div className="mt-6 space-y-4">
               <CajaRow label="Dinero recibido" value={totalRecibido} />
@@ -273,7 +273,7 @@ export default async function DiaFinanzasPage({
           </Panel>
 
           <div className="card p-8">
-            <h2 className="title-lg text-slate-900">Resumen operativo</h2>
+            <h2 className="text-lg font-bold text-gray-900">Resumen operativo</h2>
 
             <div className="mt-6 grid gap-5 md:grid-cols-3">
               <Kpi title="Pedidos creados" value={pedidosCreados.length} />
@@ -284,9 +284,9 @@ export default async function DiaFinanzasPage({
         </div>
 
         <div className="card mt-8 p-8">
-          <h2 className="title-lg text-slate-900">Todos los movimientos del día</h2>
+          <h2 className="text-lg font-bold text-gray-900">Todos los movimientos del día</h2>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-gray-500">
             Entradas, salidas, pagos, servicios y estado de cada recibo.
           </p>
 
@@ -296,14 +296,14 @@ export default async function DiaFinanzasPage({
             ))}
 
             {pedidosFiltrados.length === 0 && (
-              <p className="text-center text-slate-500">
+              <p className="text-center text-gray-500">
                 No hubo movimientos este día.
               </p>
             )}
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
@@ -318,18 +318,18 @@ function PedidoDetalle({ pedido }: { pedido: any }) {
   const entrega = pedido.historial.find((h: any) => h.estado === "ENTREGADO");
 
   return (
-    <div className="rounded-3xl border bg-slate-50 p-6">
+    <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 dark:border-white/[0.07] dark:bg-white/[0.02]">
       <div className="flex items-center justify-between gap-5">
         <div>
-          <h3 className="text-xl font-bold text-slate-900">
+          <h3 className="text-xl font-bold text-gray-900">
             Recibo #{formatPedido(pedido.id)} - {pedido.cliente.nombre}
           </h3>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-gray-500">
             Tel: {pedido.cliente.telefono || "No registrado"}
           </p>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-gray-500">
             Creado: {pedido.createdAt.toLocaleDateString("es-CO")}{" "}
             {pedido.createdAt.toLocaleTimeString("es-CO", {
               hour: "2-digit",
@@ -362,11 +362,11 @@ function PedidoDetalle({ pedido }: { pedido: any }) {
       </div>
 
       <div className="mt-5">
-        <h4 className="font-bold text-slate-800">Servicios</h4>
+        <h4 className="font-bold text-gray-800">Servicios</h4>
 
         <div className="mt-2 space-y-1">
           {pedido.prendas.map((prenda: any) => (
-            <p key={prenda.id} className="text-sm text-slate-600">
+            <p key={prenda.id} className="text-sm text-gray-600">
               {prenda.servicio ?? "Lavado"} - {prenda.tipo} x {prenda.cantidad} - $
               {prenda.valor.toLocaleString("es-CO")}
             </p>
@@ -393,20 +393,20 @@ function MovimientoCaja({
   fecha: Date;
 }) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
+    <div className="rounded-xl bg-gray-50 p-4 dark:bg-white/[0.02]">
       <div className="flex items-center justify-between">
-        <p className="font-bold text-slate-800">{titulo}</p>
+        <p className="font-bold text-gray-800">{titulo}</p>
 
         <p className="font-bold text-red-600">
           -${valor.toLocaleString("es-CO")}
         </p>
       </div>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         {descripcion || "Sin descripción"}
       </p>
 
-      <p className="mt-1 text-xs text-slate-400">
+      <p className="mt-1 text-xs text-gray-400">
         {metodo || "Sin método"} · {responsable || "Sin responsable"} ·{" "}
         {fecha.toLocaleTimeString("es-CO", {
           hour: "2-digit",
@@ -420,7 +420,7 @@ function MovimientoCaja({
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="card p-8">
-      <h2 className="title-lg text-slate-900">{title}</h2>
+      <h2 className="text-lg font-bold text-gray-900">{title}</h2>
       <div className="mt-5 space-y-3">{children}</div>
     </div>
   );
@@ -428,7 +428,7 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-slate-400">
+    <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400 dark:border-white/10">
       {text}
     </div>
   );
@@ -444,10 +444,10 @@ function Kpi({
   danger?: boolean;
 }) {
   return (
-    <div className="rounded-3xl bg-slate-100 p-5">
-      <p className="text-sm text-slate-500">{title}</p>
+    <div className="rounded-xl bg-gray-50 p-5 dark:bg-white/[0.02]">
+      <p className="text-sm text-gray-500">{title}</p>
 
-      <p className={`mt-2 text-3xl font-bold ${danger ? "text-red-600" : "text-teal-600"}`}>
+      <p className={`mt-2 text-3xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
         {value}
       </p>
     </div>
@@ -466,13 +466,13 @@ function CajaRow({
   strong?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl p-4 ${strong ? "bg-teal-50" : "bg-slate-50"}`}>
+    <div className={`rounded-xl p-4 ${strong ? "bg-brand-50 dark:bg-brand-500/10" : "bg-gray-50 dark:bg-white/[0.02]"}`}>
       <div className="flex items-center justify-between">
-        <p className="font-semibold text-slate-700">{label}</p>
+        <p className="font-semibold text-gray-700">{label}</p>
 
         <p
           className={`text-2xl font-bold ${
-            danger ? "text-red-600" : strong ? "text-teal-600" : "text-slate-900"
+            danger ? "text-red-600" : strong ? "text-brand-500" : "text-gray-900"
           }`}
         >
           ${value.toLocaleString("es-CO")}
@@ -493,9 +493,9 @@ function Money({
 }) {
   return (
     <div className="rounded-2xl bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
+      <p className="text-sm text-gray-500">{label}</p>
 
-      <p className={`mt-1 text-2xl font-bold ${danger ? "text-red-600" : "text-teal-600"}`}>
+      <p className={`mt-1 text-2xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
         ${value.toLocaleString("es-CO")}
       </p>
     </div>

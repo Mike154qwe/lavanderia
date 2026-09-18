@@ -211,7 +211,7 @@ export default async function ClientesPage({
                       {/* Nombre + avatar */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black ${avatarColors[colorIndex]}`}>
+                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${avatarColors[colorIndex]}`}>
                             {inicial}
                           </div>
                           <div>
@@ -247,7 +247,7 @@ export default async function ClientesPage({
 
                       {/* Pedidos */}
                       <td className="px-6 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-black ${
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${
                           cliente._count.pedidos > 0
                             ? "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400"
                             : "bg-gray-100 text-gray-400 dark:bg-white/5"

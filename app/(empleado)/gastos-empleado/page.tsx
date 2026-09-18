@@ -3,6 +3,7 @@ import GastosEmpleadoClient from "./GastosEmpleadoClient";
 import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
+import EmpleadoHero from "@/components/EmpleadoHero";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -61,20 +62,20 @@ export default async function GastosEmpleadoPage({
     <div className="p-4 sm:p-6">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
-      {/* ── Cabecera ─────────────────────────────────────── */}
-      <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-red-500">Empleado</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Gastos del día</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          Registra gastos para que aparezcan en el panel del gerente.
-        </p>
-      </div>
+      <EmpleadoHero
+        kicker="Caja"
+        title="Gastos del día"
+        subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
+        icon="💵"
+        tone="amber"
+        links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
+      />
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
 
         {/* ── Formulario ───────────────────────────────────── */}
         <form action={registrarGastoEmpleado} className="card p-5">
-          <h2 className="mb-4 font-black text-gray-900">Nuevo gasto</h2>
+          <h2 className="mb-4 font-bold text-[color:var(--text-1)]">Nuevo gasto</h2>
 
           {/* Tipos (radio) */}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-3">
@@ -141,7 +142,7 @@ export default async function GastosEmpleadoPage({
 
           <button
             type="submit"
-            className="mt-5 w-full rounded-xl bg-red-500 py-4 text-sm font-black text-white transition hover:bg-red-600 active:scale-[0.99]"
+            className="mt-5 w-full rounded-xl bg-red-500 py-4 text-sm font-bold text-white transition hover:bg-red-600 active:scale-[0.99]"
           >
             Registrar gasto
           </button>
@@ -150,7 +151,7 @@ export default async function GastosEmpleadoPage({
         {/* ── Resumen del día ──────────────────────────────── */}
         <div className="card p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-black text-gray-900">Resumen de hoy</h2>
+            <h2 className="font-bold text-[color:var(--text-1)]">Resumen de hoy</h2>
             <span className="font-black text-red-500">
               -{`$${totalGastos.toLocaleString("es-CO")}`}
             </span>
@@ -177,11 +178,9 @@ export default async function GastosEmpleadoPage({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-gray-200 py-10 text-center dark:border-white/10">
+            <div className="empty-state rounded-[var(--radius-well)] border border-dashed border-[color:var(--border-1)]">
               <p className="text-3xl">💸</p>
-              <p className="mt-2 text-sm font-semibold text-gray-400">
-                No hay gastos registrados hoy.
-              </p>
+              <p className="empty-state__title">No hay gastos registrados hoy.</p>
             </div>
           )}
         </div>

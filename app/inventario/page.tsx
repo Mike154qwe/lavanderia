@@ -246,7 +246,7 @@ export default async function InventarioPage({
               >
                 {chip.label}
                 {chip.count !== null && (
-                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-black leading-none ${active ? "bg-white/25 text-white" : "bg-white text-gray-500"}`}>
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-bold leading-none ${active ? "bg-white/25 text-white" : "bg-white text-gray-500"}`}>
                     {chip.count}
                   </span>
                 )}
@@ -298,7 +298,7 @@ export default async function InventarioPage({
         ) : (
           <div className="divide-y divide-gray-100">
             {/* Encabezado */}
-            <div className="grid grid-cols-[56px_1fr_110px_80px_120px_90px_80px] gap-x-3 bg-gray-50 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-gray-400">
+            <div className="grid grid-cols-[56px_1fr_110px_80px_120px_90px_80px] gap-x-3 bg-gray-50 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
               <span>#</span>
               <span>Cliente</span>
               <span>Estado</span>
@@ -369,11 +369,11 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
       <summary className="grid cursor-pointer list-none grid-cols-[56px_1fr_110px_80px_120px_90px_80px] items-center gap-x-3 px-4 py-3 transition hover:bg-gray-50 group-open:bg-brand-50">
 
         {/* # Recibo */}
-        <span className="text-xs font-black text-brand-500">#{fmt(pedido.id)}</span>
+        <span className="text-xs font-bold text-brand-500">#{fmt(pedido.id)}</span>
 
         {/* Cliente */}
         <div className="min-w-0">
-          <p className="truncate text-sm font-black text-gray-900">{pedido.cliente.nombre}</p>
+          <p className="truncate text-sm font-bold text-gray-900">{pedido.cliente.nombre}</p>
           <p className="truncate text-xs text-gray-400">{pedido.cliente.telefono ?? "—"}</p>
         </div>
 
@@ -384,7 +384,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
         {/* Prendas */}
         <div className="text-center">
-          <span className="text-sm font-black text-gray-700">{totalEnt}/{totalPrendas}</span>
+          <span className="text-sm font-bold text-gray-700">{totalEnt}/{totalPrendas}</span>
           <div className="mx-auto mt-1 h-1 w-12 overflow-hidden rounded-full bg-gray-200">
             <div
               className={`h-full rounded-full ${totalEnt === totalPrendas ? "bg-green-500" : "bg-brand-500"}`}
@@ -398,7 +398,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           {saldo > 0 ? (
             <span className="text-sm font-black text-red-600">{money(saldo)}</span>
           ) : (
-            <span className="text-sm font-black text-green-600">✅ Pagado</span>
+            <span className="text-sm font-bold text-green-600">✅ Pagado</span>
           )}
         </div>
 
@@ -456,14 +456,14 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 p-5">
         <div className="flex items-start gap-3">
           {/* Avatar con inicial */}
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-base font-black text-white shadow-sm">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-base font-bold text-white shadow-sm">
             {pedido.cliente.nombre.charAt(0).toUpperCase()}
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/pedidos/${pedido.id}`}
-                className="font-black text-gray-900 transition hover:text-brand-500"
+                className="font-bold text-gray-900 transition hover:text-brand-500"
               >
                 {pedido.cliente.nombre}
               </Link>
@@ -478,7 +478,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               📞 {pedido.cliente.telefono ?? "Sin teléfono"}
               <span className="mx-1.5 opacity-40">·</span>
               Recibo{" "}
-              <span className="font-black text-brand-500">#{fmt(pedido.id)}</span>
+              <span className="font-bold text-brand-500">#{fmt(pedido.id)}</span>
               <span className="mx-1.5 opacity-40">·</span>
               {new Date(pedido.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
               {" "}
@@ -521,11 +521,11 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           </div>
           <div className="shrink-0">
             {saldo > 0 ? (
-              <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-black text-red-600 ring-1 ring-red-200">
+              <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-600 ring-1 ring-red-200">
                 Saldo: {money(saldo)}
               </span>
             ) : (
-              <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-black text-green-600 ring-1 ring-green-200">
+              <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 ring-1 ring-green-200">
                 ✅ Pagado
               </span>
             )}
@@ -538,7 +538,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
         {/* Prendas */}
         <div className="border-b border-gray-100 p-5 xl:border-b-0 xl:border-r">
-          <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-400">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
             Prendas · {pendientes} pendiente{pendientes !== 1 ? "s" : ""}
           </p>
           <div className="space-y-2">
@@ -561,7 +561,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                     <span className="text-xl leading-none">{pEmoji(prenda.tipo)}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="font-black text-sm text-gray-900 truncate">
+                        <p className="font-bold text-sm text-gray-900 truncate">
                           {prenda.tipo}
                           <span className="ml-1.5 font-normal text-gray-400 text-xs">{prenda.servicio}</span>
                         </p>
@@ -644,7 +644,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
           {/* Resumen financiero */}
           <div className="p-5">
-            <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-400">Pagos</p>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Pagos</p>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Total del pedido</span>
@@ -655,7 +655,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                 <span className="font-black text-green-600">{money(abonado)}</span>
               </div>
               <div className={`mt-2 flex justify-between rounded-xl px-3 py-2.5 ${saldo > 0 ? "bg-red-50 ring-1 ring-red-200" : "bg-green-50 ring-1 ring-green-200"}`}>
-                <span className={`font-black ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
+                <span className={`font-bold ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
                   {saldo > 0 ? "Saldo" : "✅ Pagado"}
                 </span>
                 <span className={`text-lg font-black ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
@@ -691,7 +691,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
           {/* Cambiar estado */}
           <div className="p-5">
-            <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-400">Estado</p>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Estado</p>
             <div className="space-y-2">
               {pedido.estado === "RECIBIDO" && (
                 <EstadoBtn pedidoId={pedido.id} nuevoEstado="LISTO" label="✅ Marcar como LISTO" color="green" action={cambiarEstado} />

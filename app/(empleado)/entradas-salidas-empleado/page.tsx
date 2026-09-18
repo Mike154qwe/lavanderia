@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
+import EmpleadoLinks from "@/components/EmpleadoLinks";
 
-export const metadata: Metadata = { title: "Entradas y salidas" };
+export const metadata: Metadata = { title: "Lo de hoy" };
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 function sameDay(a: Date, b: Date) {
@@ -70,19 +71,24 @@ export default async function EntradasSalidasEmpleadoPage({
       <div className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Empleado</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">
-              Entradas y salidas {year}
+            <p className="page-kicker text-teal-600 dark:text-teal-400">Mostrador</p>
+            <h1 className="page-title">
+              Lo de hoy {year}
             </h1>
-            <p className="mt-0.5 text-sm text-gray-500">
-              Toca un día para ver el detalle.
+            <p className="page-subtitle">
+              Qué entró y qué salió hoy. Toca un día para ver el detalle.
             </p>
+            <EmpleadoLinks
+              extra={[
+                { href: "/inventario-empleado", label: "Llegó a recoger" },
+              ]}
+            />
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/entradas-salidas-empleado?year=${year - 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
               ← {year - 1}
             </Link>
-            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-black text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
               {year}
             </span>
             <Link href={`/entradas-salidas-empleado?year=${year + 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
@@ -92,7 +98,7 @@ export default async function EntradasSalidasEmpleadoPage({
         </div>
 
         {/* Filtros */}
-        <form className="mt-4 grid gap-3 sm:grid-cols-[1fr_160px_auto_auto]">
+        <form className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_160px_auto_auto]">
           <input
             name="q"
             defaultValue={q}
@@ -130,7 +136,7 @@ export default async function EntradasSalidasEmpleadoPage({
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-5 py-4 dark:border-white/[0.07]">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Día seleccionado</p>
-              <h2 className="mt-0.5 text-lg font-black capitalize text-gray-900">
+              <h2 className="mt-0.5 text-lg font-bold capitalize text-gray-900">
                 {fechaSeleccionada.toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </h2>
             </div>
@@ -201,7 +207,7 @@ export default async function EntradasSalidasEmpleadoPage({
                 {esMesActual && (
                   <span className="rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-bold text-white">Actual</span>
                 )}
-                <h2 className={`font-black ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-gray-900"}`}>
+                <h2 className={`font-bold ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-gray-900"}`}>
                   {mes} {year}
                 </h2>
               </div>
@@ -239,17 +245,17 @@ export default async function EntradasSalidasEmpleadoPage({
                       key={dia}
                       id={esHoyFlag ? "hoy" : undefined}
                       href={`/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${q}&tipo=${tipoFiltro}`}
-                      className={`rounded-xl border p-2.5 transition ${cellClass}`}
+                      className={`rounded-[var(--radius-well)] border p-1.5 transition sm:p-2.5 ${cellClass}`}
                     >
                       <div className="flex items-start justify-between">
-                        <span className={`text-lg font-black leading-none ${
+                        <span className={`text-base font-bold leading-none sm:text-lg ${
                           seleccionado ? "text-brand-600 dark:text-brand-300"
                           : esHoyFlag   ? "text-orange-600 dark:text-orange-400"
                           : activo      ? "text-brand-500"
                           : "text-gray-400"
                         }`}>{dia}</span>
                         {esHoyFlag && (
-                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-black leading-none text-white">HOY</span>
+                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-bold leading-none text-white">HOY</span>
                         )}
                       </div>
                       {activo && (
@@ -300,7 +306,7 @@ function PedidoRow({ pedido, tipo, fechaMovimiento }: { pedido: any; tipo: strin
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
         <div>
           <div className="flex items-center gap-2">
-            <Link href={`/pedidos/${pedido.id}`} className="font-mono text-sm font-black text-brand-500 hover:underline" onClick={(e) => e.stopPropagation()}>
+            <Link href={`/pedidos/${pedido.id}`} className="font-mono text-sm font-bold text-brand-500 hover:underline" onClick={(e) => e.stopPropagation()}>
               #{fmt(pedido.id)}
             </Link>
             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${tipo === "Entrada" ? "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400" : "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400"}`}>

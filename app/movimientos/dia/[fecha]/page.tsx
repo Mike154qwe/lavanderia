@@ -73,16 +73,15 @@ export default async function MovimientoDiaPage({
   );
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="rounded-3xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
+    <div className="space-y-5 p-6">
+        <div className="card p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">
+              <h1 className="text-2xl font-black text-gray-900">
                 Movimientos del día
               </h1>
 
-              <p className="mt-2 text-slate-500">
+              <p className="mt-1 text-sm text-gray-500">
                 {diaBase.toLocaleDateString("es-CO", {
                   weekday: "long",
                   year: "numeric",
@@ -94,7 +93,7 @@ export default async function MovimientoDiaPage({
 
             <Link
               href="/movimientos"
-              className="rounded-2xl bg-slate-200 px-5 py-3 font-bold text-slate-700 hover:bg-slate-300"
+              className="btn-dark"
             >
               Volver
             </Link>
@@ -144,8 +143,7 @@ export default async function MovimientoDiaPage({
             {salidas.length === 0 && <Empty text="No hubo salidas." />}
           </Panel>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }
 
@@ -171,7 +169,7 @@ function MovimientoCard({
   );
 
   return (
-    <div className="rounded-3xl border bg-slate-50 p-5">
+    <div className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.07] dark:bg-white/[0.02]">
       <div className="flex items-center justify-between">
         <span
           className={`rounded-full px-3 py-1 text-xs font-bold ${
@@ -183,20 +181,20 @@ function MovimientoCard({
           {tipo}
         </span>
 
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700 dark:bg-white/10 dark:text-gray-300">
           #{pedido.id}
         </span>
       </div>
 
-      <h3 className="mt-4 text-xl font-bold text-slate-900">
+      <h3 className="mt-4 text-xl font-bold text-gray-900">
         {pedido.cliente.nombre}
       </h3>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Tel: {pedido.cliente.telefono || "No registrado"}
       </p>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-gray-500">
         Hora:{" "}
         {fechaMovimiento.toLocaleTimeString("es-CO", {
           hour: "2-digit",
@@ -204,14 +202,14 @@ function MovimientoCard({
         })}
       </p>
 
-      <p className="mt-1 text-sm text-slate-500">Estado: {pedido.estado}</p>
+      <p className="mt-1 text-sm text-gray-500">Estado: {pedido.estado}</p>
 
-      <div className="mt-4 rounded-2xl bg-white p-4">
-        <p className="font-bold text-slate-800">Prendas: {prendas}</p>
+      <div className="mt-4 rounded-xl bg-white p-4 dark:bg-white/5">
+        <p className="font-bold text-gray-800">Prendas: {prendas}</p>
 
         <div className="mt-2 space-y-1">
           {pedido.prendas.map((prenda: any) => (
-            <p key={prenda.id} className="text-sm text-slate-500">
+            <p key={prenda.id} className="text-sm text-gray-500">
               {prenda.servicio ?? "Lavado"} - {prenda.tipo} x{" "}
               {prenda.cantidad}
             </p>
@@ -238,9 +236,9 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+    <div className="card p-6">
+      <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+      <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
       <div className="mt-5 space-y-4">{children}</div>
     </div>
   );
@@ -248,9 +246,9 @@ function Panel({
 
 function Kpi({ title, value }: { title: string; value: number }) {
   return (
-    <div className="rounded-3xl bg-slate-100 p-5">
-      <p className="text-sm text-slate-500">{title}</p>
-      <p className="mt-2 text-4xl font-bold text-teal-600">{value}</p>
+    <div className="rounded-xl bg-gray-50 p-5 dark:bg-white/[0.02]">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="mt-2 text-4xl font-black text-brand-500">{value}</p>
     </div>
   );
 }
@@ -265,11 +263,11 @@ function Money({
   danger?: boolean;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-3">
-      <p className="text-xs text-slate-400">{label}</p>
+    <div className="rounded-xl bg-white p-3 dark:bg-white/5">
+      <p className="text-xs text-gray-400">{label}</p>
       <p
-        className={`mt-1 font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
+        className={`mt-1 font-black ${
+          danger ? "text-red-600" : "text-brand-500"
         }`}
       >
         ${value.toLocaleString("es-CO")}
@@ -280,7 +278,7 @@ function Money({
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-slate-400">
+    <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400 dark:border-white/10">
       {text}
     </div>
   );

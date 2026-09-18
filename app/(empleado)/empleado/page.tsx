@@ -2,259 +2,211 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function EmpleadoPage() {
-  const hoy = new Date();
-
-  const inicioHoy = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate()
-  );
-
-  const finHoy = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate() + 1
-  );
-
-  const pedidos = await prisma.pedido.findMany({
-    include: {
-      cliente: true,
-      prendas: true,
-      pagos: true,
-      historial: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  const entradasHoy = pedidos.filter(
-    (pedido) =>
-      pedido.createdAt >= inicioHoy &&
-      pedido.createdAt < finHoy
-  );
-
-  const salidasHoy = pedidos.filter((pedido) =>
-    (pedido as any).historial.some(
-      (h: any) =>
-        h.estado === "ENTREGADO" &&
-        h.createdAt >= inicioHoy &&
-        h.createdAt < finHoy
-    )
-  );
-
-  const prendasEntradas = entradasHoy.reduce(
-    (sum, pedido) =>
-      sum +
-      pedido.prendas.reduce(
-        (s, prenda) => s + prenda.cantidad,
-        0
-      ),
-    0
-  );
-
-  const prendasSalidas = salidasHoy.reduce(
-    (sum, pedido) =>
-      sum +
-      pedido.prendas.reduce(
-        (s, prenda) => s + prenda.cantidad,
-        0
-      ),
-    0
-  );
+  const [listos, enPiso] = await Promise.all([
+    prisma.pedido.count({ where: { estado: "LISTO" } }),
+    prisma.pedido.count({ where: { estado: { notIn: ["ENTREGADO", "CANCELADO"] } } }),
+  ]);
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <section className="p-8">
-        <div className="rounded-3xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">
-                Operación diaria
-              </h1>
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+      <div>
+        <p className="page-kicker text-teal-600 dark:text-teal-400">
+          Mostrador
+        </p>
+        <h1 className="page-title">¿Qué necesita el cliente?</h1>
+        <p className="page-subtitle">
+          Dos caminos. Elige según llegó a dejar o a recoger.
+        </p>
+      </div>
 
-              <p className="mt-2 text-slate-500">
-                Resumen de entradas y salidas del día.
-              </p>
-            </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <PathCard
+          href="/pedidos/rapido"
+          tone="aqua"
+          emoji="🧺"
+          kicker="Entrada"
+          title="Llegó a dejar"
+          desc="Recibir prendas, crear el recibo y cobrar el abono."
+          steps={["Cliente", "Prendas", "Recibo"]}
+          cta="Nuevo pedido"
+        />
+        <PathCard
+          href="/inventario-empleado"
+          tone="indigo"
+          emoji="📦"
+          kicker="Salida"
+          title="Llegó a recoger"
+          desc="Buscar el recibo, cobrar el saldo y entregar."
+          steps={["Buscar", "Cobrar", "Entregar"]}
+          cta="Buscar pedido"
+        />
+      </div>
 
-            <Link
-              href="/pedidos/nuevo"
-              className="rounded-2xl bg-teal-500 px-6 py-4 font-bold text-white shadow hover:bg-teal-600"
+      <div className="grid gap-3 sm:grid-cols-2">
+        <StatTile
+          label="Listos por recoger"
+          value={listos}
+          tone="indigo"
+          emptyText="No hay pedidos listos por recoger"
+        />
+        <StatTile
+          label="Pendientes en piso"
+          value={enPiso}
+          tone="aqua"
+          emptyText="No hay pedidos pendientes en piso"
+        />
+      </div>
+
+      <div>
+        <p className="mb-3 page-kicker">También</p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <SideLink href="/gastos-empleado" emoji="💵" title="Gastos del día" desc="Jabones, insumos, pagos" />
+          <SideLink href="/clientes-empleado" emoji="👤" title="Clientes" desc="Buscar o crear ficha" />
+          <SideLink href="/entradas-salidas-empleado" emoji="📋" title="Lo de hoy" desc="Qué entró y qué salió hoy" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PathCard({
+  href,
+  tone,
+  emoji,
+  kicker,
+  title,
+  desc,
+  steps,
+  cta,
+}: {
+  href: string;
+  tone: "aqua" | "indigo";
+  emoji: string;
+  kicker: string;
+  title: string;
+  desc: string;
+  steps: string[];
+  cta: string;
+}) {
+  const aqua = tone === "aqua";
+  return (
+    <Link
+      href={href}
+      aria-label={`${title}: ${cta}`}
+      className={`card group relative overflow-hidden p-6 outline-none transition hover:shadow-soft active:scale-[0.995] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg)] ${
+        aqua
+          ? "hover:border-teal-300 focus-visible:ring-teal-400 dark:hover:border-teal-500/40"
+          : "hover:border-brand-300 focus-visible:ring-brand-400 dark:hover:border-brand-500/40"
+      }`}
+    >
+      <div
+        className={`absolute inset-x-0 top-0 h-1.5 ${
+          aqua ? "bg-gradient-to-r from-teal-400 to-cyan-500" : "bg-gradient-to-r from-brand-500 to-indigo-400"
+        }`}
+      />
+      <div className="flex items-start gap-4">
+        <span
+          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-3xl ${
+            aqua ? "bg-teal-50 dark:bg-teal-500/15" : "bg-brand-50 dark:bg-brand-500/15"
+          }`}
+        >
+          {emoji}
+        </span>
+        <div className="min-w-0">
+          <p
+            className={`page-kicker ${
+              aqua ? "text-teal-600 dark:text-teal-400" : "text-brand-500"
+            }`}
+          >
+            {kicker}
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-[color:var(--text-1)]">{title}</h2>
+          <p className="page-subtitle">{desc}</p>
+        </div>
+      </div>
+
+      <ol className="mt-5 flex flex-wrap gap-2">
+        {steps.map((step, i) => (
+          <li
+            key={step}
+            className="flex items-center gap-1.5 rounded-full bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-600 ring-1 ring-gray-200 dark:bg-white/5 dark:text-gray-300 dark:ring-white/10"
+          >
+            <span
+              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white ${
+                aqua ? "bg-teal-500" : "bg-brand-500"
+              }`}
             >
-              Nueva entrada
-            </Link>
-          </div>
-        </div>
+              {i + 1}
+            </span>
+            {step}
+          </li>
+        ))}
+      </ol>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Kpi
-            title="Entradas hoy"
-            value={entradasHoy.length}
-            detail={`${prendasEntradas} prendas recibidas`}
-            color="bg-blue-600"
-          />
-
-          <Kpi
-            title="Salidas hoy"
-            value={salidasHoy.length}
-            detail={`${prendasSalidas} prendas entregadas`}
-            color="bg-emerald-600"
-          />
-        </div>
-
-        <div className="mt-8 grid gap-8 xl:grid-cols-2">
-          <Panel
-            title="Entradas de hoy"
-            subtitle="Pedidos recibidos durante el día"
-          >
-            {entradasHoy.map((pedido) => (
-              <PedidoCard key={pedido.id} pedido={pedido} />
-            ))}
-
-            {entradasHoy.length === 0 && (
-              <Empty text="No hay entradas registradas hoy." />
-            )}
-          </Panel>
-
-          <Panel
-            title="Salidas de hoy"
-            subtitle="Pedidos entregados durante el día"
-          >
-            {salidasHoy.map((pedido) => (
-              <PedidoCard key={pedido.id} pedido={pedido} />
-            ))}
-
-            {salidasHoy.length === 0 && (
-              <Empty text="No hay salidas registradas hoy." />
-            )}
-          </Panel>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function PedidoCard({ pedido }: { pedido: any }) {
-  const abonado = pedido.pagos.reduce(
-    (sum: number, pago: any) => sum + pago.valor,
-    0
-  );
-
-  const saldo = pedido.total - abonado;
-
-  const totalPrendas = pedido.prendas.reduce(
-    (sum: number, prenda: any) => sum + prenda.cantidad,
-    0
-  );
-
-  return (
-    <div className="rounded-3xl border bg-slate-50 p-5">
-      <div className="flex items-center justify-between">
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
-          #{String(pedido.id).padStart(5, "0")}
-        </span>
-
-        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-700">
-          {pedido.estado}
-        </span>
-      </div>
-
-      <h3 className="mt-4 text-xl font-bold text-slate-900">
-        {pedido.cliente.nombre}
-      </h3>
-
-      <p className="mt-1 text-sm text-slate-500">
-        Tel: {pedido.cliente.telefono || "No registrado"}
+      <p
+        className={`mt-5 text-sm font-bold ${
+          aqua ? "text-teal-600 group-hover:text-teal-700" : "text-brand-500 group-hover:text-brand-600"
+        }`}
+      >
+        {cta} →
       </p>
-
-      <p className="mt-1 text-sm text-slate-500">
-        Hora:{" "}
-        {pedido.createdAt.toLocaleTimeString("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </p>
-
-      <p className="mt-1 text-sm text-slate-500">
-        Prendas: {totalPrendas}
-      </p>
-
-      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-        <Money label="Total" value={pedido.total} />
-        <Money label="Abono" value={abonado} />
-        <Money label="Saldo" value={saldo} danger={saldo > 0} />
-      </div>
-    </div>
+    </Link>
   );
 }
 
-function Kpi({
-  title,
-  value,
-  detail,
-  color,
-}: {
-  title: string;
-  value: number;
-  detail: string;
-  color: string;
-}) {
-  return (
-    <div className={`${color} rounded-3xl p-6 text-white shadow`}>
-      <p className="text-sm opacity-80">{title}</p>
-      <p className="mt-3 text-5xl font-bold">{value}</p>
-      <p className="mt-2 text-sm opacity-90">{detail}</p>
-    </div>
-  );
-}
-
-function Panel({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-3xl bg-white p-6 shadow">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
-      <div className="mt-5 space-y-4">{children}</div>
-    </div>
-  );
-}
-
-function Money({
+function StatTile({
   label,
   value,
-  danger,
+  tone,
+  emptyText,
 }: {
   label: string;
   value: number;
-  danger?: boolean;
+  tone: "aqua" | "indigo";
+  emptyText: string;
 }) {
-  return (
-    <div className="rounded-2xl bg-white p-3">
-      <p className="text-xs text-slate-400">{label}</p>
+  const aqua = tone === "aqua";
 
-      <p
-        className={`mt-1 font-bold ${
-          danger ? "text-red-600" : "text-teal-600"
-        }`}
-      >
-        ${value.toLocaleString("es-CO")}
+  if (value === 0) {
+    return (
+      <div className="card flex items-center gap-3 p-4">
+        <span className="text-2xl">✅</span>
+        <p className="text-sm font-semibold text-[color:var(--text-3)]">{emptyText}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-4">
+      <p className="page-kicker">{label}</p>
+      <p className={`mt-1 text-2xl font-black ${aqua ? "text-teal-600 dark:text-teal-400" : "text-brand-500"}`}>
+        {value}
       </p>
     </div>
   );
 }
 
-function Empty({ text }: { text: string }) {
+function SideLink({
+  href,
+  emoji,
+  title,
+  desc,
+}: {
+  href: string;
+  emoji: string;
+  title: string;
+  desc: string;
+}) {
   return (
-    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-slate-400">
-      {text}
-    </div>
+    <Link
+      href={href}
+      className="card flex items-center gap-3 p-4 transition hover:border-teal-300 hover:shadow-soft dark:hover:border-teal-500/40"
+    >
+      <span className="text-2xl">{emoji}</span>
+      <span className="min-w-0">
+        <span className="block text-sm font-bold text-[color:var(--text-1)]">{title}</span>
+        <span className="block text-xs text-[color:var(--text-3)]">{desc}</span>
+      </span>
+    </Link>
   );
 }

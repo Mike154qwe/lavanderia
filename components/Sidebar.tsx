@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { useSidebarNav } from "@/components/AppShell";
 
 const OCULTAR = ["/login", "/empleado-login", "/recibos", "/cierres-caja"];
 
@@ -15,7 +17,7 @@ const RUTAS_EMPLEADO = [
   "/entrega-empleado",
 ];
 
-type NavItem = { label: string; href: string; icon: React.ReactNode };
+type NavItem = { label: string; href: string; icon: React.ReactNode; aliases?: string[] };
 type NavGroup = { grupo: string; items: NavItem[] };
 
 function Icon({ d }: { d: string | string[] }) {
@@ -55,6 +57,11 @@ const GERENTE_NAV: NavGroup[] = [
         icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,
       },
       {
+        label: "Clientes",
+        href: "/clientes",
+        icon: <Icon d={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} />,
+      },
+      {
         label: "Pedidos antiguos",
         href: "/pedidos-antiguos",
         icon: <Icon d={["M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z", "M12 6v6l4 2"]} />,
@@ -69,11 +76,6 @@ const GERENTE_NAV: NavGroup[] = [
         href: "/movimientos",
         icon: <Icon d={["M18 20V10", "M12 20V4", "M6 20v-6"]} />,
       },
-      {
-        label: "Clientes",
-        href: "/clientes",
-        icon: <Icon d={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} />,
-      },
     ],
   },
 ];
@@ -83,48 +85,41 @@ const EMPLEADO_NAV: NavGroup[] = [
     grupo: "Mi trabajo",
     items: [
       {
-        label: "Inventario",
-        href: "/inventario-empleado",
-        icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,
-      },
-      {
-        label: "Clientes",
-        href: "/clientes-empleado",
-        icon: <Icon d={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"]} />,
-      },
-      {
-        label: "Pedido rápido",
+        label: "Llegó a dejar",
         href: "/pedidos/rapido",
+        aliases: ["/clientes-empleado"],
         icon: <Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
       },
       {
-        label: "Entrega / Cobro",
-        href: "/entrega-empleado",
-        icon: <Icon d={["M20 12V22H4V12", "M22 7H2v5h20V7z", "M12 22V7", "M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z", "M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"]} />,
-      },
-      {
-        label: "Entradas / Salidas",
-        href: "/entradas-salidas-empleado",
-        icon: <Icon d={["M17 1l4 4-4 4", "M3 11V9a4 4 0 0 1 4-4h14", "M7 23l-4-4 4-4", "M21 13v2a4 4 0 0 1-4 4H3"]} />,
-      },
-      {
-        label: "Gastos del día",
-        href: "/gastos-empleado",
-        icon: <Icon d={["M12 1v22", "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"]} />,
+        label: "Llegó a recoger",
+        href: "/inventario-empleado",
+        aliases: ["/entrega-empleado", "/entradas-salidas-empleado"],
+        icon: <Icon d={["M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z", "M16 3H8L6 7h12l-2-4z"]} />,
       },
     ],
   },
 ];
 
-function isActive(href: string, pathname: string): boolean {
-  if (pathname === href) return true;
-  if (href === "/") return false;
-  if (href === "/pedidos") return /^\/pedidos\/\d+/.test(pathname);
-  return pathname.startsWith(href + "/");
+const GRUPO = "rgba(255,255,255,0.45)";
+const INACTIVO_ICONO = "rgba(255,255,255,0.7)";
+
+function isActive(item: NavItem, pathname: string): boolean {
+  if (pathname === item.href) return true;
+  if (item.href === "/") return false;
+  if (item.href === "/pedidos") return /^\/pedidos\/\d+/.test(pathname);
+  if (pathname.startsWith(item.href + "/")) return true;
+  return (item.aliases ?? []).some(
+    (alias) => pathname === alias || pathname.startsWith(alias + "/")
+  );
 }
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { open, setOpen } = useSidebarNav();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname, setOpen]);
 
   if (OCULTAR.some((r) => pathname.startsWith(r))) return null;
 
@@ -133,111 +128,94 @@ export default function Sidebar() {
   const logoutHref = esEmpleado ? "/empleado-logout" : "/logout";
 
   return (
-    <aside
-      className="flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto"
-      style={{
-        background: "linear-gradient(180deg, #0d1119 0%, #0a0e16 100%)",
-        borderRight: "1px solid rgba(255,255,255,0.05)",
-      }}
-    >
-      {/* Logo */}
-      <div
-        className="flex items-center gap-3 px-5 py-5"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-          style={{
-            background: "linear-gradient(145deg, rgba(70,95,255,0.4), rgba(70,95,255,0.15))",
-            border: "1px solid rgba(70,95,255,0.3)",
-            boxShadow: "0 0 12px rgba(70,95,255,0.2)",
-          }}
-        >
-          🧺
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-bold leading-tight text-white">
-            La Manuelita
-          </p>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Lavaseco</p>
-        </div>
-      </div>
+    <>
+      {open && (
+        <button
+          type="button"
+          aria-label="Cerrar menú"
+          className="fixed inset-0 z-30 bg-black/45 lg:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-5 px-3 py-5">
-        {nav.map((grupo) => (
-          <div key={grupo.grupo}>
-            <p
-              className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.1em]"
-              style={{ color: "rgba(255,255,255,0.25)" }}
-            >
-              {grupo.grupo}
-            </p>
-            <div className="space-y-0.5">
-              {grupo.items.map((item) => {
-                const active = isActive(item.href, pathname);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150"
-                    style={
-                      active
-                        ? {
-                            background: "linear-gradient(135deg, rgba(70,95,255,0.25), rgba(70,95,255,0.12))",
-                            color: "#ffffff",
-                            boxShadow: "0 0 0 1px rgba(70,95,255,0.25), 0 2px 8px rgba(70,95,255,0.12)",
-                          }
-                        : { color: "rgba(255,255,255,0.4)" }
-                    }
-                  >
-                    {/* Barra lateral de activo */}
-                    {active && (
-                      <span
-                        className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full"
-                        style={{ background: "#465fff", boxShadow: "0 0 6px #465fff" }}
-                      />
-                    )}
-                    <span
-                      style={
-                        active
-                          ? { color: "#93a8ff" }
-                          : { color: "rgba(255,255,255,0.25)" }
-                      }
-                      className="transition-colors group-hover:!text-white/60"
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="transition-colors group-hover:text-white/80">
-                      {item.label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
+      <aside
+        className={`app-sidebar fixed inset-y-0 left-0 z-40 flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto transition-transform duration-200 lg:static lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Logo */}
+        <div className="app-sidebar-rule flex items-center gap-3 border-b px-5 py-5">
+          <div className="app-sidebar-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-lg">
+            🧺
           </div>
-        ))}
-      </nav>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold leading-tight text-white">
+              La Manuelita
+            </p>
+            <p className="text-xs" style={{ color: GRUPO }}>Lavaseco</p>
+          </div>
+        </div>
 
-      {/* Logout */}
-      <div
-        className="px-3 py-4"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <a
-          href={logoutHref}
-          className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all"
-          style={{ color: "rgba(255,255,255,0.3)" }}
-        >
-          <span
-            className="transition-colors group-hover:text-white/50"
-            style={{ color: "rgba(255,255,255,0.2)" }}
+        {/* Navigation */}
+        <nav className="flex-1 space-y-5 px-3 py-5">
+          {nav.map((grupo) => (
+            <div key={grupo.grupo}>
+              <p
+                className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.1em]"
+                style={{ color: GRUPO }}
+              >
+                {grupo.grupo}
+              </p>
+              <div className="space-y-0.5">
+                {grupo.items.map((item) => {
+                  const active = isActive(item, pathname);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`group relative flex items-center gap-3 rounded-[var(--radius-well)] px-3 py-2.5 text-sm font-semibold transition-all duration-150 ${
+                        active ? "app-nav-active" : "app-nav-link"
+                      }`}
+                    >
+                      {active && (
+                        <span
+                          className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full"
+                          style={{ background: "#465fff", boxShadow: "0 0 6px #465fff" }}
+                        />
+                      )}
+                      <span
+                        style={active ? { color: "#93a8ff" } : { color: INACTIVO_ICONO }}
+                        className="transition-colors group-hover:!text-white"
+                      >
+                        {item.icon}
+                      </span>
+                      <span className="transition-colors group-hover:text-white">
+                        {item.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div className="app-sidebar-rule border-t px-3 py-4">
+          <a
+            href={logoutHref}
+            className="app-nav-link group flex items-center gap-3 rounded-[var(--radius-well)] px-3 py-2.5 text-sm font-semibold transition-all"
           >
-            <Icon d={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"]} />
-          </span>
-          <span className="transition-colors group-hover:text-white/60">Cerrar sesión</span>
-        </a>
-      </div>
-    </aside>
+            <span
+              className="transition-colors group-hover:text-white"
+              style={{ color: INACTIVO_ICONO }}
+            >
+              <Icon d={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"]} />
+            </span>
+            <span className="transition-colors group-hover:text-white">Cerrar sesión</span>
+          </a>
+        </div>
+      </aside>
+    </>
   );
 }

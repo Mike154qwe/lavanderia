@@ -62,7 +62,7 @@ export default function EmpleadoLoginPage() {
         </div>
 
         <p
-          className="mb-1 text-sm font-black uppercase tracking-[0.2em]"
+          className="mb-1 text-sm font-bold uppercase tracking-[0.2em]"
           style={{ color: "rgba(70,95,255,0.8)" }}
         >
           Lavaseco
@@ -79,7 +79,7 @@ export default function EmpleadoLoginPage() {
       <div className="animate-fade-up-2 relative z-10 mt-12 w-full max-w-xs">
         <form action={empleadoLoginAction}>
           <button
-            className="w-full rounded-3xl py-7 text-2xl font-black text-white transition active:scale-95"
+            className="w-full rounded-3xl py-7 text-2xl font-bold text-white transition active:scale-95"
             style={{
               background: "linear-gradient(135deg, #465fff 0%, #3641f5 100%)",
               boxShadow: "0 8px 32px rgba(70,95,255,0.45), 0 0 0 1px rgba(255,255,255,0.06)",
