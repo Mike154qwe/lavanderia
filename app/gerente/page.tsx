@@ -248,27 +248,19 @@ export default async function GerentePage({
   return (
     <div className="space-y-5 p-6">
 
-      {/* ── Cabecera ─────────────────────────────────────── */}
-      <div className="card p-6">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">Panel financiero</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          KPIs del día y cierre de caja. Las gráficas y el calendario quedan abajo, plegados.
-        </p>
-      </div>
-
-      {/* ── Día seleccionado ─────────────────────────────── */}
+      {/* ── Nivel 1 · Título, día y KPIs (una sola tarjeta) ── */}
       <div className="card overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-5 dark:border-white/[0.07]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
-              {esHoy ? "Hoy" : "Día seleccionado"}
+            <p className="page-kicker text-brand-500">
+              Gerente · {esHoy ? "Hoy" : "Día seleccionado"}
             </p>
-            <h2 className="mt-1 text-xl font-bold capitalize text-gray-900">
+            <h1 className="page-title">Panel financiero</h1>
+            <p className="page-subtitle capitalize">
               {fechaSeleccionada.toLocaleDateString("es-CO", {
                 weekday: "long", year: "numeric", month: "long", day: "numeric",
               })}
-            </h2>
+            </p>
           </div>
           <form className="flex gap-2">
             <input
@@ -291,7 +283,7 @@ export default async function GerentePage({
         </div>
       </div>
 
-      {/* ── Cierre de caja (acción principal) ─────────────── */}
+      {/* ── Nivel 1 · Cierre de caja (acción principal) ───── */}
       <div className="card p-6 ring-2 ring-brand-200 dark:ring-brand-500/30">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -337,6 +329,9 @@ export default async function GerentePage({
           </p>
         )}
       </div>
+
+      {/* ── Nivel 2 · Detalle del día ─────────────────────── */}
+      <p className="page-kicker px-1 pt-2">Detalle del día</p>
 
       {/* ── Facturación del día ───────────────────────────── */}
       <div className="card p-6">
@@ -390,7 +385,7 @@ export default async function GerentePage({
         </div>
       </div>
 
-      {/* ── Gráficas (secundario) ────────────────────────── */}
+      {/* ── Nivel 3 · Gráficas (secundario, plegado) ─────── */}
       <details className="card overflow-hidden">
         <summary className="cursor-pointer list-none px-6 py-4 text-sm font-bold text-gray-700 marker:content-none dark:text-gray-200">
           Gráficas del mes
@@ -424,7 +419,7 @@ export default async function GerentePage({
         </div>
       </details>
 
-      {/* ── Calendario anual (secundario) ────────────────── */}
+      {/* ── Nivel 3 · Calendario anual (secundario, plegado) ─ */}
       <details className="space-y-4">
         <summary className="card cursor-pointer list-none px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200">
           Calendario anual {year}
