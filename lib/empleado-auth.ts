@@ -18,3 +18,9 @@ export async function cerrarSesionEmpleado() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
 }
+
+// Mismo valor que comprueba proxy.ts para dejar pasar a las rutas de empleado.
+export async function estaEmpleadoAutenticado() {
+  const cookieStore = await cookies();
+  return cookieStore.get(COOKIE_NAME)?.value === "empleado_activo";
+}
