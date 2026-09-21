@@ -9,6 +9,9 @@
 // Uso:  npm run test:rnf04
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { register, createRequire } from "node:module";
 
 process.env.AUTH_SECRET = "secreto-de-prueba-rnf04";
@@ -81,3 +84,58 @@ for (const [ruta, cookie, esperado] of REGRESION) {
     assert.equal(decidir(ruta, cookie), esperado);
   });
 }
+
+// ── Ticket de cierre de caja: datos financieros, solo gerente ─────────────────
+// /cierres-caja/[id]/ticket recalcula y muestra los totales de caja del día.
+// Tampoco estaba en el matcher: cualquiera podía abrirlo probando ids 1, 2, 3…
+const TICKET = "/cierres-caja/1/ticket";
+
+test(`${TICKET}: sin sesión redirige a /login`, () => {
+  assert.equal(decidir(TICKET), "redirect:/login");
+});
+
+test(`${TICKET}: la sesión de empleado NO basta (es información de gerente)`, () => {
+  assert.equal(decidir(TICKET, EMPLEADO), "redirect:/login");
+});
+
+test(`${TICKET}: una cookie de gerente falsa NO basta`, () => {
+  assert.equal(decidir(TICKET, GERENTE_FALSA), "redirect:/login");
+});
+
+test(`${TICKET}: con sesión de gerente pasa (el redirect tras «Hacer cierre»)`, () => {
+  assert.equal(decidir(TICKET, GERENTE), "pasa");
+});
+
+// ── Red de seguridad: ninguna ruta de la app queda abierta por olvido ─────────
+// Recorre las rutas REALES (app/**/page.tsx y route.ts). Sin sesión, todas deben
+// redirigir o dar 401, salvo las públicas de esta lista. Una ruta nueva que se
+// olvide del matcher hace fallar esta prueba.
+const PUBLICAS = new Set(["/", "/login", "/empleado-login", "/logout", "/empleado-logout"]);
+const RAIZ_APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../app");
+
+function rutasDeLaApp(dir = RAIZ_APP, segmentos = []) {
+  const rutas = [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) {
+      rutas.push(...rutasDeLaApp(path.join(dir, e.name), [...segmentos, e.name]));
+    } else if (/^(page|route)\.(tsx|ts)$/.test(e.name)) {
+      const partes = segmentos
+        .filter((s) => !/^\(.*\)$/.test(s)) // grupos de rutas: no forman parte de la URL
+        .map((s) => s.replace(/\[[^\]]+\]/g, "1")); // [id] -> 1
+      rutas.push("/" + partes.join("/"));
+    }
+  }
+  return rutas;
+}
+
+test("ninguna ruta de la app queda abierta sin sesión, salvo la lista pública", () => {
+  const rutas = rutasDeLaApp();
+  assert.ok(rutas.length > 15, `se esperaban muchas rutas, se encontraron ${rutas.length}`);
+
+  const abiertas = rutas.filter((r) => !PUBLICAS.has(r) && ["pasa", "sin-proxy"].includes(decidir(r)));
+  assert.deepEqual(
+    abiertas,
+    [],
+    `Rutas accesibles SIN sesión (el proxy no las cubre): ${abiertas.join(", ")}`,
+  );
+});

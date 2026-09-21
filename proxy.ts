@@ -25,6 +25,7 @@ const rutasGerente = [
   "/pedidos-antiguos",
   "/inventario",
   "/clientes",
+  "/cierres-caja", // ticket con los totales de caja (RNF04)
   "/pedidos/nuevo",
   "/pedidos/[id]",
 ];
@@ -132,6 +133,7 @@ export const config = {
     "/clientes/:path*",
     "/clientes-empleado/:path*",
     "/entrega-empleado/:path*",
+    "/cierres-caja/:path*",
     "/api/:path*",
   ],
 };
