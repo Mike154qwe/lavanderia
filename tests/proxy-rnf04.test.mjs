@@ -69,7 +69,8 @@ const REGRESION = [
   ["/pedidos/rapido", "", "redirect:/empleado-login"],
   ["/pedidos/rapido", EMPLEADO, "pasa"],
   ["/pedidos/rapido", GERENTE, "pasa"],
-  ["/pedidos", EMPLEADO, "pasa"],
+  ["/pedidos", EMPLEADO, "redirect:/login"], // listado con datos de clientes: solo gerente
+  ["/pedidos", GERENTE, "pasa"],
   ["/recibos/1/pdf", EMPLEADO, "pasa"],
   ["/recibos/1/pdf", "", "redirect:/empleado-login"],
   ["/gastos-empleado", EMPLEADO, "pasa"],
@@ -106,11 +107,48 @@ test(`${TICKET}: con sesión de gerente pasa (el redirect tras «Hacer cierre»)
   assert.equal(decidir(TICKET, GERENTE), "pasa");
 });
 
-// ── Red de seguridad: ninguna ruta de la app queda abierta por olvido ─────────
-// Recorre las rutas REALES (app/**/page.tsx y route.ts). Sin sesión, todas deben
-// redirigir o dar 401, salvo las públicas de esta lista. Una ruta nueva que se
-// olvide del matcher hace fallar esta prueba.
-const PUBLICAS = new Set(["/", "/login", "/empleado-login", "/logout", "/empleado-logout"]);
+// ── Nivel de acceso de CADA ruta de la app (mínimo privilegio) ────────────────
+// «publica»   : login/logout y la raíz.
+// «gerente»   : solo sesión de gerente. Incluye todo lo que muestra datos de clientes
+//               en bloque, dinero o historial (/pedidos, /clientes, /movimientos,
+//               /cierres-caja, /gerente*, /pedidos-antiguos, /inventario) y /api.
+// «mostrador» : lo que Esperanza y Diego necesitan en el día a día (empleado o gerente).
+// Una ruta nueva DEBE declararse aquí: la prueba de completitud falla si no está.
+const ACCESO = {
+  "/": "publica",
+  "/login": "publica",
+  "/empleado-login": "publica",
+  "/logout": "publica",
+  "/empleado-logout": "publica",
+
+  "/api/pedidos": "gerente",
+  "/cierres-caja/1/ticket": "gerente",
+  "/clientes": "gerente",
+  "/clientes/nuevo": "gerente",
+  "/gerente": "gerente",
+  "/gerente/dia/1": "gerente",
+  "/gerente/remoto": "gerente",
+  "/inventario": "gerente",
+  "/movimientos": "gerente",
+  "/movimientos/dia/1": "gerente",
+  "/pedidos": "gerente",
+  "/pedidos-antiguos": "gerente",
+  "/pedidos/1": "gerente",
+  "/pedidos/nuevo": "gerente",
+
+  "/empleado": "mostrador",
+  "/pedidos/rapido": "mostrador",
+  "/clientes-empleado": "mostrador",
+  "/inventario-empleado": "mostrador",
+  "/entradas-salidas-empleado": "mostrador",
+  "/gastos-empleado": "mostrador",
+  "/entrega-empleado": "mostrador",
+  "/recibos/1/pdf": "mostrador",
+};
+
+const EMPLEADO_FALSA = "lavaseco_empleado_auth=otro-valor";
+const rutasDe = (nivel) => Object.keys(ACCESO).filter((r) => ACCESO[r] === nivel);
+const PUBLICAS = new Set(rutasDe("publica"));
 const RAIZ_APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../app");
 
 function rutasDeLaApp(dir = RAIZ_APP, segmentos = []) {
@@ -128,14 +166,48 @@ function rutasDeLaApp(dir = RAIZ_APP, segmentos = []) {
   return rutas;
 }
 
-test("ninguna ruta de la app queda abierta sin sesión, salvo la lista pública", () => {
-  const rutas = rutasDeLaApp();
-  assert.ok(rutas.length > 15, `se esperaban muchas rutas, se encontraron ${rutas.length}`);
+/** Lo que debe pasar cuando NO hay permiso: 401 para la API, redirect al login para páginas. */
+const denegado = (ruta) => (ruta.startsWith("/api") ? "401" : "redirect:/login");
 
-  const abiertas = rutas.filter((r) => !PUBLICAS.has(r) && ["pasa", "sin-proxy"].includes(decidir(r)));
+test("cada ruta de la app tiene un nivel de acceso declarado (y la tabla no tiene rutas fantasma)", () => {
+  const reales = rutasDeLaApp();
+  assert.ok(reales.length > 15, `se esperaban muchas rutas, se encontraron ${reales.length}`);
+
+  const sinDeclarar = reales.filter((r) => !(r in ACCESO));
+  const fantasma = Object.keys(ACCESO).filter((r) => r !== "/" && !reales.includes(r));
+  assert.deepEqual(sinDeclarar, [], `Rutas sin nivel de acceso declarado (decide si son gerente o mostrador): ${sinDeclarar.join(", ")}`);
+  assert.deepEqual(fantasma, [], `Rutas declaradas que ya no existen: ${fantasma.join(", ")}`);
+});
+
+test("sin sesión: ninguna ruta no pública queda abierta", () => {
+  const abiertas = rutasDeLaApp().filter((r) => !PUBLICAS.has(r) && ["pasa", "sin-proxy"].includes(decidir(r)));
+  assert.deepEqual(abiertas, [], `Rutas accesibles SIN sesión: ${abiertas.join(", ")}`);
+});
+
+test("con sesión de EMPLEADO: nada exclusivo de gerente es accesible", () => {
+  const accesibles = rutasDe("gerente").filter((r) => decidir(r, EMPLEADO) !== denegado(r));
   assert.deepEqual(
-    abiertas,
+    accesibles,
     [],
-    `Rutas accesibles SIN sesión (el proxy no las cubre): ${abiertas.join(", ")}`,
+    `Rutas de gerente que la sesión de empleado SÍ alcanza: ${accesibles.map((r) => `${r} (${decidir(r, EMPLEADO)})`).join(", ")}`,
   );
+});
+
+test("con cookies falsas o inválidas: ni el mostrador ni lo de gerente se abren", () => {
+  for (const cookie of [GERENTE_FALSA, EMPLEADO_FALSA]) {
+    const abiertas = [...rutasDe("gerente"), ...rutasDe("mostrador")].filter((r) =>
+      ["pasa", "sin-proxy"].includes(decidir(r, cookie)),
+    );
+    assert.deepEqual(abiertas, [], `Con «${cookie}» se abren: ${abiertas.join(", ")}`);
+  }
+});
+
+test("con sesión de EMPLEADO: todo el mostrador sigue funcionando (no se recortó de más)", () => {
+  const bloqueadas = rutasDe("mostrador").filter((r) => decidir(r, EMPLEADO) !== "pasa");
+  assert.deepEqual(bloqueadas, [], `Rutas del mostrador que el empleado NO alcanza: ${bloqueadas.join(", ")}`);
+});
+
+test("con sesión de GERENTE: conserva acceso a todo, incluido el mostrador", () => {
+  const bloqueadas = [...rutasDe("gerente"), ...rutasDe("mostrador")].filter((r) => decidir(r, GERENTE) !== "pasa");
+  assert.deepEqual(bloqueadas, [], `Rutas que el gerente NO alcanza: ${bloqueadas.join(", ")}`);
 });

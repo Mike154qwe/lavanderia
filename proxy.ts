@@ -30,7 +30,14 @@ const rutasGerente = [
   "/pedidos/[id]",
 ];
 
-// Rutas exclusivamente de empleado (acepta cookie gerente O empleado)
+// Rutas del mostrador (acepta cookie gerente O empleado).
+//
+// RNF04 · mínimo privilegio: el acceso de empleado no pide credencial (decisión
+// documentada en lib/empleado-auth.ts), así que su sesión solo abre lo que hace
+// falta para atender el mostrador. Para el empleado NO existe: el listado de
+// /pedidos (nombre y teléfono de todos los clientes), /pedidos/[id], /clientes,
+// /movimientos, /pedidos-antiguos, /inventario, /cierres-caja, /gerente* ni /api.
+// Cada ruta nueva debe declararse en tests/proxy-rnf04.test.mjs (tabla ACCESO).
 const rutasEmpleado = [
   "/pedidos/rapido",
   "/inventario-empleado",
@@ -40,11 +47,6 @@ const rutasEmpleado = [
   "/recibos",
   "/clientes-empleado",
   "/entrega-empleado",
-];
-
-// Rutas accesibles con cualquiera de las dos sesiones
-const rutasCompartidas = [
-  "/pedidos",
 ];
 
 export function proxy(request: NextRequest) {
@@ -80,6 +82,11 @@ export function proxy(request: NextRequest) {
   // Rutas solo gerente
   const esRutaGerente =
     rutasGerente.some((ruta) => pathname === ruta || pathname.startsWith(ruta + "/")) ||
+    // El listado /pedidos (nombre y teléfono de todos los clientes) es de gerente
+    // (RNF04). Va aparte porque rutasGerente compara por prefijo y "/pedidos"
+    // bloquearía también /pedidos/rapido, el alta del mostrador. El flujo diario
+    // del empleado nunca enlaza a este listado.
+    pathname === "/pedidos" ||
     // /pedidos/nuevo y /pedidos/<número> son de gerente
     (pathname.startsWith("/pedidos/") &&
       !pathname.startsWith("/pedidos/rapido"));
@@ -99,18 +106,6 @@ export function proxy(request: NextRequest) {
   if (esRutaEmpleado) {
     if (!gerenteOk && !empleadoOk) {
       return NextResponse.redirect(new URL("/empleado-login", request.url));
-    }
-    return NextResponse.next();
-  }
-
-  // Rutas compartidas: cualquiera de las dos sesiones
-  const esRutaCompartida = rutasCompartidas.some((ruta) =>
-    pathname.startsWith(ruta)
-  );
-
-  if (esRutaCompartida) {
-    if (!gerenteOk && !empleadoOk) {
-      return NextResponse.redirect(new URL("/login", request.url));
     }
     return NextResponse.next();
   }
