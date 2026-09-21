@@ -10,11 +10,15 @@ import { PrismaClient } from "@prisma/client";
 //   - Lo que el cifrado en reposo SÍ agregaría: protección si alguien copia el
 //     archivo .db directamente del disco (acceso físico a la PC, o a un backup
 //     sin proteger). Es una amenaza real pero de otra capa (seguridad del
-//     equipo/backup, no de la aplicación), y el despliegue actual es un único
-//     PC local sin exposición a internet -- el costo de integrar SQLCipher
-//     (cambiar el driver de Prisma, gestionar la clave de cifrado, migrar la
-//     base existente) no se justifica frente al riesgo real de un prototipo
-//     académico de este tamaño y esta topología.
+//     equipo/backup, no de la aplicación). El registro local (SQLite) no tiene
+//     exposición a internet: el despliegue actual es un único PC local. El
+//     espejo de solo lectura en Firestore para el panel remoto, en cambio, SÍ
+//     vive en internet por diseño, y su acceso se protege mediante reglas de
+//     seguridad (ver lib/empleado-auth.ts para el estado actual de esa
+//     protección; esas reglas no forman parte de este repositorio). El costo
+//     de integrar SQLCipher (cambiar el driver de Prisma, gestionar la clave
+//     de cifrado, migrar la base existente) no se justifica frente al riesgo
+//     real de un prototipo académico de este tamaño y esta topología.
 //   - Si el despliegue cambia (multi-sede, backups a la nube sin cifrar,
 //     equipo compartido con más gente), esto debe reevaluarse -- no es una
 //     garantía permanente, es una decisión de alcance para esta versión.
