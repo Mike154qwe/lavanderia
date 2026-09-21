@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 const { calcularCaja, ventanaDeCierre, enVentana, MEDIO_EFECTIVO } = await import("../lib/caja.ts");
+const { money } = await import("../lib/format.ts");
 
 const pago = (metodo, valor) => ({ metodo, valor });
 
@@ -134,4 +135,35 @@ test("enVentana excluye el límite inferior e incluye el superior", () => {
     { id: "después", createdAt: h(12, 1) },
   ];
   assert.deepEqual(enVentana(items, v).map((i) => i.id), ["dentro", "justo en este cierre"]);
+});
+
+// ── Gastos que registra el empleado con un medio distinto a efectivo ──────────
+// El formulario /gastos-empleado ofrece los 5 medios del sistema. Lo que elija llega a
+// GastoCaja.metodo y el efectivo en caja solo descuenta los gastos con metodo «Efectivo».
+test("gasto de empleado por Nequi/Daviplata/Transferencia/Tarjeta: no descuenta del efectivo en caja", () => {
+  const pagos = [pago("Efectivo", 100000)];
+  for (const medio of ["Nequi", "Daviplata", "Transferencia", "Tarjeta"]) {
+    const r = calcularCaja(pagos, [pago(medio, 40000)]);
+    assert.equal(r.efectivoEnCaja, 100000, `un gasto por ${medio} no debe restar del cajón`);
+    assert.equal(r.gananciaNeta, 60000, `pero sí resta de la ganancia neta (${medio})`);
+  }
+  assert.equal(calcularCaja(pagos, [pago("Efectivo", 40000)]).efectivoEnCaja, 60000);
+});
+
+test("contraste: si el medio se guardara siempre como Efectivo, la nómina por Nequi hundiría el cajón", () => {
+  const pagos = [pago("Efectivo", 130500), pago("Nequi", 52500), pago("Daviplata", 34500)];
+  const real = calcularCaja(pagos, [pago("Nequi", 400000)]);
+  const forzado = calcularCaja(pagos, [pago(MEDIO_EFECTIVO, 400000)]);
+  assert.equal(real.efectivoEnCaja, 130500);
+  assert.equal(forzado.efectivoEnCaja, -269500, "el error que evita pedir el medio real en el formulario");
+});
+
+// ── money(): el signo va antes del símbolo ────────────────────────────────────
+test("money() imprime los negativos como -$182.500 y no como $-182.500", () => {
+  assert.equal(money(-182500), "-$182.500");
+  assert.equal(money(182500), "$182.500");
+  assert.equal(money(0), "$0");
+  assert.equal(money(-0), "$0", "el cero negativo no debe salir como -$0");
+  assert.equal(money(-999), "-$999");
+  assert.equal(money(-1234567), "-$1.234.567");
 });

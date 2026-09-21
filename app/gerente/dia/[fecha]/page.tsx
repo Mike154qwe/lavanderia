@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { formatPedido } from "@/lib/format";
+import { formatPedido, money } from "@/lib/format";
 import { calcularCaja } from "@/lib/caja";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
@@ -191,9 +191,9 @@ export default async function DiaFinanzasPage({
           </form>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <Kpi title="Recibido" value={`$${totalRecibido.toLocaleString("es-CO")}`} />
-            <Kpi title="Vendido" value={`$${totalVendido.toLocaleString("es-CO")}`} />
-            <Kpi title="Gastos" value={`$${totalGastos.toLocaleString("es-CO")}`} danger />
+            <Kpi title="Recibido" value={money(totalRecibido)} />
+            <Kpi title="Vendido" value={money(totalVendido)} />
+            <Kpi title="Gastos" value={money(totalGastos)} danger />
           </div>
 
           {/* Los dos números de caja, uno junto al otro. No son la misma cuenta. */}
@@ -201,13 +201,13 @@ export default async function DiaFinanzasPage({
             <Kpi
               title="Ganancia neta del día"
               hint="Todo lo recibido menos todos los gastos, en cualquier medio de pago."
-              value={`$${caja.gananciaNeta.toLocaleString("es-CO")}`}
+              value={money(caja.gananciaNeta)}
               danger={caja.gananciaNeta < 0}
             />
             <Kpi
               title="Efectivo en caja"
               hint="Efectivo recibido menos solo los gastos pagados en efectivo. Para cuadrar el cajón."
-              value={`$${caja.efectivoEnCaja.toLocaleString("es-CO")}`}
+              value={money(caja.efectivoEnCaja)}
               danger={caja.efectivoEnCaja < 0}
             />
           </div>
@@ -500,7 +500,7 @@ function CajaRow({
             danger ? "text-red-600" : strong ? "text-brand-500" : "text-gray-900"
           }`}
         >
-          ${value.toLocaleString("es-CO")}
+          {money(value)}
         </p>
       </div>
     </div>
@@ -521,7 +521,7 @@ function Money({
       <p className="text-sm text-gray-500">{label}</p>
 
       <p className={`mt-1 text-2xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
-        ${value.toLocaleString("es-CO")}
+        {money(value)}
       </p>
     </div>
   );

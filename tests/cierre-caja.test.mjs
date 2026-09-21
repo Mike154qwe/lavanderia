@@ -124,6 +124,18 @@ const CASOS = [
   },
 ];
 
+// Los mismos cuatro escenarios, con los gastos registrados como los guarda el formulario del
+// empleado (/gastos-empleado): responsable «Empleado» y el medio de pago elegido en el
+// formulario. Un gasto de empleado por Nequi/Transferencia NO debe descontarse del efectivo
+// en caja. Se siembran en otro mes para que sus ventanas de cierre no se mezclen con las de arriba.
+const CASOS_EMPLEADO = CASOS.map((c) => ({
+  ...c,
+  id: c.id + 10,
+  dia: [c.dia[0], 6, c.dia[2]],
+  titulo: `${c.titulo} — gastos registrados por el empleado`,
+  responsableGastos: "Empleado",
+}));
+
 /**
  * Siembra el escenario en la ventana [00:00, 18:00] de un día y crea el cierre
  * con los valores que guarda hacerCierreCaja (app/gerente/page.tsx), calculados
@@ -153,7 +165,7 @@ async function sembrar(caso) {
   }
   for (const [i, [metodo, valor, tipo]] of caso.gastos.entries()) {
     await prisma.gastoCaja.create({
-      data: { tipo, descripcion: nota, valor, metodo, responsable: RESPONSABLE, createdAt: hora(11, i) },
+      data: { tipo, descripcion: nota, valor, metodo, responsable: caso.responsableGastos ?? RESPONSABLE, createdAt: hora(11, i) },
     });
   }
 
@@ -182,18 +194,19 @@ async function leerTicket(cierreId) {
   assert.equal(res.status, 200, "el ticket debe existir");
   const html = await res.text();
 
-  const leer = (etiqueta) => {
-    const m = html.match(new RegExp(`${etiqueta}</span>\\s*<span[^>]*>-?\\$(-?[\\d.,]+)</span>`));
+  // El signo va antes del símbolo («-$182.500»). Los gastos también se imprimen como
+  // «-$X» (una resta), así que para ellos se toma el valor absoluto.
+  const leer = (etiqueta, { absoluto = false } = {}) => {
+    const m = html.match(new RegExp(`${etiqueta}</span>\\s*<span[^>]*>(-?)\\$([\\d.,]+)</span>`));
     assert.ok(m, `no se encontró «${etiqueta}» en el ticket`);
-    const n = Number(m[1].replace(/[^\d]/g, ""));
-    // Los gastos se imprimen como «-$X» y los negativos como «$-X».
-    return m[1].startsWith("-") ? -n : n;
+    const n = Number(m[2].replace(/[^\d]/g, ""));
+    return m[1] === "-" && !absoluto ? -n : n;
   };
 
   return {
     html,
     recibido: leer("Total recibido"),
-    gastos: leer("Total gastos"),
+    gastos: leer("Total gastos", { absoluto: true }),
     neta: leer("Ganancia neta"),
     efectivo: leer("Efectivo en caja"),
   };
@@ -201,7 +214,7 @@ async function leerTicket(cierreId) {
 
 const fmt = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("es-CO");
 
-for (const caso of CASOS) {
+for (const caso of [...CASOS, ...CASOS_EMPLEADO]) {
   test(`escenario ${caso.id} — ${caso.titulo}: ganancia neta ${fmt(caso.neta)} · efectivo en caja ${fmt(caso.efectivo)}`, async () => {
     const cierre = await sembrar(caso);
     const t = await leerTicket(cierre.id);
@@ -218,6 +231,14 @@ for (const caso of CASOS) {
     );
   });
 }
+
+test("el ticket imprime los negativos como «-$182.500», no «$-182.500»", async () => {
+  const nomina = CASOS.find((c) => c.neta < 0 && c.efectivo > 0);
+  const cierre = await sembrar({ ...nomina, id: 91, dia: [2026, 8, 19] });
+  const { html } = await leerTicket(cierre.id);
+  assert.ok(html.includes(`-$${Math.abs(nomina.neta).toLocaleString("es-CO")}`), "falta «-$182.500» en el ticket");
+  assert.ok(!/\$-\d/.test(html), "ningún importe debe salir como «$-X»");
+});
 
 test("el ticket ya no usa las etiquetas «Total caja» ni «Caja esperada»", async () => {
   const cierre = await sembrar({ ...CASOS[0], id: 90, dia: [2026, 8, 20] });
@@ -254,4 +275,18 @@ test("ninguna pantalla de la app dice «Caja esperada»", () => {
   };
   recorrer(path.join(RAIZ, "app"));
   assert.deepEqual(hallazgos, [], `Archivos que aún dicen «Caja esperada»: ${hallazgos.join(", ")}`);
+});
+
+// ── El formulario del empleado pide el medio de pago real ─────────────────────
+test("/gastos-empleado ofrece los 5 medios del sistema, con «Efectivo» preseleccionado", () => {
+  const tipos = fs.readFileSync(path.join(RAIZ, "lib/types.ts"), "utf8");
+  const medios = [...tipos.match(/METODOS_PAGO\s*=\s*\[([^\]]+)\]/)[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(medios, ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"]);
+
+  const pagina = fs.readFileSync(path.join(RAIZ, "app/(empleado)/gastos-empleado/page.tsx"), "utf8");
+  const select = pagina.match(/<select name="metodo"[^>]*>([\s\S]*?)<\/select>/);
+  assert.ok(select, "falta el selector name=\"metodo\" en el formulario del empleado");
+  assert.match(select[0], /defaultValue="Efectivo"/, "«Efectivo» debe venir preseleccionado");
+  assert.match(select[1], /METODOS_PAGO\.map/, "las opciones deben salir de METODOS_PAGO (no una lista a mano que se desincroniza)");
+  assert.ok(!/<option value=/.test(select[1]), "no debe haber opciones escritas a mano");
 });

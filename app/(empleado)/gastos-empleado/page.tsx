@@ -110,12 +110,11 @@ export default async function GastosEmpleadoPage({
           {/* Método + Responsable */}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-gray-500">Método</label>
-              <select name="metodo" className="input-modern">
-                <option value="Efectivo">Efectivo</option>
-                <option value="Nequi">Nequi</option>
-                <option value="Daviplata">Daviplata</option>
-                <option value="Transferencia">Transferencia</option>
+              <label className="mb-1.5 block text-xs font-bold text-gray-500">Medio de pago</label>
+              <select name="metodo" defaultValue="Efectivo" className="input-modern">
+                {METODOS_PAGO.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
               </select>
             </div>
             <div>

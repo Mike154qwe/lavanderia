@@ -2,7 +2,7 @@
 
 **Estado:** resuelto en código por la **separación de métricas** decidida con el negocio el
 21-sep-2026. **Sin publicar ni desplegar** (rama `fix/cierre-caja-negativo`, solo local).
-**Pruebas:** `npm run test:caja` (24) y `npm run test:rnf04` (32).
+**Pruebas:** `npm run test:caja` (33) y `npm run test:rnf04` (32).
 
 ## Qué pasaba
 
@@ -44,6 +44,24 @@ en el ticket.
 Los cuatro escenarios quedaron resueltos por la separación de métricas; ninguno reveló un
 bug de cálculo independiente. Sí quedan los pendientes de la sección siguiente.
 
+### Los mismos escenarios con gastos registrados por el empleado
+
+Se repitieron los cuatro escenarios con los gastos cargados **por el formulario real del
+empleado** (Playwright, base temporal) y por medios distintos de efectivo. El valor elegido
+llega a `GastoCaja.metodo` (Efectivo, Nequi, Daviplata, Transferencia y Tarjeta comprobados uno
+por uno) y el ticket da:
+
+| Escenario (gasto del empleado) | Ganancia neta | Efectivo en caja | Si el medio se guardara siempre como «Efectivo» |
+|---|---|---|---|
+| Control (sin tocar el selector → Efectivo) | $70.000 | $70.000 | igual |
+| Nómina $400.000 por **Nequi** | −$182.500 | **$130.500** | −$269.500 (error) |
+| Gasto $150.000 por **Tarjeta**, con ingreso $100.000 por Nequi (variante del caso de Joel) | −$50.000 | **$0** | −$150.000 (error) |
+| #14: $18.000 por **Transferencia** + $45.000 en efectivo | $36.420 | **$38.580** | $20.580 (error) |
+
+Las pruebas automáticas cubren lo mismo con `responsable = «Empleado»` (escenarios 10–13 de
+`tests/cierre-caja.test.mjs`), el contraste en `tests/caja-calculo.test.mjs` y una prueba
+estática que exige que el selector salga de `METODOS_PAGO` con «Efectivo» por defecto.
+
 ## Lo que no resuelve la separación (pendiente)
 
 1. **El efectivo en caja es un movimiento, no un saldo.** El modelo no guarda un fondo
@@ -51,10 +69,15 @@ bug de cálculo independiente. Sí quedan los pendientes de la sección siguient
    «efectivo en caja» negativo (Joel: −$150.000) significa que el cajón pagó en efectivo más
    de lo que recibió en esa ventana. Guardar el fondo inicial exigiría un campo nuevo y una
    migración, que requieren aprobación aparte.
-2. **Los gastos que registra el empleado siempre quedan como «Efectivo».** Su formulario
-   (`/gastos-empleado`) no pide el medio y el servidor usa «Efectivo» por defecto. Con el
-   nuevo cálculo, un gasto pagado por Nequi desde el mostrador se descontaría del efectivo
-   en caja por error. Ese formulario debería pedir el medio.
+2. ~~Los gastos del empleado siempre quedan como «Efectivo».~~ **Corregido: esa afirmación era
+   errónea.** El formulario `/gastos-empleado` ya tenía el selector `metodo` y el servidor guarda
+   lo elegido; los datos reales lo confirman (gastos del empleado por Daviplata, Nequi,
+   Transferencia y Efectivo). Lo que sí faltaba era la opción **«Tarjeta»**, que el resto del
+   sistema ofrece. Ahora las opciones salen de `METODOS_PAGO` (`lib/types.ts`), con «Efectivo»
+   preseleccionado, y la etiqueta dice «Medio de pago». Un gasto de empleado por un medio
+   distinto de efectivo **no** se descuenta del efectivo en caja (ver la prueba de contraste
+   abajo). Queda una limitación aparte: el formulario de `/gerente/dia/[fecha]` (gerente) sigue
+   sin ofrecer «Tarjeta».
 3. **Sello fijo de las 12:00 en los gastos de `/gerente/dia/[fecha]`.** Esa pantalla guarda
    `createdAt = fecha + "T12:00:00"` sin importar cuándo se registra el gasto. Un gasto
    registrado por la tarde, después de un cierre a las 17:25, queda fechado a las 12:00,
@@ -67,8 +90,8 @@ bug de cálculo independiente. Sí quedan los pendientes de la sección siguient
    (guardado $45.000): hay pagos y un gasto fechados dentro de esas ventanas que no existían
    al cerrar. Ya pasaba con el ticket; ahora también lo muestran las tarjetas de `/gerente`
    (los otros 12 cierres coinciden exactamente). La base no se modificó.
-5. **`money()` imprime los negativos como `$-182.500`** en vez de `-$182.500` (cosmético,
-   global).
+5. ~~`money()` imprimía los negativos como `$-182.500`.~~ **Resuelto:** ahora `-$182.500`
+   (`lib/format.ts`). `/gerente/dia/[fecha]` formateaba a mano y ahora usa `money()`.
 6. **El panel remoto** (`/gerente/remoto`, hoy sin datos por Firestore cerrado) sigue
    diciendo «Total caja» y recibe la ganancia neta. No se tocó.
 
@@ -82,7 +105,7 @@ valor cambiaba con el buscador. Ahora usa los pagos del día por su fecha, igual
 ## Cómo ejecutar
 
 ```bash
-npm run test:caja                      # 24 pruebas: unitarias, ticket real y estáticas
+npm run test:caja                      # 33 pruebas: unitarias, ticket real y estáticas
 KEEP_QA_DB=1 npm run test:caja         # conserva la BD temporal (responsable «Prueba QA - bug caja»)
 DATABASE_URL=file:<ruta> npx next dev -p 3001   # ver los datos en la interfaz
 ```
