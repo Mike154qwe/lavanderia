@@ -243,11 +243,10 @@ export default async function DiaFinanzasPage({
                 className="input-modern"
               />
 
-              <select name="metodo" className="input-modern">
-                <option value="Efectivo">Efectivo</option>
-                <option value="Nequi">Nequi</option>
-                <option value="Daviplata">Daviplata</option>
-                <option value="Transferencia">Transferencia</option>
+              <select name="metodo" defaultValue="Efectivo" className="input-modern">
+                {METODOS_PAGO.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
               </select>
 
               <input name="responsable" placeholder="Responsable" className="input-modern" />

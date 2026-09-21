@@ -2,7 +2,7 @@
 
 **Estado:** resuelto en código por la **separación de métricas** decidida con el negocio el
 21-sep-2026. **Sin publicar ni desplegar** (rama `fix/cierre-caja-negativo`, solo local).
-**Pruebas:** `npm run test:caja` (33) y `npm run test:rnf04` (32).
+**Pruebas:** `npm run test:caja` (39) y `npm run test:rnf04` (32).
 
 ## Qué pasaba
 
@@ -62,6 +62,22 @@ Las pruebas automáticas cubren lo mismo con `responsable = «Empleado»` (escen
 `tests/cierre-caja.test.mjs`), el contraste en `tests/caja-calculo.test.mjs` y una prueba
 estática que exige que el selector salga de `METODOS_PAGO` con «Efectivo» por defecto.
 
+### Gastos registrados por el gerente (`/gerente/dia/[fecha]`)
+
+Mismo tipo de prueba con el formulario real del gerente y gastos por **Tarjeta** (cada uno
+llegó a `GastoCaja.metodo`; el día, el ticket y la tarjeta de `/gerente` coinciden):
+
+| Escenario (gasto del gerente) | Ganancia neta | Efectivo en caja | Si se tomara como «Efectivo» |
+|---|---|---|---|
+| Control (selector sin tocar → Efectivo) | $70.000 | $70.000 | igual |
+| Nómina $400.000 por **Tarjeta** | −$182.500 | **$130.500** | −$269.500 (error) |
+| $150.000 por **Tarjeta**, ingreso $100.000 por Nequi | −$50.000 | **$0** | −$150.000 (error) |
+| #14: $18.000 por **Tarjeta** + $45.000 en efectivo | $36.420 | **$38.580** | $20.580 (error) |
+
+Las pruebas automáticas lo cubren en los escenarios 20–23 de `tests/cierre-caja.test.mjs`, y
+una prueba estática exige el mismo selector (desde `METODOS_PAGO`, «Efectivo» por defecto) en
+los dos formularios.
+
 ## Lo que no resuelve la separación (pendiente)
 
 1. **El efectivo en caja es un movimiento, no un saldo.** El modelo no guarda un fondo
@@ -76,8 +92,8 @@ estática que exige que el selector salga de `METODOS_PAGO` con «Efectivo» por
    sistema ofrece. Ahora las opciones salen de `METODOS_PAGO` (`lib/types.ts`), con «Efectivo»
    preseleccionado, y la etiqueta dice «Medio de pago». Un gasto de empleado por un medio
    distinto de efectivo **no** se descuenta del efectivo en caja (ver la prueba de contraste
-   abajo). Queda una limitación aparte: el formulario de `/gerente/dia/[fecha]` (gerente) sigue
-   sin ofrecer «Tarjeta».
+   abajo). El formulario de gastos del gerente (`/gerente/dia/[fecha]`) tampoco ofrecía
+   «Tarjeta» y se corrigió igual (selector desde `METODOS_PAGO`, «Efectivo» por defecto).
 3. **Sello fijo de las 12:00 en los gastos de `/gerente/dia/[fecha]`.** Esa pantalla guarda
    `createdAt = fecha + "T12:00:00"` sin importar cuándo se registra el gasto. Un gasto
    registrado por la tarde, después de un cierre a las 17:25, queda fechado a las 12:00,
@@ -105,7 +121,7 @@ valor cambiaba con el buscador. Ahora usa los pagos del día por su fecha, igual
 ## Cómo ejecutar
 
 ```bash
-npm run test:caja                      # 33 pruebas: unitarias, ticket real y estáticas
+npm run test:caja                      # 39 pruebas: unitarias, ticket real y estáticas
 KEEP_QA_DB=1 npm run test:caja         # conserva la BD temporal (responsable «Prueba QA - bug caja»)
 DATABASE_URL=file:<ruta> npx next dev -p 3001   # ver los datos en la interfaz
 ```

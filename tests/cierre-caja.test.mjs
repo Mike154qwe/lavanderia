@@ -136,6 +136,17 @@ const CASOS_EMPLEADO = CASOS.map((c) => ({
   responsableGastos: "Empleado",
 }));
 
+// Y con los gastos que registra el gerente en /gerente/dia/[fecha]: responsable «Gerente» y todo
+// gasto que no es en efectivo por TARJETA (el medio que ese formulario no ofrecía).
+const CASOS_GERENTE = CASOS.map((c) => ({
+  ...c,
+  id: c.id + 20,
+  dia: [c.dia[0], 5, c.dia[2]],
+  titulo: `${c.titulo} — gastos del gerente (los que no son efectivo, por tarjeta)`,
+  gastos: c.gastos.map(([metodo, valor, tipo]) => [metodo === "Efectivo" ? metodo : "Tarjeta", valor, tipo]),
+  responsableGastos: "Gerente",
+}));
+
 /**
  * Siembra el escenario en la ventana [00:00, 18:00] de un día y crea el cierre
  * con los valores que guarda hacerCierreCaja (app/gerente/page.tsx), calculados
@@ -214,7 +225,7 @@ async function leerTicket(cierreId) {
 
 const fmt = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("es-CO");
 
-for (const caso of [...CASOS, ...CASOS_EMPLEADO]) {
+for (const caso of [...CASOS, ...CASOS_EMPLEADO, ...CASOS_GERENTE]) {
   test(`escenario ${caso.id} — ${caso.titulo}: ganancia neta ${fmt(caso.neta)} · efectivo en caja ${fmt(caso.efectivo)}`, async () => {
     const cierre = await sembrar(caso);
     const t = await leerTicket(cierre.id);
@@ -278,15 +289,24 @@ test("ninguna pantalla de la app dice «Caja esperada»", () => {
 });
 
 // ── El formulario del empleado pide el medio de pago real ─────────────────────
-test("/gastos-empleado ofrece los 5 medios del sistema, con «Efectivo» preseleccionado", () => {
+const FORMULARIOS_DE_GASTO = [
+  ["/gastos-empleado (empleado)", "app/(empleado)/gastos-empleado/page.tsx"],
+  ["/gerente/dia/[fecha] (gerente)", "app/gerente/dia/[fecha]/page.tsx"],
+];
+
+test("los medios de pago del sistema son los 5 esperados", () => {
   const tipos = fs.readFileSync(path.join(RAIZ, "lib/types.ts"), "utf8");
   const medios = [...tipos.match(/METODOS_PAGO\s*=\s*\[([^\]]+)\]/)[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(medios, ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"]);
-
-  const pagina = fs.readFileSync(path.join(RAIZ, "app/(empleado)/gastos-empleado/page.tsx"), "utf8");
-  const select = pagina.match(/<select name="metodo"[^>]*>([\s\S]*?)<\/select>/);
-  assert.ok(select, "falta el selector name=\"metodo\" en el formulario del empleado");
-  assert.match(select[0], /defaultValue="Efectivo"/, "«Efectivo» debe venir preseleccionado");
-  assert.match(select[1], /METODOS_PAGO\.map/, "las opciones deben salir de METODOS_PAGO (no una lista a mano que se desincroniza)");
-  assert.ok(!/<option value=/.test(select[1]), "no debe haber opciones escritas a mano");
 });
+
+for (const [nombre, archivo] of FORMULARIOS_DE_GASTO) {
+  test(`${nombre} ofrece los 5 medios del sistema, con «Efectivo» preseleccionado`, () => {
+    const pagina = fs.readFileSync(path.join(RAIZ, archivo), "utf8");
+    const select = pagina.match(/<select name="metodo"[^>]*>([\s\S]*?)<\/select>/);
+    assert.ok(select, `falta el selector name="metodo" en ${archivo}`);
+    assert.match(select[0], /defaultValue="Efectivo"/, "«Efectivo» debe venir preseleccionado");
+    assert.match(select[1], /METODOS_PAGO\.map/, "las opciones deben salir de METODOS_PAGO (no una lista a mano que se desincroniza)");
+    assert.ok(!/<option value=/.test(select[1]), "no debe haber opciones escritas a mano");
+  });
+}
