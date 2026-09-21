@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { money, formatPedido } from "@/lib/format";
+import { calcularCaja, ventanaDeCierre } from "@/lib/caja";
 
 function inicioDia(fecha: Date) {
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
@@ -66,16 +67,13 @@ export async function GET(
   const inicio = inicioDia(cierre.createdAt);
   const fin    = finDia(cierre.createdAt);
 
-  const cierreAnterior = await prisma.cierreCaja.findFirst({
-    where: {
-      id:        { not: cierre.id },
-      createdAt: { gte: inicio, lt: cierre.createdAt },
-    },
-    orderBy: { createdAt: "desc" },
+  // Misma ventana que usan las tarjetas de /gerente (lib/caja.ts): desde el
+  // cierre anterior del mismo día (o el inicio del día) hasta este cierre.
+  const cierresDelDia = await prisma.cierreCaja.findMany({
+    where:  { createdAt: { gte: inicio, lt: fin } },
+    select: { createdAt: true },
   });
-
-  const desde = cierreAnterior ? cierreAnterior.createdAt : inicio;
-  const hasta = cierre.createdAt;
+  const { desde, hasta } = ventanaDeCierre(cierre.createdAt, cierresDelDia, inicio);
 
   const pagos = await prisma.pago.findMany({
     where:   { createdAt: { gt: desde, lte: hasta } },
@@ -94,9 +92,10 @@ export async function GET(
   const transferencia = pagosPorMetodo(pagos, "Transferencia");
   const tarjeta       = pagosPorMetodo(pagos, "Tarjeta");
 
-  const totalGastos   = gastos.reduce((s: number, g: any) => s + g.valor, 0);
-  const totalRecibido = totalPagos(pagos);
-  const totalCaja     = totalRecibido - totalGastos;
+  // Los dos números de caja salen de lib/caja.ts, igual que en el resto de vistas:
+  // «ganancia neta» (todos los medios) y «efectivo en caja» (solo efectivo).
+  const caja = calcularCaja(pagos, gastos);
+  const { totalGastos, totalRecibido } = caja;
 
   const resumenMetodos = [
     { label: "Efectivo",      val: totalPagos(efectivo) },
@@ -270,6 +269,10 @@ body{
   font-size:15px;
   padding:8px 10px;
 }
+.resumen .nota{font-size:9px;color:#888;text-align:center;padding:3px 8px;border-top:1px solid #faeef5}
+.resumen.efectivo{border-color:#1f7a4d}
+.resumen.efectivo .resumen-title{background:#1f7a4d}
+.resumen.efectivo .res-row.total-final{background:#1f7a4d}
 
 /* ── Observación ── */
 .obs{
@@ -395,9 +398,28 @@ ${
     <span style="color:#c00">-${money(totalGastos)}</span>
   </div>
   <div class="res-row total-final">
-    <span>Total caja</span>
-    <span>${money(totalCaja)}</span>
+    <span>Ganancia neta</span>
+    <span>${money(caja.gananciaNeta)}</span>
   </div>
+  <div class="nota">Todo lo recibido menos todos los gastos, en cualquier medio de pago.</div>
+</div>
+
+<!-- Efectivo en caja: para cuadrar el cajón -->
+<div class="resumen efectivo">
+  <div class="resumen-title">Efectivo en caja</div>
+  <div class="res-row sub">
+    <span>Efectivo recibido</span>
+    <span>${money(caja.efectivo)}</span>
+  </div>
+  <div class="res-row sub">
+    <span>Gastos pagados en efectivo</span>
+    <span style="color:#c00">-${money(caja.gastosEfectivo)}</span>
+  </div>
+  <div class="res-row total-final">
+    <span>Efectivo en caja</span>
+    <span>${money(caja.efectivoEnCaja)}</span>
+  </div>
+  <div class="nota">Solo efectivo: no incluye Nequi, Daviplata, transferencias ni tarjeta.</div>
 </div>
 
 ${

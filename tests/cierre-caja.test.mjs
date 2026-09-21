@@ -1,17 +1,14 @@
-// Reproducción del bug «cierre de caja negativo» (ver docs/bug-cierre-caja-negativo.md).
+// Cierre de caja bajo el modelo de DOS números (ver lib/caja.ts y
+// docs/bug-cierre-caja-negativo.md).
 //
-// Qué hace: crea una base SQLite TEMPORAL (migraciones reales, NUNCA prisma/dev.db),
-// siembra escenarios con el responsable «Prueba QA - bug caja» y ejecuta el código
-// REAL de app/cierres-caja/[id]/ticket/route.ts, que recalcula «Total caja» a partir
-// de los pagos y gastos de la ventana del cierre. Es la misma fórmula que usan
-// hacerCierreCaja y los KPI «Caja esperada» (ver el documento).
+// Crea una base SQLite TEMPORAL (migraciones reales, NUNCA prisma/dev.db), siembra
+// escenarios con el responsable «Prueba QA - bug caja» y ejecuta el código REAL de
+// app/cierres-caja/[id]/ticket/route.ts, que recalcula los totales a partir de los
+// pagos y gastos de la ventana del cierre.
 //
-// Qué espera: «caja física» = efectivo cobrado − gastos pagados en efectivo. Los
-// pagos y gastos por Nequi/Daviplata/Transferencia/Tarjeta no entran ni salen del
-// cajón. Es la definición del repro de origin/fix/cierre-caja-negativo
-// («totalCajaFisicaEsperada») y de la etiqueta «Caja esperada».
-//
-// Estado esperado HOY: los escenarios 1, 2 y 3 FALLAN (bug) y el 0 (control) pasa.
+// Qué espera el ticket:
+//   - «Ganancia neta»   = todo lo recibido − todos los gastos (cualquier medio).
+//   - «Efectivo en caja» = efectivo recibido − SOLO los gastos pagados en efectivo.
 //
 // Uso:  npm run test:caja        (KEEP_QA_DB=1 conserva la base para inspeccionarla)
 import { test, before, after } from "node:test";
@@ -31,6 +28,7 @@ const RESPONSABLE = "Prueba QA - bug caja";
 let tmp;
 let prisma;
 let GET;
+let calcularCaja;
 
 before(async () => {
   tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lavaseco-qa-caja-"));
@@ -47,6 +45,7 @@ before(async () => {
 
   ({ prisma } = await import("../lib/prisma.ts"));
   ({ GET } = await import("../app/cierres-caja/[id]/ticket/route.ts"));
+  ({ calcularCaja } = await import("../lib/caja.ts"));
 
   // Guardia: jamás sembrar en la base real. Si el cliente no apunta al archivo
   // temporal, se aborta antes de escribir nada.
@@ -70,20 +69,21 @@ after(async () => {
 });
 
 // ── Escenarios ────────────────────────────────────────────────────────────────
-// pagos:  [medio, valor]         gastos: [medio, valor, tipo]
+// pagos: [medio, valor]   gastos: [medio, valor, tipo]   neta / efectivo: lo que debe mostrar el ticket
 const CASOS = [
   {
     id: 0,
     dia: [2026, 8, 4],
-    titulo: "control: todo en efectivo (fórmula actual y caja física coinciden)",
+    titulo: "control: todo en efectivo",
     pagos: [["Efectivo", 100000]],
     gastos: [["Efectivo", 30000, "Insumos"]],
-    esperado: 70000,
+    neta: 70000,
+    efectivo: 70000,
   },
   {
     id: 1,
     dia: [2026, 8, 1],
-    titulo: "nómina pagada por Nequi NO debe dejar la caja en negativo",
+    titulo: "nómina de $400.000 por Nequi",
     // Réplica del 11-jun-2026: efectivo 130.500 + digital 87.000, gasto Nequi 400.000.
     pagos: [
       ["Efectivo", 30000],
@@ -94,7 +94,9 @@ const CASOS = [
       ["Daviplata", 34500],
     ],
     gastos: [["Nequi", 400000, "Nómina"]],
-    esperado: 130500,
+    // Se ganó $217.500 y la nómina costó $400.000: el neto negativo es coherente con los datos.
+    neta: -182500,
+    efectivo: 130500, // ningún peso salió del cajón
   },
   {
     id: 2,
@@ -102,7 +104,8 @@ const CASOS = [
     titulo: "repro de Joel: ingreso por Nequi y gasto en efectivo",
     pagos: [["Nequi", 100000]],
     gastos: [["Efectivo", 150000, "Insumos"]],
-    esperado: -150000,
+    neta: -50000, // entraron 100.000 y salieron 150.000
+    efectivo: -150000, // el cajón pagó 150.000 sin haber recibido efectivo: coincide con lo esperado por Joel
   },
   {
     id: 3,
@@ -116,23 +119,20 @@ const CASOS = [
       ["Transferencia", 18000, "Insumos"],
       ["Efectivo", 45000, "Jabones"],
     ],
-    esperado: 38580,
+    neta: 36420, // igual al total guardado por el cierre real #14
+    efectivo: 38580, // la diferencia de $2.160 es el neto digital: 18.000 − 15.840
   },
 ];
 
-const sumar = (filas, medio) =>
-  filas.filter(([m]) => !medio || m === medio).reduce((s, f) => s + f[1], 0);
-
-/** Definición que se espera: efectivo cobrado − gastos pagados en efectivo. */
-const cajaFisica = (pagos, gastos) => sumar(pagos, "Efectivo") - sumar(gastos, "Efectivo");
-
 /**
  * Siembra el escenario en la ventana [00:00, 18:00] de un día y crea el cierre
- * con los valores que hoy guardaría hacerCierreCaja (app/gerente/page.tsx).
+ * con los valores que guarda hacerCierreCaja (app/gerente/page.tsx), calculados
+ * con la misma función compartida (lib/caja.ts).
  */
 async function sembrar(caso) {
   const hora = (h, m = 0) => new Date(caso.dia[0], caso.dia[1], caso.dia[2], h, m);
   const nota = `QA bug caja · escenario ${caso.id}: ${caso.titulo}`;
+  const movs = (filas) => filas.map(([metodo, valor]) => ({ metodo, valor }));
 
   const cliente = await prisma.cliente.create({
     data: { nombre: RESPONSABLE, telefono: `QA-caja-${caso.id}` },
@@ -141,7 +141,7 @@ async function sembrar(caso) {
     data: {
       clienteId: cliente.id,
       servicio: "QA",
-      total: sumar(caso.pagos),
+      total: caso.pagos.reduce((s, [, v]) => s + v, 0),
       estado: "ENTREGADO",
       observacion: nota,
       createdAt: hora(9),
@@ -157,22 +157,16 @@ async function sembrar(caso) {
     });
   }
 
-  // Igual que hacerCierreCaja (app/gerente/page.tsx, líneas 69-75).
-  const efectivo = sumar(caso.pagos, "Efectivo");
-  const nequi = sumar(caso.pagos, "Nequi");
-  const daviplata = sumar(caso.pagos, "Daviplata");
-  const transferencia = sumar(caso.pagos, "Transferencia");
-  const tarjeta = sumar(caso.pagos, "Tarjeta");
-  const gastos = sumar(caso.gastos);
+  const r = calcularCaja(movs(caso.pagos), movs(caso.gastos));
   return prisma.cierreCaja.create({
     data: {
-      efectivo,
-      nequi,
-      daviplata,
-      transferencia,
-      tarjeta,
-      gastos,
-      totalCaja: efectivo + nequi + daviplata + transferencia + tarjeta - gastos,
+      efectivo: r.efectivo,
+      nequi: r.nequi,
+      daviplata: r.daviplata,
+      transferencia: r.transferencia,
+      tarjeta: r.tarjeta,
+      gastos: r.totalGastos,
+      totalCaja: r.gananciaNeta, // nombre histórico de la columna: guarda la GANANCIA NETA
       responsable: RESPONSABLE,
       observacion: nota,
       createdAt: hora(18),
@@ -192,33 +186,72 @@ async function leerTicket(cierreId) {
     const m = html.match(new RegExp(`${etiqueta}</span>\\s*<span[^>]*>-?\\$(-?[\\d.,]+)</span>`));
     assert.ok(m, `no se encontró «${etiqueta}» en el ticket`);
     const n = Number(m[1].replace(/[^\d]/g, ""));
-    // «Total gastos» se imprime como «-$X»; «Total caja» como «$-X» si es negativo.
+    // Los gastos se imprimen como «-$X» y los negativos como «$-X».
     return m[1].startsWith("-") ? -n : n;
   };
 
-  return { recibido: leer("Total recibido"), gastos: leer("Total gastos"), caja: leer("Total caja") };
+  return {
+    html,
+    recibido: leer("Total recibido"),
+    gastos: leer("Total gastos"),
+    neta: leer("Ganancia neta"),
+    efectivo: leer("Efectivo en caja"),
+  };
 }
 
 const fmt = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("es-CO");
 
 for (const caso of CASOS) {
-  test(`escenario ${caso.id} — ${caso.titulo}`, async () => {
-    assert.equal(cajaFisica(caso.pagos, caso.gastos), caso.esperado, "el esperado del escenario debe ser la caja física");
-
+  test(`escenario ${caso.id} — ${caso.titulo}: ganancia neta ${fmt(caso.neta)} · efectivo en caja ${fmt(caso.efectivo)}`, async () => {
     const cierre = await sembrar(caso);
-    const ticket = await leerTicket(cierre.id);
+    const t = await leerTicket(cierre.id);
 
     assert.equal(
-      ticket.caja,
-      caso.esperado,
-      [
-        `«Total caja» del ticket del cierre #${cierre.id} (${RESPONSABLE}) no es la caja física.`,
-        `  Pagos:  efectivo ${fmt(sumar(caso.pagos, "Efectivo"))} · digitales ${fmt(sumar(caso.pagos) - sumar(caso.pagos, "Efectivo"))}`,
-        `  Gastos: efectivo ${fmt(sumar(caso.gastos, "Efectivo"))} · digitales ${fmt(sumar(caso.gastos) - sumar(caso.gastos, "Efectivo"))}`,
-        `  Fórmula actual:  ${fmt(ticket.recibido)} recibido − ${fmt(ticket.gastos)} gastos = ${fmt(ticket.caja)}`,
-        `  Caja física esperada (efectivo − gastos en efectivo): ${fmt(caso.esperado)}`,
-        `  Causa: la fórmula suma TODOS los medios de pago y resta TODOS los gastos sin mirar GastoCaja.metodo.`,
-      ].join("\n"),
+      t.neta,
+      caso.neta,
+      `«Ganancia neta» del ticket del cierre #${cierre.id} (${RESPONSABLE}): ${fmt(t.recibido)} recibido − ${fmt(t.gastos)} gastos.`,
+    );
+    assert.equal(
+      t.efectivo,
+      caso.efectivo,
+      `«Efectivo en caja» del ticket del cierre #${cierre.id} (${RESPONSABLE}): efectivo recibido − solo los gastos pagados en efectivo.`,
     );
   });
 }
+
+test("el ticket ya no usa las etiquetas «Total caja» ni «Caja esperada»", async () => {
+  const cierre = await sembrar({ ...CASOS[0], id: 90, dia: [2026, 8, 20] });
+  const { html } = await leerTicket(cierre.id);
+  assert.ok(!/Total caja|Caja esperada/i.test(html), "el ticket debe decir «Ganancia neta» y «Efectivo en caja»");
+});
+
+// ── Las cuatro vistas usan LA MISMA lógica (prueba estática) ──────────────────
+// La fórmula vivía copiada en cuatro sitios y se desincronizó. Ahora ninguna vista
+// puede calcular la caja por su cuenta: deben importar lib/caja.ts.
+const VISTAS = [
+  "app/gerente/page.tsx",
+  "app/gerente/dia/[fecha]/page.tsx",
+  "app/cierres-caja/[id]/ticket/route.ts",
+];
+
+for (const vista of VISTAS) {
+  test(`${vista}: usa lib/caja.ts y no reimplementa la fórmula`, () => {
+    const src = fs.readFileSync(path.join(RAIZ, vista), "utf8");
+    assert.match(src, /from "@\/lib\/caja"/, "debe importar el cálculo compartido");
+    assert.ok(!/totalRecibido\s*-\s*totalGastos|totalPagos\(pagos\)\s*-\s*totalGastos/.test(src), "no debe restar totalRecibido − totalGastos por su cuenta");
+    assert.ok(!/tarjeta\s*-\s*totalGastos/.test(src), "no debe sumar los medios y restar los gastos por su cuenta");
+  });
+}
+
+test("ninguna pantalla de la app dice «Caja esperada»", () => {
+  const hallazgos = [];
+  const recorrer = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) recorrer(p);
+      else if (/\.(tsx|ts)$/.test(e.name) && /Caja esperada/i.test(fs.readFileSync(p, "utf8"))) hallazgos.push(path.relative(RAIZ, p));
+    }
+  };
+  recorrer(path.join(RAIZ, "app"));
+  assert.deepEqual(hallazgos, [], `Archivos que aún dicen «Caja esperada»: ${hallazgos.join(", ")}`);
+});
