@@ -31,11 +31,25 @@ import { cookies } from "next/headers";
 //     buscar por cliente o teléfono, con montos; /recibos/[id]/pdf abre
 //     cualquier recibo por su número; /entrega-empleado consulta cualquier
 //     pedido por número y no valida el saldo pendiente al entregar.
-//   - Si el despliegue cambia (la app se hace accesible fuera del negocio, p. ej.
-//     para abrir el panel remoto desde el celular; equipo compartido; Wi-Fi
-//     abierta), esta decisión debe reevaluarse: al menos un PIN de empleado y la
-//     cookie firmada con AUTH_SECRET, como la del gerente (lib/auth.ts). No es
-//     una garantía permanente: es una decisión de alcance para esta versión.
+//   - Estado a 21-sep-2026 del acceso remoto: NO existe ningún acceso remoto a la
+//     app (ni túnel, ni VPN, ni reenvío de puertos, ni hosting); el panel remoto
+//     solo se ha probado en localhost y en la red local. Firestore, en cambio,
+//     está en internet por diseño, y sus reglas eran de modo de prueba: cualquiera
+//     con la clave pública del cliente podía leer y borrar en cualquier colección
+//     sin autenticación (verificado). Por eso, como cierre de emergencia,
+//     Firestore quedó CERRADO POR COMPLETO (`allow read, write: if false` para
+//     panelRemoto y todo lo demás denegado por defecto) desde el 21-sep-2026,
+//     verificado con 403 en lecturas y escrituras sin sesión. Sigue cerrado hasta
+//     que exista autenticación real. Mientras tanto /gerente/remoto NO mostrará
+//     datos; el cierre de caja no se afecta, porque su escritura a Firestore va
+//     en un try/catch aislado y solo deja un error en el log.
+//   - Decisión pendiente: el día que se habilite acceso remoto real para la
+//     gerente (o cambie el despliegue: equipo compartido, Wi-Fi abierta), esta
+//     decisión de seguridad debe reevaluarse POR COMPLETO antes de exponer nada a
+//     internet. Como mínimo: PIN de empleado y cookie firmada con AUTH_SECRET
+//     (como la del gerente, lib/auth.ts), y reglas de Firestore que exijan
+//     autenticación real. No es una garantía permanente: es una decisión de
+//     alcance para esta versión.
 const COOKIE_NAME = "lavaseco_empleado_auth";
 
 export async function crearSesionEmpleado() {
