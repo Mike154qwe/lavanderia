@@ -5,8 +5,10 @@ export function formatPedido(id: number) {
 /** Alias corto para formatPedido */
 export const fmt = formatPedido;
 
+/** Formatea pesos. El signo va antes del símbolo: -$182.500, no $-182.500. */
 export function money(value: number) {
-  return `$${value.toLocaleString("es-CO")}`;
+  const abs = Math.abs(value).toLocaleString("es-CO");
+  return value < 0 ? `-$${abs}` : `$${abs}`;
 }
 
 export const ESTADO_BADGE: Record<string, string> = {

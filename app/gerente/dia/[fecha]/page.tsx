@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { formatPedido } from "@/lib/format";
+import { formatPedido, money } from "@/lib/format";
+import { calcularCaja } from "@/lib/caja";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 
 async function registrarGasto(formData: FormData) {
@@ -95,6 +96,14 @@ export default async function DiaFinanzasPage({
     },
   });
 
+  // Los pagos del día por SU fecha (createdAt), como en /gerente y en el cierre.
+  // Antes «Recibido» sumaba todos los pagos de los pedidos creados ese día (aunque
+  // se hubieran pagado otro día) y cambiaba con el buscador.
+  const pagosDelDia = await prisma.pago.findMany({
+    where: { createdAt: { gte: inicio, lt: fin } },
+    select: { valor: true, metodo: true },
+  });
+
   const pedidosFiltrados = q
     ? pedidos.filter((pedido: any) => {
         const id = String(pedido.id);
@@ -116,13 +125,6 @@ export default async function DiaFinanzasPage({
     0
   );
 
-  const totalRecibido = pedidosFiltrados.reduce(
-    (sum: number, pedido: any) =>
-      sum +
-      pedido.pagos.reduce((s: number, pago: any) => s + pago.valor, 0),
-    0
-  );
-
   const totalPrendas = pedidosFiltrados.reduce(
     (sum: number, pedido: any) =>
       sum +
@@ -130,12 +132,9 @@ export default async function DiaFinanzasPage({
     0
   );
 
-  const totalGastos = gastos.reduce(
-    (sum: number, gasto: any) => sum + gasto.valor,
-    0
-  );
-
-  const cajaEsperada = totalRecibido - totalGastos;
+  // Los dos números de caja (lib/caja.ts): ganancia neta y efectivo en caja.
+  const caja = calcularCaja(pagosDelDia, gastos);
+  const { totalRecibido, totalGastos } = caja;
 
   const pedidosCreados = pedidosFiltrados.filter(
     (pedido: any) => pedido.createdAt >= inicio && pedido.createdAt < fin
@@ -191,11 +190,26 @@ export default async function DiaFinanzasPage({
             )}
           </form>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-4">
-            <Kpi title="Recibido" value={`$${totalRecibido.toLocaleString("es-CO")}`} />
-            <Kpi title="Vendido" value={`$${totalVendido.toLocaleString("es-CO")}`} />
-            <Kpi title="Gastos" value={`$${totalGastos.toLocaleString("es-CO")}`} danger />
-            <Kpi title="Caja esperada" value={`$${cajaEsperada.toLocaleString("es-CO")}`} />
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            <Kpi title="Recibido" value={money(totalRecibido)} />
+            <Kpi title="Vendido" value={money(totalVendido)} />
+            <Kpi title="Gastos" value={money(totalGastos)} danger />
+          </div>
+
+          {/* Los dos números de caja, uno junto al otro. No son la misma cuenta. */}
+          <div className="mt-5 grid gap-5 md:grid-cols-2">
+            <Kpi
+              title="Ganancia neta del día"
+              hint="Todo lo recibido menos todos los gastos, en cualquier medio de pago."
+              value={money(caja.gananciaNeta)}
+              danger={caja.gananciaNeta < 0}
+            />
+            <Kpi
+              title="Efectivo en caja"
+              hint="Efectivo recibido menos solo los gastos pagados en efectivo. Para cuadrar el cajón."
+              value={money(caja.efectivoEnCaja)}
+              danger={caja.efectivoEnCaja < 0}
+            />
           </div>
         </div>
 
@@ -229,11 +243,10 @@ export default async function DiaFinanzasPage({
                 className="input-modern"
               />
 
-              <select name="metodo" className="input-modern">
-                <option value="Efectivo">Efectivo</option>
-                <option value="Nequi">Nequi</option>
-                <option value="Daviplata">Daviplata</option>
-                <option value="Transferencia">Transferencia</option>
+              <select name="metodo" defaultValue="Efectivo" className="input-modern">
+                {METODOS_PAGO.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
               </select>
 
               <input name="responsable" placeholder="Responsable" className="input-modern" />
@@ -250,7 +263,14 @@ export default async function DiaFinanzasPage({
             <div className="mt-6 space-y-4">
               <CajaRow label="Dinero recibido" value={totalRecibido} />
               <CajaRow label="Gastos" value={totalGastos} danger />
-              <CajaRow label="Caja esperada" value={cajaEsperada} strong />
+              <CajaRow label="Ganancia neta del día" value={caja.gananciaNeta} strong />
+            </div>
+
+            <p className="mt-6 text-xs font-bold uppercase tracking-widest text-gray-400">Efectivo en caja</p>
+            <div className="mt-3 space-y-4">
+              <CajaRow label="Efectivo recibido" value={caja.efectivo} />
+              <CajaRow label="Gastos pagados en efectivo" value={caja.gastosEfectivo} danger />
+              <CajaRow label="Efectivo en caja" value={caja.efectivoEnCaja} strong />
             </div>
           </div>
         </div>
@@ -438,10 +458,12 @@ function Kpi({
   title,
   value,
   danger,
+  hint,
 }: {
   title: string;
   value: string | number;
   danger?: boolean;
+  hint?: string;
 }) {
   return (
     <div className="rounded-xl bg-gray-50 p-5 dark:bg-white/[0.02]">
@@ -450,6 +472,8 @@ function Kpi({
       <p className={`mt-2 text-3xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
         {value}
       </p>
+
+      {hint && <p className="mt-1 text-xs leading-snug text-gray-400">{hint}</p>}
     </div>
   );
 }
@@ -475,7 +499,7 @@ function CajaRow({
             danger ? "text-red-600" : strong ? "text-brand-500" : "text-gray-900"
           }`}
         >
-          ${value.toLocaleString("es-CO")}
+          {money(value)}
         </p>
       </div>
     </div>
@@ -496,7 +520,7 @@ function Money({
       <p className="text-sm text-gray-500">{label}</p>
 
       <p className={`mt-1 text-2xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
-        ${value.toLocaleString("es-CO")}
+        {money(value)}
       </p>
     </div>
   );

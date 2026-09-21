@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { money, fmt } from "@/lib/format";
 import PedidoLink from "@/components/PedidoLink";
+import { calcularCaja, ventanaDeCierre, enVentana } from "@/lib/caja";
 import {
   formatearFecha,
   guardarPanelRemotoEnFirestore,
@@ -66,13 +67,14 @@ async function hacerCierreCaja(formData: FormData) {
     prisma.gastoCaja.findMany({ where: { createdAt: { gt: desde, lte: ahora } } }),
   ]);
 
-  const efectivo      = sumarMetodo(pagos, "Efectivo");
-  const nequi         = sumarMetodo(pagos, "Nequi");
-  const daviplata     = sumarMetodo(pagos, "Daviplata");
-  const transferencia = sumarMetodo(pagos, "Transferencia");
-  const tarjeta       = sumarMetodo(pagos, "Tarjeta");
-  const totalGastos   = gastos.reduce((s: number, g: any) => s + g.valor, 0);
-  const totalCaja     = efectivo + nequi + daviplata + transferencia + tarjeta - totalGastos;
+  // Cálculo compartido con las demás vistas (lib/caja.ts). `totalCaja` es el
+  // nombre histórico de la columna de la base y guarda la GANANCIA NETA del
+  // cierre (todos los medios de pago); el «efectivo en caja» se recalcula desde
+  // los movimientos, igual que en el ticket, y no se guarda.
+  const {
+    efectivo, nequi, daviplata, transferencia, tarjeta, totalGastos,
+    gananciaNeta: totalCaja,
+  } = calcularCaja(pagos, gastos);
 
   const cierre = await prisma.cierreCaja.create({
     data: { efectivo, nequi, daviplata, transferencia, tarjeta, gastos: totalGastos, totalCaja, responsable, observacion: observacion || null },
@@ -228,16 +230,17 @@ export default async function GerentePage({
     (m) => ({ metodo: m, total: sumarMetodo(pagosDia, m) })
   );
 
-  /* KPIs del día */
-  const efectivo      = sumarMetodo(pagosDia, "Efectivo");
-  const nequi         = sumarMetodo(pagosDia, "Nequi");
-  const daviplata     = sumarMetodo(pagosDia, "Daviplata");
-  const transferencia = sumarMetodo(pagosDia, "Transferencia");
-  const tarjeta       = sumarMetodo(pagosDia, "Tarjeta");
-  const totalRecibido = efectivo + nequi + daviplata + transferencia + tarjeta;
-  const totalGastos   = gastosDia.reduce((s: number, g: any) => s + g.valor, 0);
+  /* KPIs del día: «ganancia neta» y «efectivo en caja» (lib/caja.ts) */
+  const caja          = calcularCaja(pagosDia, gastosDia);
+  const { totalRecibido, totalGastos } = caja;
   const totalVentas   = pedidosDia.reduce((s: number, p: any) => s + p.total, 0);
-  const cajaEsperada  = totalRecibido - totalGastos;
+
+  // Cada cierre del día se recalcula sobre los movimientos de SU ventana (la misma
+  // regla del ticket), para que la tarjeta y el ticket muestren siempre lo mismo.
+  const cierresConCaja = cierresDia.map((cierre: any) => {
+    const v = ventanaDeCierre(cierre.createdAt, cierresDia, inicio);
+    return { cierre, caja: calcularCaja(enVentana(pagosDia, v), enVentana(gastosDia, v)) };
+  });
 
   const pagosEfectivo  = pagosDia.filter((p: any) => p.metodo === "Efectivo");
   const pagosDigitales = pagosDia.filter((p: any) => ["Nequi","Daviplata","Transferencia","Tarjeta"].includes(p.metodo));
@@ -275,11 +278,30 @@ export default async function GerentePage({
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 divide-x divide-y divide-gray-100 dark:divide-white/[0.07] md:grid-cols-4 md:divide-y-0">
+        <div className="grid grid-cols-2 divide-x divide-y divide-gray-100 dark:divide-white/[0.07] md:grid-cols-3 md:divide-y-0">
           <KpiCard label="Dinero recibido" value={money(totalRecibido)} color="green"  icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           <KpiCard label="Ventas del día"  value={money(totalVentas)}   color="blue"   icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
           <KpiCard label="Gastos"          value={money(totalGastos)}   color="red"    icon="M17 7 7 17M7 7l10 10" danger />
-          <KpiCard label="Caja esperada"   value={money(cajaEsperada)}  color="purple" icon="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </div>
+
+        {/* Los dos números de caja, uno junto al otro. No son la misma cuenta. */}
+        <div className="grid divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/[0.07] dark:border-white/[0.07] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <KpiCard
+            label="Ganancia neta del día"
+            hint="Todo lo recibido menos todos los gastos, en cualquier medio de pago."
+            value={money(caja.gananciaNeta)}
+            color="purple"
+            icon="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+            danger={caja.gananciaNeta < 0}
+          />
+          <KpiCard
+            label="Efectivo en caja"
+            hint="Efectivo recibido menos solo los gastos pagados en efectivo. Para cuadrar el cajón."
+            value={money(caja.efectivoEnCaja)}
+            color="green"
+            icon="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"
+            danger={caja.efectivoEnCaja < 0}
+          />
         </div>
       </div>
 
@@ -303,7 +325,7 @@ export default async function GerentePage({
 
         {cierresDia.length > 0 && (
           <div className="mt-4 space-y-3">
-            {cierresDia.map((cierre: any) => (
+            {cierresConCaja.map(({ cierre, caja: c }: any) => (
               <div key={cierre.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
                 <div>
                   <p className="font-bold text-gray-900">Cierre #{fmt(cierre.id)}</p>
@@ -311,7 +333,10 @@ export default async function GerentePage({
                     {cierre.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {cierre.responsable || "Sin responsable"}
                   </p>
                   <p className="mt-1 text-sm font-black text-brand-500">
-                    Total caja: {money(cierre.totalCaja)}
+                    Ganancia neta: {money(c.gananciaNeta)}
+                  </p>
+                  <p className="text-sm font-black text-teal-600 dark:text-teal-400">
+                    Efectivo en caja: {money(c.efectivoEnCaja)}
                   </p>
                 </div>
                 <Link href={`/cierres-caja/${cierre.id}/ticket`} className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-600">
@@ -515,9 +540,9 @@ export default async function GerentePage({
 /* ── Sub-componentes ──────────────────────────────────────── */
 
 function KpiCard({
-  label, value, color, icon, danger,
+  label, value, color, icon, danger, hint,
 }: {
-  label: string; value: string; color: "green" | "blue" | "red" | "purple"; icon: string; danger?: boolean;
+  label: string; value: string; color: "green" | "blue" | "red" | "purple"; icon: string; danger?: boolean; hint?: string;
 }) {
   const palette = {
     green:  "bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400",
@@ -535,6 +560,7 @@ function KpiCard({
       </div>
       <p className={`text-2xl font-black ${danger ? "text-red-500" : "text-gray-900"}`}>{value}</p>
       <p className="mt-0.5 text-xs font-medium text-gray-400">{label}</p>
+      {hint && <p className="mt-1 text-[11px] leading-snug text-gray-400">{hint}</p>}
     </div>
   );
 }
