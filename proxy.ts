@@ -63,6 +63,19 @@ export function proxy(request: NextRequest) {
   const gerenteOk = gerenteToken === AUTH_SECRET;
   const empleadoOk = empleadoToken === "empleado_activo";
 
+  // API (RNF04): protegida por defecto -- todo lo que cuelgue de /api exige
+  // sesión de gerente. Hoy la única ruta es POST /api/pedidos, que solo llama
+  // el formulario de /pedidos/nuevo (página de gerente). Una API futura para
+  // empleado tendría que permitirse aquí de forma explícita.
+  // Responde 401 en JSON y no redirige: un fetch() que sigue un redirect a
+  // /login recibiría HTML con 200 y lo trataría como éxito.
+  if (pathname === "/api" || pathname.startsWith("/api/")) {
+    if (!gerenteOk) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
+
   // Rutas solo gerente
   const esRutaGerente =
     rutasGerente.some((ruta) => pathname === ruta || pathname.startsWith(ruta + "/")) ||
@@ -119,5 +132,6 @@ export const config = {
     "/clientes/:path*",
     "/clientes-empleado/:path*",
     "/entrega-empleado/:path*",
+    "/api/:path*",
   ],
 };
