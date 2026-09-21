@@ -25,11 +25,19 @@ const rutasGerente = [
   "/pedidos-antiguos",
   "/inventario",
   "/clientes",
+  "/cierres-caja", // ticket con los totales de caja (RNF04)
   "/pedidos/nuevo",
   "/pedidos/[id]",
 ];
 
-// Rutas exclusivamente de empleado (acepta cookie gerente O empleado)
+// Rutas del mostrador (acepta cookie gerente O empleado).
+//
+// RNF04 · mínimo privilegio: el acceso de empleado no pide credencial (decisión
+// documentada en lib/empleado-auth.ts), así que su sesión solo abre lo que hace
+// falta para atender el mostrador. Para el empleado NO existe: el listado de
+// /pedidos (nombre y teléfono de todos los clientes), /pedidos/[id], /clientes,
+// /movimientos, /pedidos-antiguos, /inventario, /cierres-caja, /gerente* ni /api.
+// Cada ruta nueva debe declararse en tests/proxy-rnf04.test.mjs (tabla ACCESO).
 const rutasEmpleado = [
   "/pedidos/rapido",
   "/inventario-empleado",
@@ -39,11 +47,6 @@ const rutasEmpleado = [
   "/recibos",
   "/clientes-empleado",
   "/entrega-empleado",
-];
-
-// Rutas accesibles con cualquiera de las dos sesiones
-const rutasCompartidas = [
-  "/pedidos",
 ];
 
 export function proxy(request: NextRequest) {
@@ -63,9 +66,27 @@ export function proxy(request: NextRequest) {
   const gerenteOk = gerenteToken === AUTH_SECRET;
   const empleadoOk = empleadoToken === "empleado_activo";
 
+  // API (RNF04): protegida por defecto -- todo lo que cuelgue de /api exige
+  // sesión de gerente. Hoy la única ruta es POST /api/pedidos, que solo llama
+  // el formulario de /pedidos/nuevo (página de gerente). Una API futura para
+  // empleado tendría que permitirse aquí de forma explícita.
+  // Responde 401 en JSON y no redirige: un fetch() que sigue un redirect a
+  // /login recibiría HTML con 200 y lo trataría como éxito.
+  if (pathname === "/api" || pathname.startsWith("/api/")) {
+    if (!gerenteOk) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
+
   // Rutas solo gerente
   const esRutaGerente =
     rutasGerente.some((ruta) => pathname === ruta || pathname.startsWith(ruta + "/")) ||
+    // El listado /pedidos (nombre y teléfono de todos los clientes) es de gerente
+    // (RNF04). Va aparte porque rutasGerente compara por prefijo y "/pedidos"
+    // bloquearía también /pedidos/rapido, el alta del mostrador. El flujo diario
+    // del empleado nunca enlaza a este listado.
+    pathname === "/pedidos" ||
     // /pedidos/nuevo y /pedidos/<número> son de gerente
     (pathname.startsWith("/pedidos/") &&
       !pathname.startsWith("/pedidos/rapido"));
@@ -89,18 +110,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Rutas compartidas: cualquiera de las dos sesiones
-  const esRutaCompartida = rutasCompartidas.some((ruta) =>
-    pathname.startsWith(ruta)
-  );
-
-  if (esRutaCompartida) {
-    if (!gerenteOk && !empleadoOk) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    return NextResponse.next();
-  }
-
   return NextResponse.next();
 }
 
@@ -119,5 +128,7 @@ export const config = {
     "/clientes/:path*",
     "/clientes-empleado/:path*",
     "/entrega-empleado/:path*",
+    "/cierres-caja/:path*",
+    "/api/:path*",
   ],
 };
