@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { money } from "@/lib/format";
 
@@ -56,7 +56,12 @@ const SERVICIO_COLORS_IDLE: Record<string, string> = {
   pink:   "hover:border-pink-300 hover:bg-pink-50",
 };
 
-function StepCircle({ n, done }: { n: number; done: boolean }) {
+// Los 3 pasos del flujo (Cliente → Prendas → Recibo) van numerados arriba.
+// Las tarjetas de la prenda no llevan número para no competir con ellos:
+// son un checklist (círculo vacío → ✓).
+const PASOS = ["Cliente", "Prendas", "Recibo"];
+
+function StepCircle({ done }: { done: boolean }) {
   return (
     <div
       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
@@ -65,7 +70,7 @@ function StepCircle({ n, done }: { n: number; done: boolean }) {
           : "bg-gray-200 text-gray-500"
       }`}
     >
-      {done ? "✓" : n}
+      {done ? "✓" : ""}
     </div>
   );
 }
@@ -185,15 +190,36 @@ export default function PedidoRapidoForm({
                   Entrada · dejar prendas
                 </p>
                 <h1 className="page-title !mt-0 !text-xl">
-                  {paso === 1 ? "¿Quién trae las prendas?" : "Ingresa las prendas"}
+                  {paso === 1 ? "¿Quién trae las prendas?" : paso === 2 ? "Ingresa las prendas" : "Revisa y cobra"}
                 </h1>
               </div>
             </div>
 
-            <ol className="flex items-center gap-2">
-              <li className={`rounded-full px-2.5 py-1 text-xs font-bold ${paso === 1 ? "bg-teal-500 text-white" : "bg-teal-50 text-teal-700"}`}>1 Cliente</li>
-              <li className="text-gray-300">→</li>
-              <li className={`rounded-full px-2.5 py-1 text-xs font-bold ${paso === 2 ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-500"}`}>2 Prendas</li>
+            <ol className="flex items-center gap-1.5">
+              {PASOS.map((label, i) => {
+                const n = i + 1;
+                const pill = `flex min-h-9 items-center rounded-full px-3 text-xs font-bold ${
+                  paso === n
+                    ? "bg-teal-500 text-white"
+                    : paso > n
+                      ? "bg-teal-50 text-teal-700 dark:text-teal-300"
+                      : "bg-gray-100 text-gray-500"
+                }`;
+                return (
+                  <Fragment key={label}>
+                    {i > 0 && <li aria-hidden="true" className="text-gray-300">→</li>}
+                    <li aria-current={paso === n ? "step" : undefined}>
+                      {paso > n ? (
+                        <button type="button" onClick={() => setPaso(n)} className={pill}>
+                          ✓ {label}
+                        </button>
+                      ) : (
+                        <span className={pill}>{n} {label}</span>
+                      )}
+                    </li>
+                  </Fragment>
+                );
+              })}
             </ol>
 
             {paso === 1 && (
@@ -205,7 +231,7 @@ export default function PedidoRapidoForm({
               </Link>
             )}
 
-            {paso === 2 && (
+            {paso >= 2 && (
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-2 ring-1 ring-gray-200">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">
                   {nombre.charAt(0).toUpperCase()}
@@ -217,7 +243,7 @@ export default function PedidoRapidoForm({
                 <button
                   type="button"
                   onClick={() => setPaso(1)}
-                  className="ml-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+                  className="ml-1 min-h-10 rounded-lg bg-white px-3 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
                 >
                   Cambiar
                 </button>
@@ -280,19 +306,20 @@ export default function PedidoRapidoForm({
             </div>
           )}
 
-          {/* ── PASO 2: ITEMS + RESUMEN ────────────────────────── */}
-          {paso === 2 && (
+          {/* ── PASO 2: PRENDAS · PASO 3: RECIBO Y COBRO ───────── */}
+          {paso >= 2 && (
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
 
-              {/* ═══ COLUMNA IZQUIERDA ═══════════════════════════ */}
+              {/* ═══ COLUMNA IZQUIERDA (solo paso 2) ═════════════ */}
+              {paso === 2 && (
               <div className="min-w-0 flex-1 space-y-3">
 
-                {/* ─── PASO 1: Tipo de prenda ─── */}
+                {/* ─── Tipo de prenda ─── */}
                 <div className={`card transition-all ${
                   steps.tipo ? "ring-1 ring-emerald-200" : ""
                 }`}>
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
-                    <StepCircle n={1} done={steps.tipo} />
+                    <StepCircle done={steps.tipo} />
                     <div className="flex-1">
                       <p className="text-sm font-bold text-gray-800">Tipo de prenda</p>
                       {steps.tipo && (
@@ -349,12 +376,12 @@ export default function PedidoRapidoForm({
                   </div>
                 </div>
 
-                {/* ─── PASO 2: Servicio ─── */}
+                {/* ─── Servicio ─── */}
                 <div className={`card transition-all ${
                   steps.servicio ? "ring-emerald-200" : "ring-gray-100"
                 }`}>
                   <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
-                    <StepCircle n={2} done={steps.servicio} />
+                    <StepCircle done={steps.servicio} />
                     <div className="flex-1">
                       <p className="text-sm font-bold text-gray-800">Servicio</p>
                       {steps.servicio && (
@@ -385,7 +412,7 @@ export default function PedidoRapidoForm({
                   </div>
                 </div>
 
-                {/* ─── PASOS 3 y 4: Cantidad + Valor ─── */}
+                {/* ─── Cantidad + Valor ─── */}
                 <div className="grid grid-cols-2 gap-3">
 
                   {/* Cantidad */}
@@ -393,7 +420,7 @@ export default function PedidoRapidoForm({
                     steps.cantidad ? "ring-emerald-200" : "ring-gray-100"
                   }`}>
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
-                      <StepCircle n={3} done={steps.cantidad} />
+                      <StepCircle done={steps.cantidad} />
                       <p className="text-sm font-bold text-gray-800">Cantidad</p>
                     </div>
                     <div className="p-4">
@@ -404,7 +431,7 @@ export default function PedidoRapidoForm({
                             key={c}
                             type="button"
                             onClick={() => setCantidad(c)}
-                            className={`rounded-lg border-2 py-1.5 text-sm font-bold transition active:scale-[0.96] ${
+                            className={`min-h-11 rounded-lg border-2 py-1.5 text-sm font-bold transition active:scale-[0.96] ${
                               cantidad === c
                                 ? "border-brand-500 bg-brand-500 text-white"
                                 : "border-gray-200 text-gray-700 hover:border-brand-300 hover:bg-brand-50"
@@ -419,7 +446,7 @@ export default function PedidoRapidoForm({
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl font-bold text-gray-700 transition hover:bg-gray-200 active:scale-95"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl font-bold text-gray-700 transition hover:bg-gray-200 active:scale-95"
                         >
                           −
                         </button>
@@ -436,7 +463,7 @@ export default function PedidoRapidoForm({
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => c + 1)}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-white transition hover:bg-brand-600 active:scale-95"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-white transition hover:bg-brand-600 active:scale-95"
                         >
                           +
                         </button>
@@ -449,7 +476,7 @@ export default function PedidoRapidoForm({
                     steps.valor ? "ring-emerald-200" : "ring-gray-100"
                   }`}>
                     <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5">
-                      <StepCircle n={4} done={steps.valor} />
+                      <StepCircle done={steps.valor} />
                       <div className="flex-1">
                         <p className="text-sm font-bold text-gray-800">Valor unitario</p>
                         {steps.valor && (
@@ -471,7 +498,7 @@ export default function PedidoRapidoForm({
                             key={v}
                             type="button"
                             onClick={() => setValor(v)}
-                            className={`rounded-lg border-2 py-1.5 text-xs font-bold transition active:scale-[0.96] ${
+                            className={`min-h-11 rounded-lg border-2 py-1.5 text-xs font-bold transition active:scale-[0.96] ${
                               valor === v
                                 ? "border-brand-500 bg-brand-500 text-white"
                                 : "border-gray-200 text-gray-700 hover:border-brand-300 hover:bg-brand-50"
@@ -525,7 +552,7 @@ export default function PedidoRapidoForm({
                             key={n}
                             type="button"
                             onClick={() => toggleNovedad(n)}
-                            className={`rounded-xl border-2 p-2 text-xs font-bold transition active:scale-[0.97] ${
+                            className={`min-h-11 rounded-xl border-2 p-2 text-xs font-bold transition active:scale-[0.97] ${
                               novedades.includes(n)
                                 ? "border-orange-500 bg-orange-50 text-orange-700"
                                 : "border-gray-200 text-gray-600 hover:border-orange-300"
@@ -574,17 +601,20 @@ export default function PedidoRapidoForm({
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
-                      <span>Completa los 4 pasos para agregar la prenda</span>
-                      {!steps.tipo && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">① Tipo</span>}
-                      {steps.tipo && !steps.servicio && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">② Servicio</span>}
-                      {steps.tipo && steps.servicio && !steps.valor && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">④ Valor</span>}
+                      <span>Completa los 4 datos para agregar la prenda</span>
+                      {!steps.tipo && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">Tipo</span>}
+                      {steps.tipo && !steps.servicio && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">Servicio</span>}
+                      {steps.tipo && steps.servicio && !steps.valor && <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs">Valor</span>}
                     </span>
                   )}
                 </button>
               </div>
+              )}
 
-              {/* ═══ COLUMNA DERECHA: Pedido en curso ════════════ */}
-              <div className="w-full lg:w-72 lg:shrink-0 lg:sticky lg:top-6 lg:self-start">
+              {/* ═══ COLUMNA DERECHA: Pedido en curso (y cobro en paso 3) ═══ */}
+              <div className={paso === 2
+                ? "w-full lg:w-72 lg:shrink-0 lg:sticky lg:top-6 lg:self-start"
+                : "mx-auto w-full max-w-lg"}>
                 <div className="card overflow-hidden">
 
                   {/* Header del panel */}
@@ -605,10 +635,10 @@ export default function PedidoRapidoForm({
                     <div className="px-4 py-10 text-center">
                       <p className="text-3xl">📋</p>
                       <p className="mt-2 text-sm font-bold text-gray-300">Sin prendas aún</p>
-                      <p className="text-xs text-gray-300">Completa los 4 pasos y presiona Agregar</p>
+                      <p className="text-xs text-gray-300">Completa los 4 datos y presiona Agregar</p>
                     </div>
                   ) : (
-                    <div className="max-h-80 divide-y divide-gray-50 overflow-y-auto">
+                    <div className="max-h-80 divide-y divide-gray-50 overflow-y-auto dark:divide-white/[0.06]">
                       {items.map((item, idx) => (
                         <div key={item.id} className="flex items-start gap-2 px-4 py-2.5">
                           <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-500">
@@ -630,90 +660,103 @@ export default function PedidoRapidoForm({
                           </div>
                           <div className="shrink-0 text-right">
                             <p className="text-sm font-black text-brand-500">{money(item.valor)}</p>
-                            <button
-                              type="button"
-                              onClick={() => eliminarItem(item.id)}
-                              className="mt-0.5 text-xs font-bold text-red-300 transition hover:text-red-500"
-                            >
-                              ✕
-                            </button>
+                            {paso === 2 && (
+                              <button
+                                type="button"
+                                onClick={() => eliminarItem(item.id)}
+                                aria-label={`Quitar ${item.tipo}`}
+                                className="ml-auto flex h-9 w-9 items-center justify-center text-xs font-bold text-red-300 transition hover:text-red-500"
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Total + pago + confirmar */}
+                  {/* Total */}
                   {items.length > 0 && (
-                    <>
-                      <div className="border-t border-gray-100 bg-brand-50 px-4 py-3">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Total</p>
-                          <p className="text-2xl font-black text-brand-700">{money(total)}</p>
-                        </div>
+                    <div className="border-t border-gray-100 bg-brand-50 px-4 py-3 dark:bg-brand-500/10">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold uppercase tracking-wide text-brand-600 dark:text-brand-400">Total</p>
+                        <p className="text-2xl font-black text-brand-700 dark:text-brand-400">{money(total)}</p>
                       </div>
-
-                      <div className="space-y-3 p-4">
-                        <div>
-                          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
-                            💵 Abono inicial
-                          </label>
-                          <input
-                            type="number"
-                            value={abono || ""}
-                            onChange={(e) => setAbono(Number(e.target.value) || 0)}
-                            className="w-full rounded-xl border-2 border-gray-200 p-2.5 text-xl font-black focus:border-brand-500 focus:outline-none"
-                            placeholder="0"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
-                            Método de pago
-                          </label>
-                          <select
-                            value={metodo}
-                            onChange={(e) => setMetodo(e.target.value)}
-                            className="w-full rounded-xl border-2 border-gray-200 p-2.5 text-sm font-bold focus:border-brand-500 focus:outline-none"
-                          >
-                            <option value="Efectivo">💵 Efectivo</option>
-                            <option value="Nequi">📱 Nequi</option>
-                            <option value="Daviplata">📱 Daviplata</option>
-                            <option value="Transferencia">🏦 Transferencia</option>
-                            <option value="Tarjeta">💳 Tarjeta</option>
-                          </select>
-                        </div>
-
-                        {saldo > 0 && abono > 0 && (
-                          <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
-                            <p className="text-xs font-bold uppercase text-red-400">Saldo pendiente</p>
-                            <p className="text-lg font-black text-red-600">{money(saldo)}</p>
-                          </div>
-                        )}
-                        {saldo <= 0 && abono > 0 && (
-                          <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center">
-                            <p className="text-xs font-bold text-emerald-600">✅ Pagado completo</p>
-                          </div>
-                        )}
-
-                        <button
-                          type="submit"
-                          className="w-full rounded-2xl bg-brand-500 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99]"
-                        >
-                          ✅ Confirmar e imprimir recibo
-                        </button>
-                      </div>
-                    </>
+                    </div>
                   )}
 
-                  {items.length === 0 && (
+                  {/* Paso 2 → paso 3 */}
+                  {paso === 2 && (
                     <div className="p-4">
                       <button
-                        type="submit"
-                        disabled
-                        className="w-full cursor-not-allowed rounded-2xl bg-gray-100 py-3.5 text-sm font-bold text-gray-300"
+                        type="button"
+                        disabled={items.length === 0}
+                        onClick={() => setPaso(3)}
+                        className="w-full rounded-2xl bg-brand-500 py-4 text-base font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none dark:disabled:bg-white/10"
                       >
-                        Confirmar e imprimir recibo
+                        Continuar → Recibo
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Paso 3: cobro + confirmar */}
+                  {paso === 3 && (
+                    <div className="space-y-3 p-4">
+                      <div>
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
+                          💵 Abono inicial
+                        </label>
+                        <input
+                          type="number"
+                          value={abono || ""}
+                          onChange={(e) => setAbono(Number(e.target.value) || 0)}
+                          className="w-full rounded-xl border-2 border-gray-200 p-3 text-2xl font-black focus:border-brand-500 focus:outline-none"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
+                          Método de pago
+                        </label>
+                        <select
+                          value={metodo}
+                          onChange={(e) => setMetodo(e.target.value)}
+                          className="w-full rounded-xl border-2 border-gray-200 p-3 text-base font-bold focus:border-brand-500 focus:outline-none"
+                        >
+                          <option value="Efectivo">💵 Efectivo</option>
+                          <option value="Nequi">📱 Nequi</option>
+                          <option value="Daviplata">📱 Daviplata</option>
+                          <option value="Transferencia">🏦 Transferencia</option>
+                          <option value="Tarjeta">💳 Tarjeta</option>
+                        </select>
+                      </div>
+
+                      {saldo > 0 && abono > 0 && (
+                        <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
+                          <p className="text-xs font-bold uppercase text-red-400">Saldo pendiente</p>
+                          <p className="text-lg font-black text-red-600">{money(saldo)}</p>
+                        </div>
+                      )}
+                      {saldo <= 0 && abono > 0 && (
+                        <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center dark:bg-emerald-500/10">
+                          <p className="text-xs font-bold text-emerald-600">✅ Pagado completo</p>
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        className="w-full rounded-2xl bg-brand-500 py-4 text-lg font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99]"
+                      >
+                        ✅ Confirmar e imprimir recibo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaso(2)}
+                        className="min-h-11 w-full rounded-2xl text-sm font-bold text-gray-500 transition hover:bg-gray-100 dark:hover:bg-white/5"
+                      >
+                        ← Volver a prendas
                       </button>
                     </div>
                   )}
