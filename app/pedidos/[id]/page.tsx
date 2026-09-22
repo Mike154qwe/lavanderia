@@ -6,7 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
-import { whatsappLink } from "@/lib/whatsapp";
+import NotificarWhatsappButton from "./NotificarWhatsappButton";
+import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
 
 const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
 const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
@@ -37,6 +38,16 @@ async function cambiarEstadoAction(formData: FormData) {
     prisma.historialEstado.create({ data: { pedidoId: id, estado } }),
   ]);
   redirect(`/pedidos/${id}?flash=Estado+actualizado`);
+}
+
+async function notificarListoAction(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("pedidoId"));
+  if (!id) return;
+  // RF10: registra el envío en HistorialEstado (no es un estado real del pedido,
+  // ver ESTADO_NOTIFICADO_LISTO en lib/whatsapp.ts) -- sin migración.
+  await prisma.historialEstado.create({ data: { pedidoId: id, estado: ESTADO_NOTIFICADO_LISTO } });
+  redirect(`/pedidos/${id}?flash=Notificación+registrada`);
 }
 
 async function registrarPagoAction(formData: FormData) {
@@ -128,6 +139,11 @@ export default async function DetallePedidoPage({
   });
 
   if (!pedido) notFound();
+
+  // RF10: ESTADO_NOTIFICADO_LISTO es un marcador, no un estado real -- se saca de
+  // la línea de tiempo visible y solo se usa para saber si ya se notificó.
+  const yaNotificadoListo = pedido.historial.some((h) => h.estado === ESTADO_NOTIFICADO_LISTO);
+  const historialVisible = pedido.historial.filter((h) => h.estado !== ESTADO_NOTIFICADO_LISTO);
 
   const totalPagado = pedido.pagos.reduce((s, p) => s + p.valor, 0);
   const saldo       = pedido.total - totalPagado;
@@ -233,21 +249,16 @@ export default async function DetallePedidoPage({
             </div>
 
             {pedido.cliente.telefono ? (
-              <a
+              <NotificarWhatsappButton
+                pedidoId={pedido.id}
                 href={whatsappLink(
                   pedido.cliente.telefono,
                   pedido.id,
                   `Hola, somos Lavaseco La Manuelita. Tu pedido #${fmt(pedido.id)} ya está listo para recoger. Te esperamos. Gracias.`
                 )}
-                target="_blank"
-                className="flex items-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-600 active:scale-[0.98]"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.123 1.532 5.855L.057 23.857a.5.5 0 0 0 .604.677l6.234-1.635A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.956 9.956 0 0 1-5.167-1.438l-.37-.22-3.843 1.007 1.027-3.748-.241-.385A9.954 9.954 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                </svg>
-                Notificar por WhatsApp
-              </a>
+                yaEnviado={yaNotificadoListo}
+                action={notificarListoAction}
+              />
             ) : (
               <button
                 type="button"
@@ -499,12 +510,12 @@ export default async function DetallePedidoPage({
         )}
 
         {/* ── Historial ───────────────────────────────────── */}
-        {pedido.historial.length > 0 && (
+        {historialVisible.length > 0 && (
           <div className="card p-6">
             <h2 className="mb-4 font-bold text-gray-900">Historial</h2>
             <ol className="relative border-l border-gray-200 pl-5 dark:border-white/10">
-              {pedido.historial.map((h, i) => (
-                <li key={h.id} className={`pb-4 ${i === pedido.historial.length - 1 ? "pb-0" : ""}`}>
+              {historialVisible.map((h, i) => (
+                <li key={h.id} className={`pb-4 ${i === historialVisible.length - 1 ? "pb-0" : ""}`}>
                   <div className="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-500 dark:border-gray-900" />
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[h.estado] ?? "bg-gray-100 text-gray-500"}`}>

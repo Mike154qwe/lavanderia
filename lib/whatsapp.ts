@@ -15,3 +15,12 @@ export function whatsappLink(telefono: string | null, pedidoId: number, texto: s
 
   return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 }
+
+/**
+ * Marca en HistorialEstado (RF10) que se notificó al cliente que su pedido está
+ * listo, aprovechando esa tabla en vez de agregar una columna nueva a Pedido (sin
+ * migración). No es un estado real del pedido -- no aparece en ESTADOS_PEDIDO ni en
+ * ESTADO_BADGE -- así que quien lea `pedido.historial` para mostrar la línea de
+ * tiempo de estados debe filtrar las filas con este valor.
+ */
+export const ESTADO_NOTIFICADO_LISTO = "NOTIFICADO_LISTO_WHATSAPP";
