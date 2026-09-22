@@ -333,6 +333,10 @@ input:focus, select:focus, textarea:focus {
 ============================ */
 
 .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   border: none;
   border-radius: var(--radius-control);
   background: var(--brand-500);
@@ -352,6 +356,10 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   border: none;
   border-radius: var(--radius-control);
   background: var(--text-1);

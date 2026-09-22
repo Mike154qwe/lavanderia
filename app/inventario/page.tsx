@@ -238,7 +238,7 @@ export default async function InventarioPage({
               <Link
                 key={chip.value}
                 href={buildUrl(1, q, chip.value)}
-                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition ${
+                className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition ${
                   active
                     ? "bg-brand-500 text-white shadow-sm"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
