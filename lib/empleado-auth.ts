@@ -50,6 +50,15 @@ import { cookies } from "next/headers";
 //     (como la del gerente, lib/auth.ts), y reglas de Firestore que exijan
 //     autenticación real. No es una garantía permanente: es una decisión de
 //     alcance para esta versión.
+//   - Actualización 22-sep-2026: el acceso remoto real de la gerente ya existe,
+//     pero vive APARTE de este sistema local -- panel-remoto-web/ (proyecto
+//     separado, desplegado a Firebase Hosting, no a PM2). Ese sitio exige
+//     Firebase Auth (correo + contraseña) antes de mostrar cualquier dato;
+//     firestore.rules deja de cerrar "panelRemoto" por completo y permite su
+//     lectura solo a usuarios autenticados (todo lo demás, incluida
+//     "respaldosDb", sigue cerrado). ESTE sistema local (empleado_activo,
+//     cookie sin firmar) NO cambió en nada: sigue siendo la misma decisión de
+//     alcance descrita arriba, sin exposición nueva a internet.
 const COOKIE_NAME = "lavaseco_empleado_auth";
 
 export async function crearSesionEmpleado() {
