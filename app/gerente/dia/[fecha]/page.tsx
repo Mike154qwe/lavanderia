@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { formatPedido, money } from "@/lib/format";
 import { calcularCaja } from "@/lib/caja";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
+import { ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
 
 async function registrarGasto(formData: FormData) {
   "use server";
@@ -56,6 +57,10 @@ export default async function DiaFinanzasPage({
         {
           historial: {
             some: {
+              // Solo cambios de estado reales cuentan como "actividad del día" --
+              // el marcador de RF10 (ESTADO_NOTIFICADO_LISTO) no es un estado del
+              // pedido y no debe hacer que un pedido de otro día aparezca aquí.
+              estado: { not: ESTADO_NOTIFICADO_LISTO },
               createdAt: {
                 gte: inicio,
                 lt: fin,
