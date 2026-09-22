@@ -2,20 +2,14 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPedido } from "@/lib/format";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Pedidos antiguos" };
 
-function whatsappLink(telefono: string | null, pedidoId: number) {
-  if (!telefono) return "#";
-
-  const limpio = telefono.replace(/\D/g, "");
-  const numero = limpio.startsWith("57") ? limpio : `57${limpio}`;
-
-  const mensaje = `Hola, somos Lavaseco La Manuelita. Te recordamos que tu pedido #${formatPedido(
+function mensajeRecordatorio(pedidoId: number) {
+  return `Hola, somos Lavaseco La Manuelita. Te recordamos que tu pedido #${formatPedido(
     pedidoId
   )} lleva más de 3 meses en la lavandería y está pendiente por recoger. Por favor acércate a reclamarlo. Gracias.`;
-
-  return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 }
 
 export default async function PedidosAntiguosPage() {
@@ -149,7 +143,7 @@ export default async function PedidosAntiguosPage() {
                   </div>
 
                   <a
-                    href={whatsappLink(pedido.cliente.telefono, pedido.id)}
+                    href={whatsappLink(pedido.cliente.telefono, pedido.id, mensajeRecordatorio(pedido.id))}
                     target="_blank"
                     className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition ${
                       pedido.cliente.telefono
