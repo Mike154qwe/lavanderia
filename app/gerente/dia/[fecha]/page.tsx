@@ -17,15 +17,11 @@ async function registrarGasto(formData: FormData) {
 
   if (!tipo || valor <= 0 || !METODOS_PAGO.includes(metodo)) return;
 
+  // Hora real de creación (createdAt default now() del esquema), no un sello fijo de
+  // mediodía: un gasto registrado por la tarde debe caer en la ventana del cierre que
+  // corresponda, igual que ya hace el formulario del empleado.
   await prisma.gastoCaja.create({
-    data: {
-      tipo,
-      descripcion,
-      valor,
-      metodo,
-      responsable,
-      createdAt: new Date(fecha + "T12:00:00"),
-    },
+    data: { tipo, descripcion, valor, metodo, responsable },
   });
 
   revalidatePath(`/gerente/dia/${fecha}`);

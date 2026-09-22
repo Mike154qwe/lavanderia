@@ -257,6 +257,53 @@ test("el ticket ya no usa las etiquetas «Total caja» ni «Caja esperada»", as
   assert.ok(!/Total caja|Caja esperada/i.test(html), "el ticket debe decir «Ganancia neta» y «Efectivo en caja»");
 });
 
+// Regresión del sello fijo de las 12:00 (docs/bug-cierre-caja-negativo.md, pendiente #3):
+// un gasto registrado por la tarde debe caer en la ventana del cierre que sigue, no en la
+// de un cierre anterior ya hecho (que es lo que pasaba cuando createdAt quedaba fijo en
+// T12:00:00 sin importar la hora real de registro).
+test("un gasto registrado por la tarde cae en la ventana del cierre correspondiente, no en la de un cierre anterior", async () => {
+  // Guarda estática: el registro de gastos de /gerente/dia/[fecha] no puede volver a fijar
+  // createdAt a un sello de mediodía. No se puede ejecutar el server action real (el archivo
+  // es .tsx con JSX, que el cargador de estas pruebas no transforma), así que se comprueba
+  // el bloque real de gastoCaja.create en el código fuente: no debe mencionar createdAt.
+  const paginaDia = fs.readFileSync(path.join(RAIZ, "app/gerente/dia/[fecha]/page.tsx"), "utf8");
+  const crea = paginaDia.match(/await prisma\.gastoCaja\.create\(\{[\s\S]*?\}\);/);
+  assert.ok(crea, "no se encontró prisma.gastoCaja.create en /gerente/dia/[fecha]");
+  assert.ok(!/createdAt/.test(crea[0]), "el gasto no debe fijar createdAt a mano (debe usar la hora real, el default now() del esquema): " + crea[0]);
+
+  const hora = (h, m = 0) => new Date(2026, 4, 5, h, m); // 5-may-2026
+  const cliente = await prisma.cliente.create({ data: { nombre: RESPONSABLE, telefono: "QA-caja-tarde" } });
+  const pedido = await prisma.pedido.create({
+    data: { clienteId: cliente.id, servicio: "QA", total: 150000, estado: "ENTREGADO", createdAt: hora(9) },
+  });
+
+  // Pago de la mañana y primer cierre, antes de que exista el gasto de la tarde.
+  await prisma.pago.create({ data: { pedidoId: pedido.id, metodo: "Efectivo", valor: 100000, createdAt: hora(9, 30) } });
+  const cierreManana = await prisma.cierreCaja.create({
+    data: { efectivo: 100000, nequi: 0, daviplata: 0, transferencia: 0, tarjeta: 0, gastos: 0, totalCaja: 100000, responsable: RESPONSABLE, createdAt: hora(13) },
+  });
+
+  // Gasto registrado a las 15:30 -- la hora real de creación (createdAt = new Date() en el
+  // servidor), como hace el código ya corregido. Con el sello fijo de mediodía habría
+  // quedado a las 12:00, DENTRO de la ventana del cierre de la mañana (que ya se había
+  // hecho a las 13:00) y afuera de la de la tarde.
+  await prisma.pago.create({ data: { pedidoId: pedido.id, metodo: "Efectivo", valor: 50000, createdAt: hora(16) } });
+  await prisma.gastoCaja.create({
+    data: { tipo: "Insumos", descripcion: "QA sello de la tarde", valor: 20000, metodo: "Efectivo", responsable: "Empleado", createdAt: hora(15, 30) },
+  });
+  const cierreTarde = await prisma.cierreCaja.create({
+    data: { efectivo: 30000, nequi: 0, daviplata: 0, transferencia: 0, tarjeta: 0, gastos: 20000, totalCaja: 30000, responsable: RESPONSABLE, createdAt: hora(17, 25) },
+  });
+
+  const manana = await leerTicket(cierreManana.id);
+  assert.equal(manana.neta, 100000, "el cierre de la mañana no debe verse afectado por el gasto de la tarde");
+  assert.equal(manana.efectivo, 100000, "el gasto de la tarde no debe descontarse del cierre de la mañana, ya hecho");
+
+  const tarde = await leerTicket(cierreTarde.id);
+  assert.equal(tarde.neta, 30000, "el gasto de la tarde (20.000) sí debe descontarse del cierre de la tarde: 50.000 − 20.000");
+  assert.equal(tarde.efectivo, 30000, "el gasto de la tarde sí debe descontarse del efectivo en caja del cierre que le corresponde");
+});
+
 // ── Las cuatro vistas usan LA MISMA lógica (prueba estática) ──────────────────
 // La fórmula vivía copiada en cuatro sitios y se desincronizó. Ahora ninguna vista
 // puede calcular la caja por su cuenta: deben importar lib/caja.ts.
