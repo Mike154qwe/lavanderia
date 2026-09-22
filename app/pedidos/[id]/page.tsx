@@ -6,6 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
+import NotificarWhatsappButton from "./NotificarWhatsappButton";
+import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
 
 const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
 const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
@@ -36,6 +38,16 @@ async function cambiarEstadoAction(formData: FormData) {
     prisma.historialEstado.create({ data: { pedidoId: id, estado } }),
   ]);
   redirect(`/pedidos/${id}?flash=Estado+actualizado`);
+}
+
+async function notificarListoAction(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("pedidoId"));
+  if (!id) return;
+  // RF10: registra el envío en HistorialEstado (no es un estado real del pedido,
+  // ver ESTADO_NOTIFICADO_LISTO en lib/whatsapp.ts) -- sin migración.
+  await prisma.historialEstado.create({ data: { pedidoId: id, estado: ESTADO_NOTIFICADO_LISTO } });
+  redirect(`/pedidos/${id}?flash=Notificación+registrada`);
 }
 
 async function registrarPagoAction(formData: FormData) {
@@ -127,6 +139,11 @@ export default async function DetallePedidoPage({
   });
 
   if (!pedido) notFound();
+
+  // RF10: ESTADO_NOTIFICADO_LISTO es un marcador, no un estado real -- se saca de
+  // la línea de tiempo visible y solo se usa para saber si ya se notificó.
+  const yaNotificadoListo = pedido.historial.some((h) => h.estado === ESTADO_NOTIFICADO_LISTO);
+  const historialVisible = pedido.historial.filter((h) => h.estado !== ESTADO_NOTIFICADO_LISTO);
 
   const totalPagado = pedido.pagos.reduce((s, p) => s + p.valor, 0);
   const saldo       = pedido.total - totalPagado;
@@ -220,6 +237,40 @@ export default async function DetallePedidoPage({
             </div>
           )}
         </div>
+
+        {/* ── Notificar al cliente (RF10) ───────────────────── */}
+        {pedido.estado === "LISTO" && (
+          <div className="card flex flex-wrap items-center justify-between gap-3 p-6">
+            <div>
+              <h2 className="font-bold text-gray-900">Notificar al cliente</h2>
+              <p className="mt-0.5 text-sm text-gray-400">
+                Avísale por WhatsApp que su pedido ya está listo para recoger.
+              </p>
+            </div>
+
+            {pedido.cliente.telefono ? (
+              <NotificarWhatsappButton
+                pedidoId={pedido.id}
+                href={whatsappLink(
+                  pedido.cliente.telefono,
+                  pedido.id,
+                  `Hola, somos Lavaseco La Manuelita. Tu pedido #${fmt(pedido.id)} ya está listo para recoger. Te esperamos. Gracias.`
+                )}
+                yaEnviado={yaNotificadoListo}
+                action={notificarListoAction}
+              />
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="Este cliente no tiene teléfono registrado"
+                className="flex cursor-not-allowed items-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-bold text-gray-400 dark:bg-white/5"
+              >
+                Sin teléfono registrado
+              </button>
+            )}
+          </div>
+        )}
 
         {/* ── Prendas ─────────────────────────────────────── */}
         <div className="card overflow-hidden">
@@ -459,12 +510,12 @@ export default async function DetallePedidoPage({
         )}
 
         {/* ── Historial ───────────────────────────────────── */}
-        {pedido.historial.length > 0 && (
+        {historialVisible.length > 0 && (
           <div className="card p-6">
             <h2 className="mb-4 font-bold text-gray-900">Historial</h2>
             <ol className="relative border-l border-gray-200 pl-5 dark:border-white/10">
-              {pedido.historial.map((h, i) => (
-                <li key={h.id} className={`pb-4 ${i === pedido.historial.length - 1 ? "pb-0" : ""}`}>
+              {historialVisible.map((h, i) => (
+                <li key={h.id} className={`pb-4 ${i === historialVisible.length - 1 ? "pb-0" : ""}`}>
                   <div className="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-500 dark:border-gray-900" />
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[h.estado] ?? "bg-gray-100 text-gray-500"}`}>
