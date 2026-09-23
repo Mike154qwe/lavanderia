@@ -8,7 +8,6 @@ const OCULTAR = ["/login", "/empleado-login", "/recibos", "/cierres-caja"];
 
 const TITULOS: Record<string, string> = {
   "/gerente":                   "Panel financiero",
-  "/gerente/remoto":            "Panel remoto",
   "/pedidos":                   "Pedidos",
   "/pedidos/nuevo":             "Nuevo pedido",
   "/pedidos/rapido":            "Pedido rápido",
