@@ -176,16 +176,36 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Tendencia */}
+          {/* Tendencia -- con pocos puntos (recién empieza el historial), el
+              mensaje de abajo dice explícitamente que crece con cada cierre,
+              para que no se vea como una gráfica vacía o rota. */}
           <div className="card p-6">
-            <h2 className="mb-1 text-lg font-black text-gray-900 dark:text-white">Tendencia</h2>
+            <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-lg font-black text-gray-900 dark:text-white">Tendencia</h2>
+              {tendencia.length > 0 && tendencia.length < 8 && (
+                <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                  Historial reciente
+                </span>
+              )}
+            </div>
             <p className="mb-2 text-xs text-gray-400">Ganancia neta y efectivo en caja por día</p>
             {tendencia.length >= 2 ? (
-              <TrendChart data={tendencia} />
+              <>
+                <TrendChart data={tendencia} />
+                <p className="mt-3 text-center text-xs text-gray-400">
+                  {tendencia.length} día{tendencia.length === 1 ? "" : "s"} con cierre desde que se activó la
+                  sincronización -- el historial crece con cada cierre nuevo.
+                </p>
+              </>
             ) : (
-              <p className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm font-semibold text-gray-400 dark:border-white/10">
-                Hace falta más de un día con cierre para trazar una tendencia.
-              </p>
+              <>
+                <p className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm font-semibold text-gray-400 dark:border-white/10">
+                  Hace falta más de un día con cierre para trazar una tendencia.
+                </p>
+                <p className="mt-3 text-center text-xs text-gray-400">
+                  Ya va {tendencia.length} de 2 -- el historial crece con cada cierre nuevo.
+                </p>
+              </>
             )}
           </div>
 
