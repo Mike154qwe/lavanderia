@@ -6,38 +6,28 @@
       "dom.iterable",
       "esnext"
     ],
-
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-
     "jsx": "react-jsx",
-
     "incremental": true,
-    "ignoreDeprecations": "6.0",
-
-    "baseUrl": ".",
-
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
   },
-
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -45,13 +35,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-
   "exclude": [
-    "node_modules",
-    // panel-remoto/ es un proyecto Next.js aparte (Firebase Hosting, no
-    // PM2), con su propio tsconfig.json y su propio alias "@/*" -- sin este
-    // exclude, el include sin acotar de arriba (**/*.ts) lo tipa con el
-    // alias de ESTE proyecto, que resuelve a rutas equivocadas.
-    "panel-remoto"
+    "node_modules"
   ]
 }
