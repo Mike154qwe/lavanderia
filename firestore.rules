@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Reglas de Firestore del proyecto lavaseco-la-manuelita -- gobiernan TODO lo
+// que hay en Firestore, para los dos sitios que lo usan: lavanderia-local
+// (app del mostrador, PM2) y panel-remoto-web (Firebase Hosting).
+//
+// Historia: el 21-sep-2026 se encontró que las reglas estaban en modo de
+// prueba -- cualquiera con la clave pública del cliente podía leer y BORRAR
+// cualquier colección, sin autenticación (verificado). Cierre de emergencia:
+// todo denegado por defecto (ver lib/empleado-auth.ts para el relato
+// completo). Hasta hoy no había ningún archivo versionado con las reglas
+// reales -- vivían solo pegadas a mano en la consola de Firebase. Este
+// archivo las versiona por primera vez.
+//
+// Este cambio (22-sep-2026) abre UNA sola excepción, angosta a propósito:
+// lectura de "panelRemoto" para cualquier usuario que haya iniciado sesión
+// con Firebase Auth (panel-remoto-web/components/AuthGate.tsx). Hoy esa
+// cuenta es una sola (lvmanuelita@gmail.com, cuenta del prototipo académico
+// -- ver panel-remoto-web/README.md), así que "cualquier usuario autenticado"
+// equivale en la práctica a "la gerente", pero la regla en sí no depende de
+// cuántas cuentas existan hoy.
+//
+// "respaldosDb" (la base completa comprimida, scripts/respaldo-db-firebase.js)
+// y TODO lo demás siguen completamente cerrados -- ni lectura ni escritura,
+// para nadie que no sea la cuenta de servicio del Admin SDK (que no pasa por
+// estas reglas: las evita por diseño, es la vía por la que ya se escribe
+// panelRemoto desde hacerCierreCaja y se sube el respaldo completo).
+//
+// Cómo aplicar este archivo: pegar su contenido en Firebase Console ->
+// Firestore Database -> Reglas -> Publicar. No hay despliegue automático
+// desde este repo (no hay `firebase deploy --only firestore:rules` en ningún
+// script ni pipeline) -- aplicarlo es siempre un paso manual, a propósito,
+// dado lo sensible del cambio.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /panelRemoto/{fecha} {
+      allow read: if request.auth != null;
+      allow write: if false; // solo escribe la cuenta de servicio (Admin SDK)
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
