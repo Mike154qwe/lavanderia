@@ -17,6 +17,12 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Permite import con extensión ".ts" explícita (ej. scripts/backfill-
+    // panel-remoto.ts), que Node exige para imports relativos al correrlo
+    // como ESM real con `node`. Next.js/Turbopack no usa tsc para emitir
+    // (noEmit ya está en true), así que esto no cambia nada del build de la
+    // app -- solo le da permiso a tsc de aceptar esa sintaxis al tipar.
+    "allowImportingTsExtensions": true,
 
     "jsx": "react-jsx",
 
