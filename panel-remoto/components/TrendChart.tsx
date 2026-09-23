@@ -30,8 +30,17 @@ function CustomTooltip({ active, payload, label }: any) {
 
 /** Tendencia de ganancia neta y efectivo en caja por día -- mismo estilo que
  * los gráficos de lavanderia-local/components/charts/ (recharts, colores de
- * marca, tooltip redondeado). */
+ * marca, tooltip redondeado).
+ *
+ * Con pocos puntos (historial recién empezando) los puntos se dibujan más
+ * grandes a propósito -- una línea delgada con 2-5 puntos sueltos, sin nada
+ * que resalte cada dato, se ve pobre/rota; puntos grandes y bien marcados se
+ * leen como "esto es todo el historial que hay todavía", no como un error. */
 export default function TrendChart({ data }: { data: PuntoTendencia[] }) {
+  const pocosPuntos = data.length <= 7;
+  const radioPunto = pocosPuntos ? 5 : 3;
+  const radioPuntoActivo = pocosPuntos ? 7 : 5;
+
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
@@ -51,8 +60,8 @@ export default function TrendChart({ data }: { data: PuntoTendencia[] }) {
           name="Ganancia neta"
           stroke="#465fff"
           strokeWidth={2}
-          dot={{ r: 3, fill: "#465fff", strokeWidth: 0 }}
-          activeDot={{ r: 5 }}
+          dot={{ r: radioPunto, fill: "#465fff", strokeWidth: 0 }}
+          activeDot={{ r: radioPuntoActivo }}
         />
         <Line
           type="monotone"
@@ -60,8 +69,8 @@ export default function TrendChart({ data }: { data: PuntoTendencia[] }) {
           name="Efectivo en caja"
           stroke="#12b76a"
           strokeWidth={2}
-          dot={{ r: 3, fill: "#12b76a", strokeWidth: 0 }}
-          activeDot={{ r: 5 }}
+          dot={{ r: radioPunto, fill: "#12b76a", strokeWidth: 0 }}
+          activeDot={{ r: radioPuntoActivo }}
         />
       </LineChart>
     </ResponsiveContainer>
