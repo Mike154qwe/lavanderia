@@ -10,10 +10,10 @@ import PedidoLink from "@/components/PedidoLink";
 import { calcularCaja, ventanaDeCierre, enVentana } from "@/lib/caja";
 import {
   formatearFecha,
-  guardarPanelRemotoEnFirestore,
   type MovimientoRemoto,
   type PanelRemotoData,
 } from "@/lib/panel-remoto";
+import { guardarPanelRemotoEnFirestore } from "@/lib/panel-remoto-admin";
 
 export const metadata: Metadata = { title: "Gerente" };
 
