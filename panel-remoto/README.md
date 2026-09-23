@@ -4,10 +4,20 @@ Sitio estático (Firebase Hosting) con el dashboard de solo lectura que la
 gerente abre desde su celular, fuera del negocio: KPIs acumulados, tendencia
 de ganancia neta y efectivo en caja por día, e historial de días con cierre
 (clic en un día para ver su detalle -- entradas, salidas, desglose del
-cierre). Es un proyecto **separado** de `lavanderia-local` (la app del
-mostrador, Next.js + PM2, servidor en ejecución): este sitio no tiene
-servidor propio, corre 100% en el navegador y se despliega a Firebase
-Hosting con `next build` (`output: "export"`).
+cierre). Vive en `lavanderia-local/panel-remoto/` -- una carpeta del mismo
+repositorio (importada con `git subtree`, historial preservado desde su
+antiguo repo `panel-remoto-web`, 22-sep-2026), pero es un proyecto Next.js
+**independiente** de la app del mostrador: su propio `package.json`, su
+propio `tsconfig.json` (con su propio alias `@/*`, que resuelve a esta
+carpeta), su propio `node_modules/` y su propio ciclo de despliegue. No
+tiene servidor propio -- corre 100% en el navegador y se despliega a
+Firebase Hosting con `next build` (`output: "export"`), aparte de
+`lavanderia-local`, que se despliega a PM2 (servidor Node en ejecución).
+
+El `tsconfig.json` de `lavanderia-local` excluye explícitamente esta carpeta
+(`"exclude": [..., "panel-remoto"]`) -- sin eso, su `include` sin acotar
+(`**/*.ts`) intentaría tipar este proyecto con el alias `@/*` de
+`lavanderia-local`, que resuelve a rutas equivocadas.
 
 **Estrictamente de solo lectura.** No existe ninguna función de escritura a
 Firestore en este proyecto (ni `setDoc`, ni `addDoc`, nada) -- a propósito,
@@ -20,13 +30,20 @@ Ambos proyectos comparten el mismo proyecto de Firebase
 que escribe `hacerCierreCaja` en `lavanderia-local/app/gerente/page.tsx`),
 pero no comparten código ni ciclo de despliegue.
 
-## Por qué es un proyecto aparte y no una rama
+## Por qué vive en el monorepo pero no se mezcla con la app del mostrador
 
-Una rama tiene sentido cuando el código eventualmente se fusiona de vuelta
-al mismo artefacto desplegable. Aquí nunca pasa eso: `lavanderia-local` se
-despliega a PM2 (servidor Node corriendo); este sitio se despliega a
-Firebase Hosting (archivos estáticos, sin servidor). Son dos ciclos de vida
-de despliegue totalmente distintos.
+Nunca tuvo sentido como rama de `lavanderia-local`: una rama es para código
+que eventualmente se fusiona de vuelta al mismo artefacto desplegable, y
+esto nunca se fusiona con nada -- `lavanderia-local` se despliega a PM2
+(servidor Node corriendo); esto se despliega a Firebase Hosting (archivos
+estáticos, sin servidor). Empezó como repositorio propio, hermano de
+`lavanderia-local` (`panel-remoto-web/`), y se unificó a este repo con
+`git subtree` (22-sep-2026) para tener todo el código del trabajo de grado
+en un solo lugar sin perder el historial -- pero sigue siendo, en la
+práctica, un proyecto Next.js aparte: su propio `package.json`, su propio
+`tsconfig.json`, su propio ciclo de instalar/compilar/desplegar. La única
+diferencia real de estar dentro del monorepo es que su `tsconfig.json`
+raíz debe excluirse del de `lavanderia-local` (ver arriba).
 
 ## Autenticación
 
@@ -76,18 +93,29 @@ incompleta hasta que se decida extender `hacerCierreCaja` para incluirlos.
 
 ## Desarrollo local
 
+Todos los comandos corren **desde esta carpeta** (`lavanderia-local/panel-remoto/`),
+no desde la raíz del repo -- tiene su propio `package.json`/`node_modules`,
+separado del de `lavanderia-local`.
+
 ```bash
+cd lavanderia-local/panel-remoto
 npm install
 npm run dev          # http://localhost:3002 (puerto distinto al de lavanderia-local)
 ```
 
+`.env.local` (config web de Firebase, no secreta) no viaja con `git subtree`
+-- si es una copia nueva del repo, hay que recrearlo a mano (ver
+`lib/firebase.ts` para las variables que necesita).
+
 ## Build y despliegue
 
 ```bash
+cd lavanderia-local/panel-remoto
 npm run build         # genera out/ (exportación estática)
 firebase deploy --only hosting   # publica a https://lavaseco-la-manuelita.web.app
 ```
 
-**No desplegado públicamente todavía** (al momento de crear este archivo):
-verificado en local contra Firebase Auth/Firestore reales antes de publicar
-a la URL pública.
+`firebase.json`/`.firebaserc` son relativos a esta carpeta -- el comando de
+despliegue no cambió, solo desde dónde se ejecuta.
+
+**No desplegado públicamente todavía.**

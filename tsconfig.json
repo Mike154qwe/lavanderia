@@ -47,6 +47,11 @@
   ],
 
   "exclude": [
-    "node_modules"
+    "node_modules",
+    // panel-remoto/ es un proyecto Next.js aparte (Firebase Hosting, no
+    // PM2), con su propio tsconfig.json y su propio alias "@/*" -- sin este
+    // exclude, el include sin acotar de arriba (**/*.ts) lo tipa con el
+    // alias de ESTE proyecto, que resuelve a rutas equivocadas.
+    "panel-remoto"
   ]
 }
