@@ -127,7 +127,6 @@ const ACCESO = {
   "/clientes/nuevo": "gerente",
   "/gerente": "gerente",
   "/gerente/dia/1": "gerente",
-  "/gerente/remoto": "gerente",
   "/inventario": "gerente",
   "/movimientos": "gerente",
   "/movimientos/dia/1": "gerente",

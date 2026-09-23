@@ -47,11 +47,6 @@ const GERENTE_NAV: NavGroup[] = [
         icon: <Icon d={["M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"]} />,
       },
       {
-        label: "Panel remoto",
-        href: "/gerente/remoto",
-        icon: <Icon d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />,
-      },
-      {
         label: "Pedidos",
         href: "/pedidos",
         icon: <Icon d={["M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2", "M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2", "M9 12h6M9 16h4"]} />,
@@ -121,8 +116,6 @@ const INACTIVO_ICONO = "rgba(255,255,255,0.7)";
 function isActive(item: NavItem, pathname: string): boolean {
   if (pathname === item.href) return true;
   if (item.href === "/") return false;
-  // /gerente/remoto tiene su propio ítem; "Panel" no debe quedar activo también.
-  if (item.href === "/gerente" && pathname.startsWith("/gerente/remoto")) return false;
   if (item.href === "/pedidos") return /^\/pedidos\/\d+/.test(pathname);
   if (pathname.startsWith(item.href + "/")) return true;
   return (item.aliases ?? []).some(
