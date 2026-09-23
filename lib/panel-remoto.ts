@@ -1,10 +1,24 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 // Forma de los datos que el panel remoto de la gerente (app/gerente/remoto)
 // espera encontrar en Firestore. Se escribe desde hacerCierreCaja
 // (app/gerente/page.tsx) justo después de cada cierre de caja exitoso:
 // colección "panelRemoto", un documento por día con id "YYYY-MM-DD".
+//
+// Este módulo es SEGURO para el navegador a propósito -- lo importa
+// app/gerente/remoto/PanelRemotoClient.tsx ("use client"). La ESCRITURA
+// (guardarPanelRemotoEnFirestore) vive aparte, en lib/panel-remoto-admin.ts,
+// porque necesita el Admin SDK (paquetes de solo-Node: firebase-admin,
+// @google-cloud/firestore, grpc). Se probó traerla a este mismo archivo con
+// un import dinámico adentro de la función (para no ensuciar el tope del
+// archivo), pero Turbopack igual sigue esa importación para armar el bundle
+// del cliente y el build falla ("the chunking context does not support
+// external modules: node:net") -- un import dinámico sigue siendo parte del
+// grafo de módulos alcanzable desde el cliente, no alcanza con eso. La única
+// forma de que el Admin SDK nunca llegue al navegador es que viva en un
+// archivo que ningún "use client" importe, ni directa ni indirectamente.
+// Ver lib/panel-remoto-admin.ts para la escritura real.
 
 export type MovimientoRemoto = {
   pedidoId: number;
@@ -34,7 +48,7 @@ export type PanelRemotoData = {
   cierre: CierreRemoto | null;
 };
 
-const COLECCION = "panelRemoto";
+export const COLECCION_PANEL_REMOTO = "panelRemoto";
 
 /** Clave usada para guardar/leer la caché offline de un día dado. */
 export function claveCachePanelRemoto(fecha: string): string {
@@ -66,7 +80,7 @@ export function fechaHoy(): string {
  *    fallo de red: el llamador debe caer a leerCacheRemoto().
  */
 export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelRemotoData | null> {
-  const snap = await getDoc(doc(db, COLECCION, fecha));
+  const snap = await getDoc(doc(db, COLECCION_PANEL_REMOTO, fecha));
 
   if (snap.metadata.fromCache) {
     throw new Error(`Datos de ${fecha} vinieron de la caché interna de Firestore, no del servidor`);
@@ -77,9 +91,4 @@ export async function traerPanelRemotoDeFirestore(fecha: string): Promise<PanelR
   }
 
   return snap.data() as PanelRemotoData;
-}
-
-/** Reemplaza el documento del día con los datos dados. Propaga cualquier error de red. */
-export async function guardarPanelRemotoEnFirestore(datos: PanelRemotoData): Promise<void> {
-  await setDoc(doc(db, COLECCION, datos.fecha), datos);
 }
