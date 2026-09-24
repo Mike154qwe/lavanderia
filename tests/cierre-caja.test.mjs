@@ -262,13 +262,15 @@ test("el ticket ya no usa las etiquetas «Total caja» ni «Caja esperada»", as
 // de un cierre anterior ya hecho (que es lo que pasaba cuando createdAt quedaba fijo en
 // T12:00:00 sin importar la hora real de registro).
 test("un gasto registrado por la tarde cae en la ventana del cierre correspondiente, no en la de un cierre anterior", async () => {
-  // Guarda estática: el registro de gastos de /gerente/dia/[fecha] no puede volver a fijar
-  // createdAt a un sello de mediodía. No se puede ejecutar el server action real (el archivo
-  // es .tsx con JSX, que el cargador de estas pruebas no transforma), así que se comprueba
-  // el bloque real de gastoCaja.create en el código fuente: no debe mencionar createdAt.
-  const paginaDia = fs.readFileSync(path.join(RAIZ, "app/gerente/dia/[fecha]/page.tsx"), "utf8");
-  const crea = paginaDia.match(/await prisma\.gastoCaja\.create\(\{[\s\S]*?\}\);/);
-  assert.ok(crea, "no se encontró prisma.gastoCaja.create en /gerente/dia/[fecha]");
+  // Guarda estática: el registro de gastos (hoy, único lugar: gastos-empleado --
+  // /gerente/dia/[fecha] tenía el mismo formulario pero se borró el 23-sep-2026 por
+  // quedar sin ningún enlace en la navegación) no puede volver a fijar createdAt a un
+  // sello de mediodía. No se puede ejecutar el server action real (el archivo es .tsx
+  // con JSX, que el cargador de estas pruebas no transforma), así que se comprueba el
+  // bloque real de gastoCaja.create en el código fuente: no debe mencionar createdAt.
+  const paginaGasto = fs.readFileSync(path.join(RAIZ, "app/(empleado)/gastos-empleado/page.tsx"), "utf8");
+  const crea = paginaGasto.match(/await prisma\.gastoCaja\.create\(\{[\s\S]*?\}\);/);
+  assert.ok(crea, "no se encontró prisma.gastoCaja.create en gastos-empleado");
   assert.ok(!/createdAt/.test(crea[0]), "el gasto no debe fijar createdAt a mano (debe usar la hora real, el default now() del esquema): " + crea[0]);
 
   const hora = (h, m = 0) => new Date(2026, 4, 5, h, m); // 5-may-2026
@@ -309,7 +311,6 @@ test("un gasto registrado por la tarde cae en la ventana del cierre correspondie
 // puede calcular la caja por su cuenta: deben importar lib/caja.ts.
 const VISTAS = [
   "app/gerente/page.tsx",
-  "app/gerente/dia/[fecha]/page.tsx",
   "app/cierres-caja/[id]/ticket/route.ts",
 ];
 
@@ -338,7 +339,6 @@ test("ninguna pantalla de la app dice «Caja esperada»", () => {
 // ── El formulario del empleado pide el medio de pago real ─────────────────────
 const FORMULARIOS_DE_GASTO = [
   ["/gastos-empleado (empleado)", "app/(empleado)/gastos-empleado/page.tsx"],
-  ["/gerente/dia/[fecha] (gerente)", "app/gerente/dia/[fecha]/page.tsx"],
 ];
 
 test("los medios de pago del sistema son los 5 esperados", () => {

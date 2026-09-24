@@ -19,7 +19,6 @@
     "firebase-admin": "^14.4.0",
     "next": "latest",
     "pdf-lib": "^1.17.1",
-    "pdfkit": "^0.18.0",
     "react": "latest",
     "react-dom": "latest",
     "recharts": "^3.8.1",
@@ -27,7 +26,6 @@
   },
   "devDependencies": {
     "@types/node": "latest",
-    "@types/pdfkit": "^0.17.6",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "autoprefixer": "^10.5.0",
