@@ -32,6 +32,13 @@ export type CierreRemoto = {
   totalCaja: number;
   responsable: string | null;
   createdAt: string; // ISO 8601
+  // Opcionales a propósito (23-sep-2026): hacerCierreCaja no los incluía
+  // todavía cuando se migró la escritura al Admin SDK -- ver el commit de
+  // este arreglo. panel-remoto/lib/panel-remoto.ts (proyecto aparte) ya
+  // esperaba estos dos campos desde el backfill del 22-sep; el dashboard
+  // ya sabe mostrar "—" si faltan (documentos viejos, de antes de este fix).
+  gastosEfectivo?: number;
+  efectivoEnCaja?: number;
 };
 
 export type PanelRemotoData = {

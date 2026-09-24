@@ -73,7 +73,7 @@ async function hacerCierreCaja(formData: FormData) {
   // los movimientos, igual que en el ticket, y no se guarda.
   const {
     efectivo, nequi, daviplata, transferencia, tarjeta, totalGastos,
-    gananciaNeta: totalCaja,
+    gananciaNeta: totalCaja, gastosEfectivo, efectivoEnCaja,
   } = calcularCaja(pagos, gastos);
 
   const cierre = await prisma.cierreCaja.create({
@@ -126,6 +126,8 @@ async function hacerCierreCaja(formData: FormData) {
         tarjeta,
         gastos: totalGastos,
         totalCaja,
+        gastosEfectivo,
+        efectivoEnCaja,
         responsable: cierre.responsable,
         createdAt: cierre.createdAt.toISOString(),
       },
