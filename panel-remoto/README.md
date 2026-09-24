@@ -27,8 +27,10 @@ lectura, de la de `lavanderia-local`.
 
 Ambos proyectos comparten el mismo proyecto de Firebase
 (`lavaseco-la-manuelita`) y la misma colección de Firestore (`panelRemoto`,
-que escribe `hacerCierreCaja` en `lavanderia-local/app/gerente/page.tsx`),
-pero no comparten código ni ciclo de despliegue.
+que escribe `hacerCierreCaja` en `lavanderia-local/app/gerente/page.tsx`,
+vía `lavanderia-local/lib/panel-remoto-admin.ts` desde el 23-sep-2026 --
+Admin SDK, no el SDK web; ver "Reglas de Firestore" más abajo), pero no
+comparten código ni ciclo de despliegue.
 
 ## Por qué vive en el monorepo pero no se mezcla con la app del mostrador
 
@@ -66,10 +68,17 @@ posiblemente con verificación en dos pasos) y rotar o revocar esta.
 `panelRemoto` pasa de completamente cerrado (`allow read, write: if false`,
 cierre de emergencia de RNF04 documentado en `lavanderia-local/lib/
 empleado-auth.ts`) a **lectura permitida solo para usuarios autenticados**
-con Firebase Auth. Todo lo demás -- incluida `respaldosDb`, que tiene la
-base completa comprimida -- sigue cerrado del todo. El archivo de reglas
-vive en `lavanderia-local/firestore.rules` (un solo juego de reglas por
-proyecto de Firebase, gobierna ambos sitios).
+con Firebase Auth (este sitio) y **escritura solo desde la cuenta de
+servicio del Admin SDK** (`allow write: if false` para cualquier otro --
+ver `lavanderia-local/lib/panel-remoto-admin.ts`). Todo lo demás -- incluida
+`respaldosDb`, que tiene la base completa comprimida -- sigue cerrado del
+todo. El archivo de reglas vive en `lavanderia-local/firestore.rules` (un
+solo juego de reglas por proyecto de Firebase, gobierna ambos sitios).
+
+La cuenta de servicio del Admin SDK (JSON, fuera de git) vive un nivel
+arriba de `lavanderia-local/`, en `firebase/` -- ver el README de la raíz
+del proyecto (`lavanderia-local/README.md`) para la tabla completa de
+dónde vive cada credencial.
 
 ## Historial y backfill (22-sep-2026)
 
@@ -81,15 +90,19 @@ documento por día**, no por cierre -- un día con varios cierres solo guarda
 los números del **último** cierre de ese día, más las entradas/salidas del
 día completo.
 
-**Aviso pendiente:** el backfill escribe dos campos nuevos por día,
+**Resuelto (23-sep-2026):** el backfill ya escribía dos campos por día,
 `gastosEfectivo` y `efectivoEnCaja` (`CierreRemoto` en `lib/panel-remoto.ts`,
-opcionales), necesarios para la tendencia de "efectivo en caja". `
-hacerCierreCaja` (en `lavanderia-local`, sin tocar en esta tarea) **todavía
-no escribe esos dos campos** -- un cierre nuevo en vivo, el día que la
-escritura a Firestore deje de estar bloqueada por las reglas, va a producir
-un documento sin `efectivoEnCaja`. El dashboard ya maneja ese caso
-(`efectivoEnCaja !== undefined`), pero la tendencia de ese día quedaría
-incompleta hasta que se decida extender `hacerCierreCaja` para incluirlos.
+opcionales -- documentos viejos pueden no tenerlos), necesarios para la
+tendencia de "efectivo en caja", pero `hacerCierreCaja`
+(`lavanderia-local/app/gerente/page.tsx`) no los incluía todavía cuando se
+migró la escritura al Admin SDK. Quedó pendiente un momento real: el primer
+cierre en vivo tras desbloquear la escritura sí habría llegado sin
+`efectivoEnCaja`. Se corrigió el mismo día -- `hacerCierreCaja` ya pasa
+ambos campos, verificado con un cierre de prueba real (documento en
+Firestore con los dos campos, y el hero de este dashboard mostrando el
+número en vez de "--"). El dashboard sigue manejando el caso de documentos
+viejos sin el campo (`efectivoEnCaja !== undefined`), pero ya no es el
+camino esperado para cierres nuevos.
 
 ## Desarrollo local
 
@@ -118,4 +131,4 @@ firebase deploy --only hosting   # publica a https://lavaseco-la-manuelita.web.a
 `firebase.json`/`.firebaserc` son relativos a esta carpeta -- el comando de
 despliegue no cambió, solo desde dónde se ejecuta.
 
-**No desplegado públicamente todavía.**
+**En producción desde el 23-sep-2026:** `https://lavaseco-la-manuelita.web.app`.
