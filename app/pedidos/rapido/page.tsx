@@ -95,6 +95,14 @@ export default async function PedidoRapidoPage({
   searchParams: Promise<{ error?: string; nombre?: string; telefono?: string }>;
 }) {
   const { error, nombre, telefono } = await searchParams;
+
+  // RF02: mismo tarifario que /pedidos/nuevo (NuevoPedidoForm.tsx), para que
+  // el mostrador también pueda autocompletar el valor de la prenda desde
+  // categoría + ítem, en vez de escribirlo siempre a mano.
+  const tarifario = await prisma.tarifario.findMany({
+    orderBy: [{ categoria: "asc" }, { item: "asc" }],
+  });
+
   return (
     <>
       <FlashMessage message={error} type="error" />
@@ -102,6 +110,12 @@ export default async function PedidoRapidoPage({
         guardarPedidoRapidoAction={guardarPedidoRapidoAction}
         initialNombre={nombre}
         initialTelefono={telefono}
+        tarifario={tarifario.map((t) => ({
+          categoria: t.categoria,
+          item: t.item,
+          precioMin: t.precioMin,
+          precioMax: t.precioMax,
+        }))}
       />
     </>
   );
