@@ -39,6 +39,26 @@ const NOVEDADES = [
 const CANT_RAPIDAS = [1, 2, 3, 5, 10, 15, 20, 30];
 const VALORES_RAPIDOS = [5000, 8000, 10000, 15000, 20000, 25000, 30000];
 
+// RF02 -- mismo tipo y misma lógica que app/pedidos/nuevo/NuevoPedidoForm.tsx:
+// categoría + ítem del tarifario autocompletan el valor, pero el campo de
+// abajo sigue siendo un número normal y editable (nunca queda "bloqueado" en
+// el precio sugerido).
+type TarifaItem = {
+  categoria: string;
+  item: string;
+  precioMin: number;
+  precioMax: number | null;
+};
+
+function formatoPrecioTarifa(t: TarifaItem) {
+  const f = (n: number) => `$${n.toLocaleString("es-CO")}`;
+  return t.precioMax != null ? `${f(t.precioMin)} – ${f(t.precioMax)}` : f(t.precioMin);
+}
+
+function precioSugeridoTarifa(t: TarifaItem) {
+  return t.precioMax != null ? Math.round((t.precioMin + t.precioMax) / 2) : t.precioMin;
+}
+
 const SERVICIO_COLORS: Record<string, string> = {
   blue:   "border-blue-400 bg-blue-500 text-white",
   orange: "border-orange-400 bg-orange-500 text-white",
@@ -79,10 +99,12 @@ export default function PedidoRapidoForm({
   guardarPedidoRapidoAction,
   initialNombre = "",
   initialTelefono = "",
+  tarifario,
 }: {
   guardarPedidoRapidoAction: (formData: FormData) => void;
   initialNombre?: string;
   initialTelefono?: string;
+  tarifario: TarifaItem[];
 }) {
   const clientePreCargado = !!initialNombre && !!initialTelefono;
   const [paso, setPaso] = useState(clientePreCargado ? 2 : 1);
@@ -97,6 +119,12 @@ export default function PedidoRapidoForm({
   const [novedades, setNovedades] = useState<string[]>([]);
   const [notaExtra, setNotaExtra] = useState("");
   const [showNovedades, setShowNovedades] = useState(false);
+
+  // RF02 -- selección de categoría/ítem del tarifario, solo para sugerir el
+  // valor de abajo. No se envía al servidor: lo único que viaja en el form
+  // es "valor" (el número que quede en el input, editado o no).
+  const [categoriaTarifario, setCategoriaTarifario] = useState("");
+  const [itemTarifario, setItemTarifario]           = useState("");
 
   const [items, setItems]   = useState<ItemPedido[]>([]);
   const [abono, setAbono]   = useState(0);
@@ -125,6 +153,26 @@ export default function PedidoRapidoForm({
 
   const valorTotal = cantidad * valor;
 
+  // RF02 -- categorías disponibles y, una vez elegida una, sus ítems (con el
+  // mismo criterio de precioSugerido que NuevoPedidoForm: el punto medio del
+  // rango, o el precio fijo si no hay rango).
+  const categoriasTarifario = useMemo(
+    () => Array.from(new Set(tarifario.map((t) => t.categoria))).sort((a, b) => a.localeCompare(b, "es")),
+    [tarifario],
+  );
+  const itemsDeLaCategoria = tarifario.filter((t) => t.categoria === categoriaTarifario);
+
+  function elegirCategoriaTarifario(categoria: string) {
+    setCategoriaTarifario(categoria);
+    setItemTarifario("");
+  }
+
+  function elegirItemTarifario(itemNombre: string) {
+    setItemTarifario(itemNombre);
+    const tarifa = tarifario.find((t) => t.categoria === categoriaTarifario && t.item === itemNombre);
+    if (tarifa) setValor(precioSugeridoTarifa(tarifa));
+  }
+
   function agregarItem() {
     if (!puedeAgregar) return;
     setItems((prev) => [
@@ -144,6 +192,8 @@ export default function PedidoRapidoForm({
     setNovedades([]);
     setNotaExtra("");
     setShowNovedades(false);
+    setCategoriaTarifario("");
+    setItemTarifario("");
   }
 
   function eliminarItem(id: number) {
@@ -492,6 +542,31 @@ export default function PedidoRapidoForm({
                       )}
                     </div>
                     <div className="p-4">
+                      {/* RF02 -- tarifario: opcional, solo sugiere el valor de abajo */}
+                      <div className="mb-3 grid grid-cols-2 gap-1.5">
+                        <select
+                          value={categoriaTarifario}
+                          onChange={(e) => elegirCategoriaTarifario(e.target.value)}
+                          className="min-h-11 rounded-lg border-2 border-gray-200 px-2 text-xs font-bold text-gray-700 focus:border-brand-500 focus:outline-none"
+                        >
+                          <option value="">Tarifario: categoría…</option>
+                          {categoriasTarifario.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={itemTarifario}
+                          onChange={(e) => elegirItemTarifario(e.target.value)}
+                          disabled={!categoriaTarifario}
+                          className="min-h-11 rounded-lg border-2 border-gray-200 px-2 text-xs font-bold text-gray-700 focus:border-brand-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-300"
+                        >
+                          <option value="">{categoriaTarifario ? "Ítem…" : "Elige categoría primero"}</option>
+                          {itemsDeLaCategoria.map((t) => (
+                            <option key={t.item} value={t.item}>{t.item} — {formatoPrecioTarifa(t)}</option>
+                          ))}
+                        </select>
+                      </div>
+
                       <div className="mb-3 grid grid-cols-4 gap-1.5">
                         {VALORES_RAPIDOS.map((v) => (
                           <button
