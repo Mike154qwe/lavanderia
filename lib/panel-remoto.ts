@@ -1,5 +1,5 @@
 // Forma de los datos que sincroniza el panel remoto de la gerente
-// (panel-remoto-web, proyecto aparte desplegado en Firebase Hosting -- ver
+// (panel-remoto/, proyecto aparte desplegado en Firebase Hosting -- ver
 // su README). Se escribe desde hacerCierreCaja (app/gerente/page.tsx) justo
 // después de cada cierre de caja exitoso, vía lib/panel-remoto-admin.ts:
 // colección "panelRemoto", un documento por día con id "YYYY-MM-DD".
@@ -10,7 +10,7 @@
 // el 23-sep-2026 junto con app/gerente/remoto/: esa página nunca tuvo login
 // propio, así que quedó rota sin arreglo simple en cuanto firestore.rules
 // empezó a exigir autenticación para leer "panelRemoto" (21-sep-2026). El
-// acceso remoto real de la gerente vive en panel-remoto-web, que sí
+// acceso remoto real de la gerente vive en panel-remoto/, que sí
 // autentica con Firebase Auth.
 
 export type MovimientoRemoto = {

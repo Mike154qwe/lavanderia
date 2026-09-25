@@ -5,15 +5,20 @@ import { COLECCION_PANEL_REMOTO } from "@/lib/panel-remoto";
 
 // Escritura de panelRemoto vía Admin SDK (cuenta de servicio) -- APARTE de
 // lib/panel-remoto.ts a propósito, no por gusto de organización: ese otro
-// archivo lo importa app/gerente/remoto/PanelRemotoClient.tsx ("use client"),
-// y firebase-admin arrastra paquetes de solo-Node (@google-cloud/firestore,
-// grpc) que rompen el build del navegador en cuanto son alcanzables desde un
-// componente cliente -- ni siquiera un import dinámico adentro de una
-// función alcanza, porque Turbopack igual lo sigue para armar el bundle
-// (mensaje real visto: "the chunking context does not support external
-// modules: node:net"). Este archivo SOLO lo importa hacerCierreCaja
-// (app/gerente/page.tsx, "use server"), así que nunca es parte del grafo
-// del cliente.
+// archivo solo tiene tipos y helpers sin Firestore, pensado para poder
+// importarse también desde un componente cliente -- de hecho llegó a
+// importarlo app/gerente/remoto/PanelRemotoClient.tsx ("use client"), borrado
+// el 23-sep-2026 junto con esa página (ver lib/panel-remoto.ts). El
+// problema de fondo: firebase-admin arrastra paquetes de solo-Node
+// (@google-cloud/firestore, grpc) que rompen el build del navegador en
+// cuanto son alcanzables desde un componente cliente -- ni siquiera un
+// import dinámico adentro de una función alcanza, porque Turbopack igual lo
+// sigue para armar el bundle (mensaje real visto: "the chunking context
+// does not support external modules: node:net"). Hoy este archivo SOLO lo
+// importa hacerCierreCaja (app/gerente/page.tsx, "use server") -- ningún
+// componente cliente de este proyecto llega a este código, pero la
+// separación se deja así por si lib/panel-remoto.ts vuelve a importarse
+// desde uno.
 //
 // Por qué el Admin SDK y no el SDK web: firestore.rules exige
 // `allow write: if false` para panelRemoto desde el cierre de emergencia del

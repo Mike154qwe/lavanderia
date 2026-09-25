@@ -2,7 +2,7 @@ rules_version = '2';
 
 // Reglas de Firestore del proyecto lavaseco-la-manuelita -- gobiernan TODO lo
 // que hay en Firestore, para los dos sitios que lo usan: lavanderia-local
-// (app del mostrador, PM2) y panel-remoto-web (Firebase Hosting).
+// (app del mostrador, PM2) y panel-remoto/ (Firebase Hosting).
 //
 // Historia: el 21-sep-2026 se encontró que las reglas estaban en modo de
 // prueba -- cualquiera con la clave pública del cliente podía leer y BORRAR
@@ -14,9 +14,9 @@ rules_version = '2';
 //
 // Este cambio (22-sep-2026) abre UNA sola excepción, angosta a propósito:
 // lectura de "panelRemoto" para cualquier usuario que haya iniciado sesión
-// con Firebase Auth (panel-remoto-web/components/AuthGate.tsx). Hoy esa
+// con Firebase Auth (panel-remoto/components/AuthGate.tsx). Hoy esa
 // cuenta es una sola (lvmanuelita@gmail.com, cuenta del prototipo académico
-// -- ver panel-remoto-web/README.md), así que "cualquier usuario autenticado"
+// -- ver panel-remoto/README.md), así que "cualquier usuario autenticado"
 // equivale en la práctica a "la gerente", pero la regla en sí no depende de
 // cuántas cuentas existan hoy.
 //

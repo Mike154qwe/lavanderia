@@ -51,7 +51,7 @@ import { cookies } from "next/headers";
 //     autenticación real. No es una garantía permanente: es una decisión de
 //     alcance para esta versión.
 //   - Actualización 22-sep-2026: el acceso remoto real de la gerente ya existe,
-//     pero vive APARTE de este sistema local -- panel-remoto-web/ (proyecto
+//     pero vive APARTE de este sistema local -- panel-remoto/ (proyecto
 //     separado, desplegado a Firebase Hosting, no a PM2). Ese sitio exige
 //     Firebase Auth (correo + contraseña) antes de mostrar cualquier dato;
 //     firestore.rules deja de cerrar "panelRemoto" por completo y permite su
