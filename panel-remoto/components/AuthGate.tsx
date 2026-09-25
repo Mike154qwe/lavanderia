@@ -16,7 +16,7 @@ import { auth } from "@/lib/firebase";
 // justo al cargar la página) NO se muestra nada del panel -- ni siquiera el
 // formulario de login "vacío" sobre un fondo con datos. Sin sesión válida,
 // solo se renderiza el formulario: cero datos, ni el estado gris/ámbar de
-// PanelRemotoClient, que ni se monta.
+// Dashboard (children, ver app/page.tsx), que ni se monta.
 export default function AuthGate({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<User | null | undefined>(undefined);
   const [email, setEmail] = useState("");
