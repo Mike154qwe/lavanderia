@@ -1,8 +1,31 @@
 # Cierre de caja: «caja negativa» — diagnóstico y resolución
 
+> **ARCHIVADO — diagnóstico histórico (24-sep-2026).** Este documento describe la
+> investigación y la decisión de negocio del 21-sep-2026 que llevó al modelo de dos números
+> (`lib/caja.ts`); el bug que describe **ya está resuelto y en `main`** desde entonces, no es
+> un problema abierto. Se conserva tal cual se escribió, como registro de la investigación,
+> **no** como descripción del estado actual del sistema. Dos cosas cambiaron después de
+> escrito y ya no son ciertas hoy, aunque el texto de abajo las siga mencionando:
+> - **`/gerente/dia/[fecha]`** (mencionada varias veces abajo, incluida toda la sección
+>   "Gastos registrados por el gerente") **se borró el 23-sep-2026** por quedar sin ningún
+>   enlace en la navegación (limpieza de código muerto, commit `38b1c18`). El registro de
+>   gastos del gerente sigue existiendo, ahora solo por `/gastos-empleado` (accesible también
+>   con sesión de gerente); el detalle financiero de un día específico se ve hoy en
+>   `/gerente?fecha=AAAA-MM-DD`.
+> - **`/gerente/remoto`** (mencionada en el punto 6 de "Lo que no resuelve") **también se
+>   borró el 23-sep-2026** — nunca tuvo login propio y quedó rota sin arreglo simple cuando
+>   `firestore.rules` empezó a exigir autenticación. El panel remoto real de la gerente vive
+>   en `panel-remoto/` (proyecto aparte, Firebase Hosting, con Firebase Auth), y ya muestra
+>   "Ganancia neta" y "Efectivo en caja" como números separados, no "Total caja".
+>
+> El resto del documento (la fórmula, la decisión de los dos números, los cuatro escenarios,
+> `lib/caja.ts` como única fuente de verdad) sigue vigente y es la explicación de por qué el
+> sistema calcula la caja como lo hace hoy.
+
 **Estado:** resuelto en código por la **separación de métricas** decidida con el negocio el
-21-sep-2026. **Sin publicar ni desplegar** (rama `fix/cierre-caja-negativo`, solo local).
-**Pruebas:** `npm run test:caja` (39) y `npm run test:rnf04` (32).
+21-sep-2026, fusionado a `main` ese mismo rango de días y en producción desde entonces.
+**Pruebas:** `npm run test:caja` (38 al 24-sep-2026; el número cambia con el tiempo, ver el
+conteo real corriendo el comando) y `npm run test:rnf04` (32).
 
 ## Qué pasaba
 
@@ -108,8 +131,11 @@ los dos formularios.
    (los otros 12 cierres coinciden exactamente). La base no se modificó.
 5. ~~`money()` imprimía los negativos como `$-182.500`.~~ **Resuelto:** ahora `-$182.500`
    (`lib/format.ts`). `/gerente/dia/[fecha]` formateaba a mano y ahora usa `money()`.
-6. **El panel remoto** (`/gerente/remoto`, hoy sin datos por Firestore cerrado) sigue
-   diciendo «Total caja» y recibe la ganancia neta. No se tocó.
+6. ~~**El panel remoto** (`/gerente/remoto`, hoy sin datos por Firestore cerrado) sigue
+   diciendo «Total caja» y recibe la ganancia neta. No se tocó.~~ **Superado:**
+   `/gerente/remoto` se borró el 23-sep-2026 (ver la nota de archivo al inicio). El panel
+   remoto real, en `panel-remoto/`, ya recibe y muestra "Ganancia neta" y "Efectivo en caja"
+   como números separados (migración de la escritura al Admin SDK, 23-sep-2026).
 
 ## Cambio de comportamiento a tener en cuenta
 
@@ -121,7 +147,7 @@ valor cambiaba con el buscador. Ahora usa los pagos del día por su fecha, igual
 ## Cómo ejecutar
 
 ```bash
-npm run test:caja                      # 39 pruebas: unitarias, ticket real y estáticas
+npm run test:caja                      # unitarias, ticket real y estáticas (38 al 24-sep-2026)
 KEEP_QA_DB=1 npm run test:caja         # conserva la BD temporal (responsable «Prueba QA - bug caja»)
 DATABASE_URL=file:<ruta> npx next dev -p 3001   # ver los datos en la interfaz
 ```
@@ -129,8 +155,11 @@ DATABASE_URL=file:<ruta> npx next dev -p 3001   # ver los datos en la interfaz
 Con la app apuntada a una base de prueba, no pulsar «Hacer cierre»: escribiría en Firestore.
 Las pruebas usan una base SQLite temporal con las migraciones reales y nunca `prisma/dev.db`.
 
-## Sobre el script de `origin/fix/cierre-caja-negativo`
+## Sobre el script de reproducción (histórico)
 
-`scripts/repro-cierre-caja-negativo.js` reimplementa la fórmula dentro del propio script, así
-que prueba su copia y no el código de la app; su caso (ingreso Nequi $100 y gasto en efectivo
-$150 → caja física −$150) corresponde a «efectivo en caja» y está cubierto aquí.
+Existió un script (`scripts/repro-cierre-caja-negativo.js`, en la rama de trabajo
+`fix/cierre-caja-negativo`, ninguno de los dos vive ya en el repo) que reimplementaba la
+fórmula dentro de sí mismo, así que probaba su propia copia y no el código de la app; su caso
+(ingreso Nequi $100 y gasto en efectivo $150 → caja física −$150) corresponde a «efectivo en
+caja» y quedó cubierto por los escenarios de esta página y por `tests/cierre-caja.test.mjs`,
+que sí ejercitan el código real.
