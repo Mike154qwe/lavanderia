@@ -179,7 +179,9 @@ export default async function GastosEmpleadoPage({
             </div>
           ) : (
             <div className="empty-state rounded-[var(--radius-well)] border border-dashed border-[color:var(--border-1)]">
-              <p className="text-3xl">💸</p>
+              <span className="mx-auto figure-well h-12 w-12">
+                <Wallet size={22} strokeWidth={1.75} aria-hidden="true" />
+              </span>
               <p className="empty-state__title">No hay gastos registrados hoy.</p>
             </div>
           )}

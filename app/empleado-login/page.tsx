@@ -30,7 +30,7 @@ export default function EmpleadoLoginPage() {
 
         <form action={empleadoLoginAction} className="animate-fade-up-2 mt-10 w-full">
           <button
-            className="flex min-h-16 w-full items-center justify-center gap-2.5 rounded-[var(--radius-card)] py-5 text-xl font-bold text-white transition active:scale-[0.98]"
+            className="flex min-h-[4.75rem] w-full items-center justify-center gap-2.5 rounded-[var(--radius-card)] py-6 text-2xl font-bold text-white transition active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, #465fff 0%, #3641f5 100%)",
               boxShadow: "0 8px 28px rgba(70,95,255,0.4), 0 0 0 1px rgba(255,255,255,0.08)",
