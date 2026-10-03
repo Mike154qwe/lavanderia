@@ -16,7 +16,7 @@ export default async function EmpleadoPage() {
   ]);
 
   return (
-    <div className="page-frame space-y-6">
+    <div className="page-frame">
       <div>
         <p className="page-kicker text-teal-600 dark:text-teal-400">
           Mostrador

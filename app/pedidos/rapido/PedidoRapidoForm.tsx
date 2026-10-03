@@ -209,7 +209,7 @@ export default function PedidoRapidoForm({
 
   return (
     <main className="empleado-workspace min-h-full">
-      <div className="mx-auto max-w-7xl px-4 py-5 lg:px-6">
+      <div className="page-frame page-frame--wide">
         <form action={guardarPedidoRapidoAction}>
           {/* Hidden fields */}
           <input type="hidden" name="nombre"   value={nombre} />

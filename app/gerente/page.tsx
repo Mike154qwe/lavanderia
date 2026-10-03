@@ -251,7 +251,7 @@ export default async function GerentePage({
   const esHoy = sameDay(fechaSeleccionada, hoy);
 
   return (
-    <div className="page-frame page-frame--wide space-y-5">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Nivel 1 · Título, día y KPIs (una sola tarjeta) ── */}
       <div className="card overflow-hidden">
@@ -356,11 +356,9 @@ export default async function GerentePage({
       </div>
 
       {/* ── Nivel 2 · Detalle del día ─────────────────────── */}
-      <p className="page-kicker px-1 pt-2">Detalle del día</p>
-
-      {/* ── Facturación del día ───────────────────────────── */}
       <div className="card p-5">
-        <h2 className="mb-5 text-lg font-bold text-gray-900">Facturación del día</h2>
+        <p className="page-kicker">Detalle del día</p>
+        <h2 className="mb-5 mt-1 text-lg font-bold text-gray-900">Facturación del día</h2>
         <div className="grid gap-5 xl:grid-cols-2">
           <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
           <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />

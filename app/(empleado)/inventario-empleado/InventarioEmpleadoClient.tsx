@@ -97,7 +97,7 @@ export default function InventarioEmpleadoClient({
       </EmpleadoHero>
 
       {!q && !pedido && (
-        <div className="card mt-4 px-4 py-3 sm:px-5">
+        <div className="card px-4 py-3 sm:px-5">
           <ol className="grid gap-3 sm:grid-cols-3">
             <HintStep n="1" title="Escribe el recibo" desc="El número de 5 dígitos, el nombre o el teléfono." />
             <HintStep n="2" title="Cobra si hay saldo" desc="Si debe, registra el pago antes de entregar." />
@@ -108,7 +108,7 @@ export default function InventarioEmpleadoClient({
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && pedidos.length === 0 && (
-        <div className="card empty-state mt-4">
+        <div className="card empty-state">
           <p className="text-3xl">🔍</p>
           <p className="empty-state__title">
             No se encontró ningún pedido activo para "<span className="text-[color:var(--text-1)]">{q}</span>".
@@ -119,7 +119,7 @@ export default function InventarioEmpleadoClient({
 
       {/* ── Lista de resultados ──────────────────────────── */}
       {!pedido && pedidos.length > 1 && (
-        <div className="card mt-4 p-5">
+        <div className="card p-5">
           <h2 className="mb-4 font-bold text-gray-900">
             {pedidos.length} resultados — selecciona el pedido
           </h2>
@@ -156,7 +156,7 @@ export default function InventarioEmpleadoClient({
 
       {/* ── Detalle del pedido activo ─────────────────────── */}
       {pedido && (
-        <div className="mt-4 space-y-4">
+        <div className="space-y-4">
 
           {/* Cabecera */}
           <div className="card overflow-hidden">

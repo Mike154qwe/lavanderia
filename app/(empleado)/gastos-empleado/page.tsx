@@ -71,7 +71,7 @@ export default async function GastosEmpleadoPage({
         links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
       />
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
 
         {/* ── Formulario ───────────────────────────────────── */}
         <form action={registrarGastoEmpleado} className="card p-5">
