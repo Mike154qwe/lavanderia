@@ -8,16 +8,11 @@ import { EmptyState } from "@/components/EmptyState";
 import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
+import { PrendaIcon } from "@/components/PrendaIcon";
 
 export const metadata: Metadata = { title: "Inventario" };
 
 const PAGE_SIZE = 20;
-
-const PRENDA_EMOJI: Record<string, string> = {
-  Camisa: "👔", Pantalón: "👖", Chaqueta: "🧥", Cubrelecho: "🛏️",
-  Tenis: "👟", Traje: "🤵", Vestido: "👗", Cobija: "🧺", Tapete: "🟫",
-};
-function pEmoji(tipo: string) { return PRENDA_EMOJI[tipo] ?? "👕"; }
 
 function diasDesde(fecha: Date) {
   return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
@@ -558,7 +553,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                   }`}
                 >
                   <div className="flex items-center gap-3 px-4 py-3">
-                    <span className="text-xl leading-none">{pEmoji(prenda.tipo)}</span>
+                    <PrendaIcon tipo={prenda.tipo} size={20} className="shrink-0 text-gray-600 dark:text-gray-300" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-bold text-sm text-gray-900 truncate">

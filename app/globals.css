@@ -7,6 +7,8 @@
 ============================ */
 
 :root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --brand-50:  #eef2ff;
   --brand-100: #e0e7ff;
   --brand-500: #465fff;
@@ -234,16 +236,24 @@ input:focus, select:focus, textarea:focus {
    ANIMATIONS
 ============================ */
 
-@keyframes bubble-rise {
-  0%   { transform: translateY(0) scale(1);   opacity: 0; }
-  8%   { opacity: 0.7; }
-  92%  { opacity: 0.25; }
-  100% { transform: translateY(-110vh) scale(1.15); opacity: 0; }
+@keyframes bubble-float {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+  10%  { opacity: 0.55; }
+  28%  { transform: translate3d(12px, -30vh, 0) scale(1.04); }
+  52%  { transform: translate3d(-10px, -58vh, 0) scale(1.08); }
+  76%  { transform: translate3d(14px, -84vh, 0) scale(1.1); }
+  90%  { opacity: 0.18; }
+  100% { transform: translate3d(4px, -112vh, 0) scale(1.12); opacity: 0; }
 }
 
-@keyframes bubble-sway {
-  0%, 100% { margin-left: 0; }
-  50%       { margin-left: 18px; }
+@keyframes wave-shift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes foam-bob {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.35; }
+  50%      { transform: translate3d(0, -7px, 0) scale(1.08); opacity: 0.6; }
 }
 
 @keyframes spin-slow {
@@ -265,17 +275,77 @@ input:focus, select:focus, textarea:focus {
 .animate-fade-up-2{ animation: fade-up 0.5s 0.1s ease both; }
 .animate-fade-up-3{ animation: fade-up 0.5s 0.2s ease both; }
 
-/* Burbuja de jabón */
+/* Burbuja de jabón (solo login: loop permitido) */
 .soap-bubble {
   position: absolute;
   border-radius: 50%;
   background: radial-gradient(circle at 32% 28%,
-    rgba(255,255,255,0.22) 0%,
-    rgba(255,255,255,0.04) 60%,
+    rgba(255,255,255,0.28) 0%,
+    rgba(255,255,255,0.06) 58%,
     transparent 100%);
-  border: 1px solid rgba(255,255,255,0.14);
-  animation: bubble-rise var(--dur,10s) var(--delay,0s) ease-in infinite,
-             bubble-sway calc(var(--dur,10s) * 0.6) var(--delay,0s) ease-in-out infinite;
+  border: 1px solid rgba(255,255,255,0.16);
+  animation: bubble-float var(--dur, 10s) var(--delay, 0s) linear infinite;
+  pointer-events: none;
+}
+
+.laundry-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.laundry-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 48%, rgba(70, 95, 255, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 48% 42% at 84% 28%, rgba(14, 165, 164, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 36% at 78% 78%, rgba(191, 13, 89, 0.06) 0%, transparent 70%);
+}
+
+.laundry-wave-wrap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  width: 200%;
+  will-change: transform;
+}
+
+.laundry-wave-svg {
+  display: block;
+  width: 50%;
+  height: 100%;
+}
+
+.laundry-wave-a {
+  height: 42%;
+  animation: wave-shift 22s linear infinite;
+}
+
+.laundry-wave-b {
+  height: 34%;
+  opacity: 0.9;
+  animation: wave-shift 34s linear infinite reverse;
+}
+
+.laundry-wave-c {
+  height: 22%;
+  animation: wave-shift 16s linear infinite;
+}
+
+.laundry-foam {
+  position: absolute;
+  bottom: 18%;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.12) 70%,
+    transparent 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: foam-bob 3.6s var(--ease-in-out) infinite;
   pointer-events: none;
 }
 
@@ -297,6 +367,81 @@ input:focus, select:focus, textarea:focus {
 
 .shadow-soft {
   box-shadow: 0 4px 20px rgba(16, 24, 40, 0.08), 0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+/* Navegación por módulos: movimiento solo en hover (nunca loop) */
+.card-nav {
+  transition:
+    transform 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    border-color 180ms var(--ease-out);
+}
+
+.card-nav:active {
+  transform: scale(0.995);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-nav:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+      0 10px 28px rgba(16, 24, 40, 0.12),
+      0 4px 10px rgba(16, 24, 40, 0.06);
+  }
+  .dark .card-nav:hover {
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.35),
+      0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.icon-motion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+  transition: transform 180ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .icon-motion,
+  a:hover .icon-motion,
+  button:hover .icon-motion {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soap-bubble,
+  .laundry-wave-wrap,
+  .laundry-foam,
+  .animate-fade-up,
+  .animate-fade-up-2,
+  .animate-fade-up-3 {
+    animation: none !important;
+  }
+  .soap-bubble {
+    opacity: 0.28;
+    transform: none;
+  }
+  .laundry-wave-wrap {
+    transform: none;
+    width: 100%;
+  }
+  .laundry-wave-svg:last-child {
+    display: none;
+  }
+  .card-nav,
+  .icon-motion {
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .card-nav:hover,
+  .card-nav:active,
+  .group:hover .icon-motion,
+  a:hover .icon-motion,
+  button:hover .icon-motion {
+    transform: none;
+  }
 }
 
 /* ============================

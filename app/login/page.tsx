@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
+import LaundryBackdrop from "@/components/login/LaundryBackdrop";
 import { loginAction } from "./actions";
 
 export const metadata: Metadata = { title: "Acceso gerente" };
-
-const BUBBLES = [
-  { size: 28,  left: "8%",  delay: "0s",   dur: "9s"  },
-  { size: 48,  left: "18%", delay: "1.5s", dur: "13s" },
-  { size: 20,  left: "32%", delay: "3s",   dur: "8s"  },
-  { size: 64,  left: "48%", delay: "0.8s", dur: "15s" },
-  { size: 36,  left: "62%", delay: "2.2s", dur: "11s" },
-  { size: 22,  left: "75%", delay: "4s",   dur: "9s"  },
-  { size: 52,  left: "88%", delay: "1s",   dur: "14s" },
-  { size: 18,  left: "55%", delay: "5s",   dur: "7s"  },
-];
 
 export default async function LoginPage({
   searchParams,
@@ -27,31 +17,7 @@ export default async function LoginPage({
       className="relative flex min-h-screen items-center justify-center overflow-hidden p-4"
       style={{ background: "linear-gradient(135deg, #060b14 0%, #0d1525 60%, #060b14 100%)" }}
     >
-      {/* Burbujas de jabón flotantes */}
-      {BUBBLES.map((b, i) => (
-        <span
-          key={i}
-          className="soap-bubble"
-          style={{
-            width:  b.size,
-            height: b.size,
-            left:   b.left,
-            bottom: "-10%",
-            ["--delay" as any]: b.delay,
-            ["--dur"   as any]: b.dur,
-          }}
-        />
-      ))}
-
-      {/* Luz ambiental de fondo */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 20% 50%, rgba(70,95,255,0.08) 0%, transparent 70%), " +
-            "radial-gradient(ellipse 40% 40% at 80% 30%, rgba(191,13,89,0.06) 0%, transparent 70%)",
-        }}
-      />
+      <LaundryBackdrop />
 
       {/* Tarjeta principal */}
       <div className="relative z-10 flex w-full max-w-5xl overflow-hidden rounded-3xl shadow-2xl"

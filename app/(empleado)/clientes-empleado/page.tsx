@@ -81,7 +81,7 @@ export default async function ClientesEmpleadoPage({
           </div>
           <Link
             href="/pedidos/rapido"
-            className="card p-5 transition hover:border-teal-300 hover:shadow-soft"
+            className="card card-nav p-5 hover:border-teal-300"
           >
             <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Primera vez</p>
             <p className="mt-1 font-bold text-gray-900">Crear cliente y recibo</p>

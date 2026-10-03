@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
+import LaundryBackdrop from "@/components/login/LaundryBackdrop";
 import { empleadoLoginAction } from "./actions";
 
 export const metadata: Metadata = { title: "Acceso empleado" };
-
-const BUBBLES = [
-  { size: 22,  left: "5%",  delay: "0s",   dur: "11s" },
-  { size: 56,  left: "15%", delay: "2s",   dur: "14s" },
-  { size: 18,  left: "28%", delay: "4s",   dur: "9s"  },
-  { size: 80,  left: "42%", delay: "1s",   dur: "17s" },
-  { size: 34,  left: "58%", delay: "3s",   dur: "12s" },
-  { size: 20,  left: "70%", delay: "5s",   dur: "8s"  },
-  { size: 60,  left: "82%", delay: "1.5s", dur: "15s" },
-  { size: 26,  left: "93%", delay: "3.5s", dur: "10s" },
-  { size: 44,  left: "50%", delay: "6s",   dur: "13s" },
-];
 
 export default function EmpleadoLoginPage() {
   return (
@@ -21,30 +10,7 @@ export default function EmpleadoLoginPage() {
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden p-8"
       style={{ background: "linear-gradient(160deg, #05090f 0%, #0b1220 50%, #080d1a 100%)" }}
     >
-      {/* Burbujas */}
-      {BUBBLES.map((b, i) => (
-        <span
-          key={i}
-          className="soap-bubble"
-          style={{
-            width:  b.size,
-            height: b.size,
-            left:   b.left,
-            bottom: "-10%",
-            ["--delay" as any]: b.delay,
-            ["--dur"   as any]: b.dur,
-          }}
-        />
-      ))}
-
-      {/* Luz ambiental de fondo */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(70,95,255,0.1) 0%, transparent 70%)",
-        }}
-      />
+      <LaundryBackdrop />
 
       {/* Contenido principal */}
       <div className="animate-fade-up relative z-10 flex flex-col items-center text-center">

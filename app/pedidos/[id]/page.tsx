@@ -8,14 +8,10 @@ import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
 import NotificarWhatsappButton from "./NotificarWhatsappButton";
 import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
+import { PrendaIcon } from "@/components/PrendaIcon";
 
 const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
 const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
-const PRENDA_EMOJI: Record<string, string> = {
-  Camisa: "👔", Pantalón: "👖", Chaqueta: "🧥", Cubrelecho: "🛏️",
-  Tenis: "👟", Traje: "🤵", Vestido: "👗", Cobija: "🧺", Tapete: "🟫",
-};
-function pEmoji(tipo: string) { return PRENDA_EMOJI[tipo] ?? "👕"; }
 
 export async function generateMetadata({
   params,
@@ -291,7 +287,7 @@ export default async function DetallePedidoPage({
               <details key={p.id} className="group">
                 {/* Fila compacta */}
                 <summary className={`flex cursor-pointer list-none items-center gap-3 px-6 py-4 transition hover:bg-gray-50 group-open:bg-brand-50/40 dark:hover:bg-white/[0.02] dark:group-open:bg-brand-500/5 ${!terminado ? "" : "cursor-default"}`}>
-                  <span className="text-2xl leading-none">{pEmoji(p.tipo)}</span>
+                  <PrendaIcon tipo={p.tipo} size={22} className="shrink-0 text-gray-600 dark:text-gray-300" />
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-bold text-gray-900">{p.tipo}</span>

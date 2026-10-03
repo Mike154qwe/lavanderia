@@ -3,6 +3,7 @@
 import { Fragment, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { money } from "@/lib/format";
+import { PrendaIcon, ServicioIcon } from "@/components/PrendaIcon";
 
 type ItemPedido = {
   id: number;
@@ -14,21 +15,21 @@ type ItemPedido = {
 };
 
 const PRENDAS = [
-  { nombre: "Camisa",      emoji: "👔" },
-  { nombre: "Pantalón",    emoji: "👖" },
-  { nombre: "Chaqueta",    emoji: "🧥" },
-  { nombre: "Cubrelecho",  emoji: "🛏️" },
-  { nombre: "Tenis",       emoji: "👟" },
-  { nombre: "Traje",       emoji: "🤵" },
-  { nombre: "Vestido",     emoji: "👗" },
-  { nombre: "Cobija",      emoji: "🧺" },
-  { nombre: "Tapete",      emoji: "🟫" },
+  "Camisa",
+  "Pantalón",
+  "Chaqueta",
+  "Cubrelecho",
+  "Tenis",
+  "Traje",
+  "Vestido",
+  "Cobija",
+  "Tapete",
 ];
 
 const SERVICIOS = [
-  { nombre: "Lavado",    emoji: "🫧", color: "blue"   },
-  { nombre: "Planchado", emoji: "🔥", color: "orange" },
-  { nombre: "Tintura",   emoji: "🎨", color: "pink"   },
+  { nombre: "Lavado",    color: "blue"   },
+  { nombre: "Planchado", color: "orange" },
+  { nombre: "Tintura",   color: "pink"   },
 ];
 
 const NOVEDADES = [
@@ -205,8 +206,6 @@ export default function PedidoRapidoForm({
       prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n],
     );
   }
-
-  const servicioSeleccionado = SERVICIOS.find((s) => s.nombre === servicio);
 
   return (
     <main className="empleado-workspace min-h-full">
@@ -386,19 +385,19 @@ export default function PedidoRapidoForm({
                   </div>
                   <div className="p-4">
                     <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6">
-                      {PRENDAS.map((p) => (
+                      {PRENDAS.map((nombre) => (
                         <button
-                          key={p.nombre}
+                          key={nombre}
                           type="button"
-                          onClick={() => { setTipo(p.nombre); setTipoCustom(""); }}
+                          onClick={() => { setTipo(nombre); setTipoCustom(""); }}
                           className={`flex flex-col items-center gap-1 rounded-xl border-2 px-2 py-3 text-center transition active:scale-[0.96] ${
-                            tipo === p.nombre
+                            tipo === nombre
                               ? "border-brand-500 bg-brand-500 text-white shadow-md"
                               : "border-gray-200 bg-white text-gray-700 hover:border-brand-300 hover:bg-brand-50"
                           }`}
                         >
-                          <span className="text-2xl leading-none">{p.emoji}</span>
-                          <span className="text-xs font-bold leading-tight">{p.nombre}</span>
+                          <PrendaIcon tipo={nombre} size={22} animated />
+                          <span className="text-xs font-bold leading-tight">{nombre}</span>
                         </button>
                       ))}
                       <button
@@ -410,7 +409,7 @@ export default function PedidoRapidoForm({
                             : "border-dashed border-gray-300 bg-white text-gray-500 hover:border-brand-300"
                         }`}
                       >
-                        <span className="text-2xl leading-none">✏️</span>
+                        <PrendaIcon tipo="Otro" size={22} animated />
                         <span className="text-xs font-bold leading-tight">Otro</span>
                       </button>
                     </div>
@@ -436,7 +435,7 @@ export default function PedidoRapidoForm({
                       <p className="text-sm font-bold text-gray-800">Servicio</p>
                       {steps.servicio && (
                         <p className="text-xs font-bold text-emerald-600">
-                          {servicioSeleccionado?.emoji} {servicio}
+                          <ServicioIcon nombre={servicio} size={14} /> {servicio}
                         </p>
                       )}
                     </div>
@@ -454,7 +453,7 @@ export default function PedidoRapidoForm({
                               : `border-gray-200 bg-white text-gray-700 ${SERVICIO_COLORS_IDLE[s.color]}`
                           }`}
                         >
-                          <span className="text-2xl leading-none">{s.emoji}</span>
+                          <ServicioIcon nombre={s.nombre} size={22} animated />
                           <span className="text-xs font-bold leading-tight">{s.nombre}</span>
                         </button>
                       ))}
