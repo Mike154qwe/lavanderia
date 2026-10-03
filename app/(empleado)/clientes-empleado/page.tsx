@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import { User } from "lucide-react";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -42,7 +43,7 @@ export default async function ClientesEmpleadoPage({
         kicker="Fichas"
         title="Clientes"
         subtitle="Busca a quien ya viene, o crea el recibo si es la primera vez."
-        icon="👤"
+        icon={<User size={20} strokeWidth={1.75} />}
         tone="aqua"
         links={[
           { href: "/pedidos/rapido", label: "Pedido rápido" },

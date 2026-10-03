@@ -2,6 +2,7 @@
 
 import { Fragment, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { Phone, User, WashingMachine } from "lucide-react";
 import { money } from "@/lib/format";
 import { PrendaIcon, ServicioIcon } from "@/components/PrendaIcon";
 
@@ -231,8 +232,8 @@ export default function PedidoRapidoForm({
             <div className="h-1.5 bg-gradient-to-r from-teal-400 to-cyan-500" />
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-well)] bg-teal-50 text-xl dark:bg-teal-500/15">
-                🧺
+              <div className="figure-well figure-well--aqua h-10 w-10">
+                <WashingMachine size={20} strokeWidth={1.75} aria-hidden="true" />
               </div>
               <div>
                 <p className="page-kicker text-teal-600 dark:text-teal-400">
@@ -305,8 +306,8 @@ export default function PedidoRapidoForm({
           {paso === 1 && (
             <div className="card mx-auto max-w-lg p-8">
               <div className="mb-6 text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-4xl dark:bg-teal-500/15">
-                  👤
+                <div className="mx-auto mb-3 figure-well figure-well--aqua h-16 w-16">
+                  <User size={32} strokeWidth={1.75} aria-hidden="true" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">Datos del cliente</h2>
                 <p className="mt-1 text-sm text-gray-400">
@@ -316,18 +317,28 @@ export default function PedidoRapidoForm({
 
               <div className="space-y-3">
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">👤</span>
+                  <User
+                    size={20}
+                    strokeWidth={1.75}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
+                    aria-hidden="true"
+                  />
                   <input
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-                    className="w-full rounded-2xl border-2 border-gray-200 py-4 pl-12 pr-5 text-xl font-bold placeholder:text-gray-300 focus:border-brand-500 focus:outline-none"
+                    className="input-modern w-full py-4 pl-12 pr-5 text-xl font-bold"
                     placeholder="Nombre completo"
                     autoFocus
                   />
                 </div>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">📞</span>
+                  <Phone
+                    size={20}
+                    strokeWidth={1.75}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
+                    aria-hidden="true"
+                  />
                   <input
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
@@ -338,7 +349,7 @@ export default function PedidoRapidoForm({
                       }
                     }}
                     type="tel"
-                    className="w-full rounded-2xl border-2 border-gray-200 py-4 pl-12 pr-5 text-xl font-bold placeholder:text-gray-300 focus:border-brand-500 focus:outline-none"
+                    className="input-modern w-full py-4 pl-12 pr-5 text-xl font-bold"
                     placeholder="Teléfono"
                   />
                 </div>
@@ -390,26 +401,30 @@ export default function PedidoRapidoForm({
                           key={nombre}
                           type="button"
                           onClick={() => { setTipo(nombre); setTipoCustom(""); }}
-                          className={`flex flex-col items-center gap-1 rounded-xl border-2 px-2 py-3 text-center transition active:scale-[0.96] ${
+                          className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-well)] border px-2 py-3 text-center transition active:scale-[0.96] ${
                             tipo === nombre
-                              ? "border-brand-500 bg-brand-500 text-white shadow-md"
-                              : "border-gray-200 bg-white text-gray-700 hover:border-brand-300 hover:bg-brand-50"
+                              ? "border-brand-500 bg-brand-500 text-white"
+                              : "border-[color:var(--border-1)] bg-[color:var(--surface)] text-[color:var(--text-2)] hover:border-brand-300 hover:bg-brand-50"
                           }`}
                         >
-                          <PrendaIcon tipo={nombre} size={22} animated />
+                          <span className={tipo === nombre ? "" : "figure-well h-9 w-9"}>
+                            <PrendaIcon tipo={nombre} size={22} animated />
+                          </span>
                           <span className="text-xs font-bold leading-tight">{nombre}</span>
                         </button>
                       ))}
                       <button
                         type="button"
                         onClick={() => setTipo("__otro__")}
-                        className={`flex flex-col items-center gap-1 rounded-xl border-2 px-2 py-3 text-center transition active:scale-[0.96] ${
+                        className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-well)] border px-2 py-3 text-center transition active:scale-[0.96] ${
                           tipo === "__otro__"
-                            ? "border-brand-500 bg-brand-500 text-white shadow-md"
-                            : "border-dashed border-gray-300 bg-white text-gray-500 hover:border-brand-300"
+                            ? "border-brand-500 bg-brand-500 text-white"
+                            : "border-dashed border-[color:var(--border-2)] bg-[color:var(--surface)] text-[color:var(--text-3)] hover:border-brand-300"
                         }`}
                       >
-                        <PrendaIcon tipo="Otro" size={22} animated />
+                        <span className={tipo === "__otro__" ? "" : "figure-well h-9 w-9"}>
+                          <PrendaIcon tipo="Otro" size={22} animated />
+                        </span>
                         <span className="text-xs font-bold leading-tight">Otro</span>
                       </button>
                     </div>
@@ -447,13 +462,15 @@ export default function PedidoRapidoForm({
                           key={s.nombre}
                           type="button"
                           onClick={() => setServicio(s.nombre)}
-                          className={`flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-3 text-center transition active:scale-[0.97] ${
+                          className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-well)] border px-3 py-3 text-center transition active:scale-[0.97] ${
                             servicio === s.nombre
                               ? SERVICIO_COLORS[s.color]
-                              : `border-gray-200 bg-white text-gray-700 ${SERVICIO_COLORS_IDLE[s.color]}`
+                              : `border-[color:var(--border-1)] bg-[color:var(--surface)] text-[color:var(--text-2)] ${SERVICIO_COLORS_IDLE[s.color]}`
                           }`}
                         >
-                          <ServicioIcon nombre={s.nombre} size={22} animated />
+                          <span className={servicio === s.nombre ? "" : "figure-well h-9 w-9"}>
+                            <ServicioIcon nombre={s.nombre} size={22} animated />
+                          </span>
                           <span className="text-xs font-bold leading-tight">{s.nombre}</span>
                         </button>
                       ))}

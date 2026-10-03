@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import { Wallet } from "lucide-react";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -66,7 +67,7 @@ export default async function GastosEmpleadoPage({
         kicker="Caja"
         title="Gastos del día"
         subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
-        icon="💵"
+        icon={<Wallet size={20} strokeWidth={1.75} />}
         tone="amber"
         links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
       />
@@ -91,7 +92,7 @@ export default async function GastosEmpleadoPage({
                   required
                   className="sr-only"
                 />
-                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-white/10">
+      <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-[var(--radius-well)] figure-well">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-red-500">
                     {item.icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
                   </svg>

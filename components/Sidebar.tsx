@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useSidebarNav } from "@/components/AppShell";
+import BrandMark from "@/components/BrandMark";
 
 const OCULTAR = ["/login", "/empleado-login", "/recibos", "/cierres-caja"];
 
@@ -155,9 +156,7 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="app-sidebar-rule flex items-center gap-3 border-b px-5 py-5">
-          <div className="app-sidebar-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-lg">
-            🧺
-          </div>
+          <BrandMark size={36} />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold leading-tight text-white">
               La Manuelita

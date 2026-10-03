@@ -4,17 +4,14 @@ const TONES = {
   aqua: {
     kicker: "text-teal-600 dark:text-teal-400",
     bar: "bg-gradient-to-r from-teal-400 to-cyan-500",
-    icon: "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300",
   },
   indigo: {
     kicker: "text-brand-500",
     bar: "bg-gradient-to-r from-brand-500 to-indigo-400",
-    icon: "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300",
   },
   amber: {
     kicker: "text-amber-600 dark:text-amber-400",
     bar: "bg-gradient-to-r from-amber-400 to-orange-400",
-    icon: "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
   },
 } as const;
 
@@ -43,9 +40,9 @@ export default function EmpleadoHero({
       <div className="flex flex-wrap items-start gap-3 px-4 py-4 sm:px-5">
         {icon != null && icon !== "" && (
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-well)] ${t.icon} ${
-              typeof icon === "string" ? "text-xl" : ""
-            }`}
+            className={`figure-well h-11 w-11 ${
+              tone === "aqua" ? "figure-well--aqua" : tone === "indigo" ? "figure-well--indigo" : "figure-well--amber"
+            } ${typeof icon === "string" ? "text-xl" : ""}`}
           >
             {icon}
           </div>

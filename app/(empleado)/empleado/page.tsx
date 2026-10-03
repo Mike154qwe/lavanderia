@@ -114,8 +114,8 @@ function PathCard({
       />
       <div className="flex items-start gap-4">
         <span
-          className={`icon-motion flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-well)] ${
-            aqua ? "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300" : "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+          className={`icon-motion figure-well h-14 w-14 ${
+            aqua ? "figure-well--aqua" : "figure-well--indigo"
           }`}
         >
           {icon}
@@ -210,7 +210,7 @@ function SideLink({
       href={href}
       className="card card-nav group flex items-center gap-3 p-4 hover:border-teal-300 dark:hover:border-teal-500/40"
     >
-      <span className="icon-motion flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-well)] bg-gray-50 text-[color:var(--text-2)] dark:bg-white/5">
+      <span className="icon-motion figure-well h-10 w-10">
         {icon}
       </span>
       <span className="min-w-0">
