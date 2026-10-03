@@ -321,24 +321,24 @@ input:focus, select:focus, textarea:focus {
 }
 
 .laundry-wave-a {
-  height: 42%;
+  height: 28%;
   animation: wave-shift 22s linear infinite;
 }
 
 .laundry-wave-b {
-  height: 34%;
+  height: 22%;
   opacity: 0.9;
   animation: wave-shift 34s linear infinite reverse;
 }
 
 .laundry-wave-c {
-  height: 22%;
+  height: 14%;
   animation: wave-shift 16s linear infinite;
 }
 
 .laundry-foam {
   position: absolute;
-  bottom: 18%;
+  bottom: 10%;
   border-radius: 999px;
   background: radial-gradient(circle at 35% 35%,
     rgba(255, 255, 255, 0.55) 0%,
@@ -383,7 +383,7 @@ input:focus, select:focus, textarea:focus {
 
 @media (hover: hover) and (pointer: fine) {
   .card-nav:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-3px) scale(1.025);
     box-shadow:
       0 10px 28px rgba(16, 24, 40, 0.12),
       0 4px 10px rgba(16, 24, 40, 0.06);
