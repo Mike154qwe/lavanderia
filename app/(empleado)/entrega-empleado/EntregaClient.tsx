@@ -123,7 +123,7 @@ export default function EntregaClient({
   const estadoInfo = pedido ? (ESTADO_STYLE[pedido.estado] ?? ESTADO_STYLE["RECIBIDO"]) : null;
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
       <div className="mx-auto max-w-lg">
 
         {/* ── HEADER ────────────────────────────────── */}

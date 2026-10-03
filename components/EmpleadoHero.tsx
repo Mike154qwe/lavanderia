@@ -30,7 +30,7 @@ export default function EmpleadoHero({
   kicker?: string;
   title: string;
   subtitle: string;
-  icon?: string;
+  icon?: React.ReactNode;
   tone?: keyof typeof TONES;
   links?: { href: string; label: string }[];
   children?: React.ReactNode;
@@ -38,24 +38,25 @@ export default function EmpleadoHero({
   const t = TONES[tone];
 
   return (
-    <div className="card">
-      <div className={`h-1.5 ${t.bar}`} style={{ borderRadius: "var(--radius-card) var(--radius-card) 0 0" }} />
-      <div className="p-5 sm:p-6">
-        <div className="flex items-start gap-4">
-          {icon && (
-            <div className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-well)] text-2xl ${t.icon}`}>
-              {icon}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className={`page-kicker ${t.kicker}`}>{kicker}</p>
-            <h1 className="page-title">{title}</h1>
-            <p className="page-subtitle">{subtitle}</p>
+    <div className="card overflow-hidden">
+      <div className={`h-1 ${t.bar}`} />
+      <div className="flex flex-wrap items-start gap-3 px-4 py-4 sm:px-5">
+        {icon != null && icon !== "" && (
+          <div
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-well)] ${t.icon} ${
+              typeof icon === "string" ? "text-xl" : ""
+            }`}
+          >
+            {icon}
           </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className={`page-kicker ${t.kicker}`}>{kicker}</p>
+          <h1 className="page-title !mt-0.5 !text-[1.35rem]">{title}</h1>
+          <p className="page-subtitle">{subtitle}</p>
         </div>
-
         {links && links.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:justify-end">
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -67,9 +68,13 @@ export default function EmpleadoHero({
             ))}
           </div>
         )}
-
-        {children && <div className="mt-5">{children}</div>}
       </div>
+
+      {children && (
+        <div className="border-t border-[color:var(--border-1)] bg-[color:var(--surface-2)] px-4 py-3 sm:px-5">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

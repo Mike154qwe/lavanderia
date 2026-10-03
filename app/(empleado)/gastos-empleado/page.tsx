@@ -59,7 +59,7 @@ export default async function GastosEmpleadoPage({
   const totalGastos = gastos.reduce((s: number, g: any) => s + g.valor, 0);
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       <EmpleadoHero

@@ -31,9 +31,9 @@
   --info:    #0ba5ec;
 
   /* semánticos */
-  --bg:         #f4f7fb;
+  --bg:         #e7edf5;
   --surface:    #ffffff;
-  --surface-2:  #f9fafb;
+  --surface-2:  #f3f6fa;
   --text-1:     #101828;
   --text-2:     #344054;
   --text-3:     #667085;
@@ -49,7 +49,7 @@
   --chrome-text:  rgba(255, 255, 255, 0.72);
 
   /* radios: superficies 16 · nidos 12 · controles 10 · chips pill */
-  --radius-card:    16px;
+  --radius-card:    14px;
   --radius-well:    12px;
   --radius-control: 10px;
   --radius-chip:    999px;
@@ -113,9 +113,9 @@ html, body {
 body {
   margin: 0;
   background-image:
-    radial-gradient(1100px 480px at 8% -12%, rgba(70, 95, 255, 0.10), transparent 55%),
-    radial-gradient(900px 420px at 100% -8%, rgba(14, 165, 164, 0.11), transparent 52%),
-    radial-gradient(720px 380px at 78% 118%, rgba(70, 95, 255, 0.05), transparent 58%);
+    radial-gradient(980px 420px at 6% -10%, rgba(70, 95, 255, 0.16), transparent 58%),
+    radial-gradient(820px 380px at 100% -6%, rgba(14, 165, 164, 0.14), transparent 54%),
+    radial-gradient(640px 340px at 82% 118%, rgba(70, 95, 255, 0.07), transparent 58%);
   background-attachment: fixed;
 }
 
@@ -356,13 +356,38 @@ input:focus, select:focus, textarea:focus {
 .card {
   border-radius: var(--radius-card);
   background: var(--surface);
-  border: 1px solid var(--border-1);
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.05);
+  border: 1px solid color-mix(in srgb, var(--border-1) 78%, #7b8aa5 22%);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dark .card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-color: var(--border-1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+.card-well {
+  border-radius: var(--radius-well);
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+}
+
+.page-frame {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 56rem;
+  padding: 1.25rem 1.25rem 2.25rem;
+}
+
+@media (min-width: 640px) {
+  .page-frame {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+}
+
+.page-frame--wide {
+  max-width: 72rem;
 }
 
 .shadow-soft {
@@ -450,13 +475,14 @@ input:focus, select:focus, textarea:focus {
 
 .input-modern {
   width: 100%;
+  min-height: 44px;
   border-radius: var(--radius-control);
-  border: 1px solid var(--border-1);
+  border: 1px solid var(--border-2);
   padding: 10px 14px;
   font-size: 14px;
   color: var(--text-1);
   background: var(--surface);
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input-modern::placeholder { color: var(--text-4); }
@@ -728,8 +754,8 @@ input:focus, select:focus, textarea:focus {
 .empleado-workspace {
   min-height: 100%;
   background:
-    radial-gradient(900px 320px at 0% -8%, rgba(14, 165, 164, 0.10), transparent 55%),
-    radial-gradient(700px 280px at 100% 0%, rgba(70, 95, 255, 0.06), transparent 50%);
+    radial-gradient(820px 280px at 0% -10%, rgba(14, 165, 164, 0.13), transparent 58%),
+    radial-gradient(640px 240px at 100% 0%, rgba(70, 95, 255, 0.08), transparent 52%);
 }
 
 .dark .empleado-workspace {

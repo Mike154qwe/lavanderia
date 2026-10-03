@@ -36,7 +36,7 @@ export default async function ClientesEmpleadoPage({
   const clientes = await buscarClientes(q.trim());
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
 
       <EmpleadoHero
         kicker="Fichas"
