@@ -6,7 +6,7 @@ import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
-import { PackageCheck } from "lucide-react";
+import { Check, CircleCheck, PackageCheck, Search, TriangleAlert, X } from "lucide-react";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -83,15 +83,14 @@ export default function InventarioEmpleadoClient({
             placeholder="Número de recibo, nombre o teléfono…"
             className="input-modern min-w-0 flex-1 text-base font-semibold"
           />
-          <button className="btn-primary px-5 sm:shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+          <button className="btn-primary px-5 sm:shrink-0" aria-label="Buscar">
+            <Search size={18} strokeWidth={2.25} aria-hidden="true" />
           </button>
         </form>
         {q && (
-          <a href="/inventario-empleado" className="mt-3 inline-block text-sm font-semibold text-gray-400 hover:text-gray-600">
-            ✕ Limpiar búsqueda
+          <a href="/inventario-empleado" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--text-3)] hover:text-[color:var(--text-1)]">
+            <X size={14} strokeWidth={2.25} aria-hidden="true" />
+            Limpiar búsqueda
           </a>
         )}
       </EmpleadoHero>
@@ -109,7 +108,9 @@ export default function InventarioEmpleadoClient({
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && pedidos.length === 0 && (
         <div className="card empty-state">
-          <p className="text-3xl">🔍</p>
+          <span className="mx-auto figure-well h-12 w-12">
+            <Search size={22} strokeWidth={1.75} aria-hidden="true" />
+          </span>
           <p className="empty-state__title">
             No se encontró ningún pedido activo para "<span className="text-[color:var(--text-1)]">{q}</span>".
           </p>
@@ -145,7 +146,7 @@ export default function InventarioEmpleadoClient({
                     {item.cliente.telefono ?? "Sin teléfono"} · {new Date(item.createdAt).toLocaleDateString("es-CO")}
                   </p>
                   <p className={`mt-2 text-sm font-black ${sal > 0 ? "text-red-500" : "text-green-600"}`}>
-                    {sal > 0 ? `Saldo: ${money(sal)}` : "✅ Pagado"}
+                    {sal > 0 ? `Saldo: ${money(sal)}` : "Pagado"}
                   </p>
                 </button>
               );
@@ -195,7 +196,7 @@ export default function InventarioEmpleadoClient({
               <div className="card-well px-3 py-3 text-center">
                 <p className={`text-[11px] font-bold uppercase tracking-wide ${saldo > 0 ? "text-red-500" : "text-green-600"}`}>Saldo</p>
                 <p className={`mt-1 text-lg font-black ${saldo > 0 ? "text-red-500" : "text-green-600"}`}>
-                  {saldo > 0 ? money(saldo) : "✓ Listo"}
+                  {saldo > 0 ? money(saldo) : "Listo"}
                 </p>
               </div>
             </div>
@@ -277,8 +278,9 @@ export default function InventarioEmpleadoClient({
                           </span>
                         </p>
                         {prenda.descripcion && (
-                          <p className="mt-2 rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-                            ⚠️ {prenda.descripcion}
+                          <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+                            <TriangleAlert size={13} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                            {prenda.descripcion}
                           </p>
                         )}
                       </div>
@@ -286,7 +288,10 @@ export default function InventarioEmpleadoClient({
                       <div className="shrink-0 text-right">
                         <p className="font-black text-brand-500">{money(prenda.valor)}</p>
                         {done ? (
-                          <p className="mt-2 text-sm font-bold text-green-600">✅ Entregada</p>
+                          <p className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-green-600">
+                            <CircleCheck size={14} strokeWidth={2} aria-hidden="true" />
+                            Entregada
+                          </p>
                         ) : (
                           <button
                             type="button"
@@ -345,8 +350,9 @@ export default function InventarioEmpleadoClient({
                           <input name="observacion" placeholder="Opcional" className="input-modern" />
                         </div>
 
-                        <button className="btn-primary sm:col-span-2">
-                          ✅ Confirmar retiro — {pend} prenda{pend !== 1 ? "s" : ""}
+                        <button className="btn-primary sm:col-span-2 inline-flex items-center justify-center gap-2">
+                          <Check size={16} strokeWidth={2.25} aria-hidden="true" />
+                          Confirmar retiro — {pend} prenda{pend !== 1 ? "s" : ""}
                         </button>
                       </form>
                     )}
@@ -359,8 +365,9 @@ export default function InventarioEmpleadoClient({
             {saldo <= 0 && prendasPendientes > 0 && (
               <form action={entregarCompletoEmpleado} className="mt-5">
                 <input type="hidden" name="pedidoId" value={pedido.id} />
-                <button className="w-full rounded-xl bg-green-500 py-5 text-xl font-bold text-white shadow-sm transition hover:bg-green-600 active:scale-[0.99]">
-                  📦 Entregar todo el pedido
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-5 text-xl font-bold text-white shadow-sm transition hover:bg-green-600 active:scale-[0.99]">
+                  <PackageCheck size={22} strokeWidth={2} aria-hidden="true" />
+                  Entregar todo el pedido
                 </button>
               </form>
             )}

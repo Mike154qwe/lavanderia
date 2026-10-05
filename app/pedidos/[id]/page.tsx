@@ -9,6 +9,7 @@ import CancelButton from "./CancelButton";
 import NotificarWhatsappButton from "./NotificarWhatsappButton";
 import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
 import { PrendaIcon } from "@/components/PrendaIcon";
+import { CircleCheck, TriangleAlert } from "lucide-react";
 
 const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
 const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
@@ -297,7 +298,10 @@ export default async function DetallePedidoPage({
                       <span className="text-sm text-gray-400">×{p.cantidad}</span>
                     </div>
                     {p.descripcion && (
-                      <p className="mt-0.5 text-xs font-semibold text-orange-600 dark:text-orange-400">⚠️ {p.descripcion}</p>
+                      <p className="mt-0.5 flex items-start gap-1 text-xs font-semibold text-orange-600 dark:text-orange-400">
+                        <TriangleAlert size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                        {p.descripcion}
+                      </p>
                     )}
                   </div>
                   <span className="shrink-0 font-black text-brand-500">{money(p.valor)}</span>
@@ -458,7 +462,7 @@ export default async function DetallePedidoPage({
 
           {saldo <= 0 && !terminado && (
             <p className="flex items-center gap-2 border-t border-gray-100 px-6 py-3 text-sm font-semibold text-green-600 dark:border-white/[0.07] dark:text-green-400">
-              <span>✅</span> Pedido completamente pagado
+              <CircleCheck size={16} strokeWidth={2} aria-hidden="true" /> Pedido completamente pagado
             </p>
           )}
         </div>
@@ -473,10 +477,10 @@ export default async function DetallePedidoPage({
                 <QuickEstado pedidoId={pedido.id} estado="EN_PROCESO" label="→ En proceso" color="yellow" action={cambiarEstadoAction} />
               )}
               {(pedido.estado === "RECIBIDO" || pedido.estado === "EN_PROCESO") && (
-                <QuickEstado pedidoId={pedido.id} estado="LISTO" label="✅ Marcar listo" color="green" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="LISTO" label="Marcar listo" color="green" action={cambiarEstadoAction} />
               )}
               {pedido.estado === "LISTO" && saldo <= 0 && (
-                <QuickEstado pedidoId={pedido.id} estado="ENTREGADO" label="📦 Entregar pedido" color="brand" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="ENTREGADO" label="Entregar pedido" color="brand" action={cambiarEstadoAction} />
               )}
               {pedido.estado === "LISTO" && saldo > 0 && (
                 <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">

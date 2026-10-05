@@ -9,7 +9,7 @@ import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
 import { PrendaIcon } from "@/components/PrendaIcon";
-import { AlertTriangle, CircleCheck, ClipboardList, Layers } from "lucide-react";
+import { AlertTriangle, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, X } from "lucide-react";
 
 export const metadata: Metadata = { title: "Inventario" };
 
@@ -219,8 +219,9 @@ export default async function InventarioPage({
             className="input-modern flex-1"
           />
           {q && (
-            <Link href="/inventario" className="flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50">
-              ✕ Limpiar
+            <Link href="/inventario" className="inline-flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50">
+              <X size={14} strokeWidth={2.25} aria-hidden="true" />
+              Limpiar
             </Link>
           )}
           <button className="btn-primary whitespace-nowrap">Buscar</button>
@@ -267,7 +268,9 @@ export default async function InventarioPage({
             ? "bg-green-50 text-green-700 ring-1 ring-green-200"
             : "bg-red-50 text-red-600 ring-1 ring-red-200"
         }`}>
-          <span className="text-lg">{pedidos.length > 0 ? "✅" : "❌"}</span>
+          {pedidos.length > 0
+            ? <CircleCheck size={18} strokeWidth={2} aria-hidden="true" />
+            : <CircleX size={18} strokeWidth={2} aria-hidden="true" />}
           {pedidos.length > 0
             ? `Recibo #${String(parseInt(q, 10)).padStart(5, "0")} encontrado — ${pedidos[0].cliente.nombre}`
             : `No se encontró el recibo #${String(parseInt(q, 10)).padStart(5, "0")}`}
@@ -394,7 +397,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           {saldo > 0 ? (
             <span className="text-sm font-black text-red-600">{money(saldo)}</span>
           ) : (
-            <span className="text-sm font-bold text-green-600">✅ Pagado</span>
+            <span className="text-sm font-bold text-green-600">Pagado</span>
           )}
         </div>
 
@@ -470,8 +473,9 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                 {diasLabel(dias)}
               </span>
             </div>
-            <p className="mt-0.5 text-xs text-gray-400">
-              📞 {pedido.cliente.telefono ?? "Sin teléfono"}
+            <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-[color:var(--text-3)]">
+              <Phone size={12} strokeWidth={2} aria-hidden="true" />
+              {pedido.cliente.telefono ?? "Sin teléfono"}
               <span className="mx-1.5 opacity-40">·</span>
               Recibo{" "}
               <span className="font-bold text-brand-500">#{fmt(pedido.id)}</span>
@@ -490,7 +494,8 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             target="_blank"
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:border-brand-300 hover:text-brand-600"
           >
-            🖨️ Recibo
+            <Printer size={13} strokeWidth={2} aria-hidden="true" />
+            Recibo
           </Link>
           <Link
             href={`/pedidos/${pedido.id}`}
@@ -522,7 +527,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               </span>
             ) : (
               <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 ring-1 ring-green-200">
-                ✅ Pagado
+                Pagado
               </span>
             )}
           </div>
@@ -580,7 +585,10 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
                   {prenda.descripcion && (
                     <div className="border-t border-orange-100 bg-orange-50 px-4 py-1.5">
-                      <p className="text-xs font-bold text-orange-600">⚠️ {prenda.descripcion}</p>
+                      <p className="flex items-start gap-1.5 text-xs font-bold text-orange-600">
+                        <AlertTriangle size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                        {prenda.descripcion}
+                      </p>
                     </div>
                   )}
 
@@ -652,7 +660,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               </div>
               <div className={`mt-2 flex justify-between rounded-xl px-3 py-2.5 ${saldo > 0 ? "bg-red-50 ring-1 ring-red-200" : "bg-green-50 ring-1 ring-green-200"}`}>
                 <span className={`font-bold ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
-                  {saldo > 0 ? "Saldo" : "✅ Pagado"}
+                  {saldo > 0 ? "Saldo" : "Pagado"}
                 </span>
                 <span className={`text-lg font-black ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
                   {money(Math.max(saldo, 0))}
@@ -690,10 +698,10 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Estado</p>
             <div className="space-y-2">
               {pedido.estado === "RECIBIDO" && (
-                <EstadoBtn pedidoId={pedido.id} nuevoEstado="LISTO" label="✅ Marcar como LISTO" color="green" action={cambiarEstado} />
+                <EstadoBtn pedidoId={pedido.id} nuevoEstado="LISTO" label="Marcar como LISTO" color="green" action={cambiarEstado} />
               )}
               {pedido.estado === "LISTO" && saldo <= 0 && (
-                <EstadoBtn pedidoId={pedido.id} nuevoEstado="ENTREGADO" label="📦 Entregar pedido completo" color="brand" action={cambiarEstado} />
+                <EstadoBtn pedidoId={pedido.id} nuevoEstado="ENTREGADO" label="Entregar pedido completo" color="brand" action={cambiarEstado} />
               )}
               {pedido.estado === "LISTO" && saldo > 0 && (
                 <p className="rounded-xl bg-red-50 p-3 text-xs font-bold text-red-600">

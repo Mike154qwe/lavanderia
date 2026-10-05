@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
-import { User } from "lucide-react";
+import { Search, User, X } from "lucide-react";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -58,15 +58,14 @@ export default async function ClientesEmpleadoPage({
             placeholder="Nombre o teléfono del cliente…"
             className="input-modern min-w-0 flex-1 text-base font-semibold"
           />
-          <button className="btn-primary px-5 sm:shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+          <button className="btn-primary px-5 sm:shrink-0" aria-label="Buscar">
+            <Search size={18} strokeWidth={2.25} aria-hidden="true" />
           </button>
         </form>
         {q && (
-          <a href="/clientes-empleado" className="mt-2 inline-block text-sm font-semibold text-gray-400 hover:text-gray-600">
-            ✕ Limpiar búsqueda
+          <a href="/clientes-empleado" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--text-3)] hover:text-[color:var(--text-1)]">
+            <X size={14} strokeWidth={2.25} aria-hidden="true" />
+            Limpiar búsqueda
           </a>
         )}
       </EmpleadoHero>
@@ -109,7 +108,9 @@ export default async function ClientesEmpleadoPage({
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && clientes.length === 0 && (
         <div className="card empty-state">
-          <p className="text-3xl">🔍</p>
+          <span className="mx-auto figure-well h-12 w-12">
+            <Search size={22} strokeWidth={1.75} aria-hidden="true" />
+          </span>
           <p className="empty-state__title">
             No se encontró cliente con "<span className="text-[color:var(--text-1)]">{q}</span>".
           </p>
