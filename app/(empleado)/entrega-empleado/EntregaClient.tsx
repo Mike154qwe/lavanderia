@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleAlert, CircleCheck, CircleX, ScanLine, Search } from "lucide-react";
+import { CircleAlert, CircleCheck, CircleX, FileText, ScanLine, Search } from "lucide-react";
 
 export type PedidoEntrega = {
   id: number;
@@ -424,8 +424,10 @@ export default function EntregaClient({
 
         {/* ── ESTADO IDLE ───────────────────────────── */}
         {status === "idle" && (
-          <div className="card empty-state mt-4">
-            <p className="text-3xl">📄</p>
+          <div className="card empty-state">
+            <span className="mx-auto figure-well figure-well--indigo h-12 w-12">
+              <FileText size={22} strokeWidth={1.75} aria-hidden="true" />
+            </span>
             <p className="empty-state__title">Esperando escaneo</p>
             <p className="empty-state__desc">
               Apunta la pistola al código de barras del recibo

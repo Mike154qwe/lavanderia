@@ -293,7 +293,8 @@ function KpiCard({
 
   return (
     <div className="card p-5">
-      <div className={`mb-3 figure-well h-10 w-10 ${palette}`}>
+      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-well)] ${palette}`}
+        style={{ boxShadow: "inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent)" }}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
           {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
         </svg>
