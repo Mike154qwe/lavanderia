@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import { User } from "lucide-react";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -36,13 +37,13 @@ export default async function ClientesEmpleadoPage({
   const clientes = await buscarClientes(q.trim());
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
 
       <EmpleadoHero
         kicker="Fichas"
         title="Clientes"
         subtitle="Busca a quien ya viene, o crea el recibo si es la primera vez."
-        icon="👤"
+        icon={<User size={20} strokeWidth={1.75} />}
         tone="aqua"
         links={[
           { href: "/pedidos/rapido", label: "Pedido rápido" },
@@ -71,7 +72,7 @@ export default async function ClientesEmpleadoPage({
       </EmpleadoHero>
 
       {!q && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="card p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-teal-600">Ya es cliente</p>
             <p className="mt-1 font-bold text-gray-900">Escríbelo arriba</p>
@@ -81,7 +82,7 @@ export default async function ClientesEmpleadoPage({
           </div>
           <Link
             href="/pedidos/rapido"
-            className="card p-5 transition hover:border-teal-300 hover:shadow-soft"
+            className="card card-nav p-5 hover:border-teal-300"
           >
             <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Primera vez</p>
             <p className="mt-1 font-bold text-gray-900">Crear cliente y recibo</p>
@@ -96,7 +97,7 @@ export default async function ClientesEmpleadoPage({
       {q && (
         <Link
           href="/pedidos/rapido"
-          className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
+          className="flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
         >
           <span>+ Crear cliente nuevo y recibo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -107,7 +108,7 @@ export default async function ClientesEmpleadoPage({
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && clientes.length === 0 && (
-        <div className="card empty-state mt-4">
+        <div className="card empty-state">
           <p className="text-3xl">🔍</p>
           <p className="empty-state__title">
             No se encontró cliente con "<span className="text-[color:var(--text-1)]">{q}</span>".
@@ -120,7 +121,7 @@ export default async function ClientesEmpleadoPage({
 
       {/* ── Resultados ──────────────────────────────────── */}
       {clientes.length > 0 && (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           {clientes.map((cliente) => {
             const activos = cliente.pedidos.filter(
               (p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO"

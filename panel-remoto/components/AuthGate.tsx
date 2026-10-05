@@ -45,23 +45,34 @@ export default function AuthGate({ children }: { children: ReactNode }) {
 
   if (usuario === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <p className="text-sm font-semibold text-gray-400">Verificando sesión…</p>
+      <div className="remote-shell">
+        <p className="text-sm font-semibold text-white/70">Verificando sesión…</p>
       </div>
     );
   }
 
   if (!usuario) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
+      <div className="remote-shell">
         <form onSubmit={handleSubmit} className="card w-full max-w-sm p-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-          <h1 className="mt-1 text-xl font-black text-gray-900 dark:text-white">Panel remoto</h1>
-          <p className="mt-1 text-sm text-gray-500">Inicia sesión para ver los datos.</p>
+          <div className="flex justify-center">
+            <span className="figure-well figure-well--brand h-12 w-12" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <path d="M3 6h3" />
+                <path d="M17 6h.01" />
+                <rect width="18" height="14" x="3" y="6" rx="2" />
+                <circle cx="12" cy="13" r="2" />
+                <path d="m3 6 3-4h12l3 4" />
+              </svg>
+            </span>
+          </div>
+          <p className="page-kicker mt-4 text-center">Gerente</p>
+          <h1 className="page-title text-center">Panel remoto</h1>
+          <p className="page-subtitle text-center">Inicia sesión para ver los datos.</p>
 
           <div className="mt-5 space-y-3">
             <div>
-              <label className="mb-1 block text-xs font-bold text-gray-500">Correo</label>
+              <label className="mb-1 block text-xs font-bold text-[color:var(--text-2)]">Correo</label>
               <input
                 type="email"
                 required
@@ -72,7 +83,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-bold text-gray-500">Contraseña</label>
+              <label className="mb-1 block text-xs font-bold text-[color:var(--text-2)]">Contraseña</label>
               <input
                 type="password"
                 required

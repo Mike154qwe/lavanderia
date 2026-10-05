@@ -66,7 +66,7 @@ export default async function EntradasSalidasEmpleadoPage({
   const mesHoy = year === hoy.getFullYear() ? hoy.getMonth() : 11;
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-5">

@@ -251,11 +251,11 @@ export default async function GerentePage({
   const esHoy = sameDay(fechaSeleccionada, hoy);
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Nivel 1 · Título, día y KPIs (una sola tarjeta) ── */}
       <div className="card overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-5 dark:border-white/[0.07]">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[color:var(--border-1)] px-5 py-4">
           <div>
             <p className="page-kicker text-brand-500">
               Gerente · {esHoy ? "Hoy" : "Día seleccionado"}
@@ -279,15 +279,13 @@ export default async function GerentePage({
           </form>
         </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-2 divide-x divide-y divide-gray-100 dark:divide-white/[0.07] md:grid-cols-3 md:divide-y-0">
+        <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-3">
           <KpiCard label="Dinero recibido" value={money(totalRecibido)} color="green"  icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           <KpiCard label="Ventas del día"  value={money(totalVentas)}   color="blue"   icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
           <KpiCard label="Gastos"          value={money(totalGastos)}   color="red"    icon="M17 7 7 17M7 7l10 10" danger />
         </div>
 
-        {/* Los dos números de caja, uno junto al otro. No son la misma cuenta. */}
-        <div className="grid divide-y divide-gray-100 border-t border-gray-100 dark:divide-white/[0.07] dark:border-white/[0.07] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        <div className="grid gap-3 border-t border-[color:var(--border-1)] p-4 sm:grid-cols-2">
           <KpiCard
             label="Ganancia neta del día"
             hint="Todo lo recibido menos todos los gastos, en cualquier medio de pago."
@@ -308,18 +306,17 @@ export default async function GerentePage({
       </div>
 
       {/* ── Nivel 1 · Cierre de caja (acción principal) ───── */}
-      <div className="card p-6 ring-2 ring-brand-200 dark:ring-brand-500/30">
-        <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Acción principal</p>
-            <h2 className="mt-1 text-lg font-bold text-gray-900">Cierre de caja</h2>
-            <p className="mt-0.5 text-sm text-gray-400">
-              Toma los movimientos desde el último cierre hasta ahora.
-            </p>
-          </div>
+      <div className="card overflow-hidden">
+        <div className="border-b border-[color:var(--border-1)] px-5 py-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Acción principal</p>
+          <h2 className="mt-1 text-lg font-bold text-gray-900">Cierre de caja</h2>
+          <p className="mt-0.5 text-sm text-gray-400">
+            Toma los movimientos desde el último cierre hasta ahora.
+          </p>
         </div>
 
-        <form action={hacerCierreCaja} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+        <div className="p-4 sm:p-5">
+        <form action={hacerCierreCaja} className="card-well grid gap-3 p-3 sm:grid-cols-[1fr_1fr_auto] sm:p-4">
           <input name="responsable" placeholder="Responsable" defaultValue="Gerente" className="input-modern" />
           <input name="observacion" placeholder="Observación opcional" className="input-modern" />
           <button className="btn-dark whitespace-nowrap">Hacer cierre →</button>
@@ -355,14 +352,13 @@ export default async function GerentePage({
             No hay cierres registrados este día.
           </p>
         )}
+        </div>
       </div>
 
       {/* ── Nivel 2 · Detalle del día ─────────────────────── */}
-      <p className="page-kicker px-1 pt-2">Detalle del día</p>
-
-      {/* ── Facturación del día ───────────────────────────── */}
-      <div className="card p-6">
-        <h2 className="mb-5 text-lg font-bold text-gray-900">Facturación del día</h2>
+      <div className="card p-5">
+        <p className="page-kicker">Detalle del día</p>
+        <h2 className="mb-5 mt-1 text-lg font-bold text-gray-900">Facturación del día</h2>
         <div className="grid gap-5 xl:grid-cols-2">
           <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
           <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />
@@ -387,7 +383,7 @@ export default async function GerentePage({
       </div>
 
       {/* ── Gastos del día ───────────────────────────────── */}
-      <div className="card p-6">
+      <div className="card p-5">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">Gastos del día</h2>
           {gastosDia.length > 0 && (
@@ -554,15 +550,19 @@ function KpiCard({
   }[color];
 
   return (
-    <div className="p-5">
-      <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${palette}`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4.5 w-4.5 h-[18px] w-[18px]">
-          {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-        </svg>
+    <div className="card-well p-4">
+      <div className="flex items-start gap-3">
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${palette}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+            {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-gray-500">{label}</p>
+          <p className={`mt-0.5 text-xl font-black tabular-nums ${danger ? "text-red-500" : "text-gray-900"}`}>{value}</p>
+          {hint && <p className="mt-1 text-[11px] leading-snug text-gray-400">{hint}</p>}
+        </div>
       </div>
-      <p className={`text-2xl font-black ${danger ? "text-red-500" : "text-gray-900"}`}>{value}</p>
-      <p className="mt-0.5 text-xs font-medium text-gray-400">{label}</p>
-      {hint && <p className="mt-1 text-[11px] leading-snug text-gray-400">{hint}</p>}
     </div>
   );
 }
@@ -571,7 +571,7 @@ function PagosGrupo({ titulo, icon, pagos }: { titulo: string; icon: string; pag
   const total = pagos.reduce((s: number, p: any) => s + p.valor, 0);
 
   return (
-    <div className="rounded-xl border border-gray-100 dark:border-white/[0.07]">
+    <div className="card-well">
       <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3.5 dark:border-white/[0.07]">
         <div className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-brand-500">
@@ -614,7 +614,7 @@ function MovSection({
   }[color];
 
   return (
-    <div className="card p-6">
+    <div className="card p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-bold text-gray-900">{title}</h2>
         <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${badge}`}>{count}</span>

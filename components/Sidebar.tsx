@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useSidebarNav } from "@/components/AppShell";
+import BrandMark from "@/components/BrandMark";
 
 const OCULTAR = ["/login", "/empleado-login", "/recibos", "/cierres-caja"];
 
@@ -155,9 +156,7 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="app-sidebar-rule flex items-center gap-3 border-b px-5 py-5">
-          <div className="app-sidebar-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-lg">
-            🧺
-          </div>
+          <BrandMark size={36} />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold leading-tight text-white">
               La Manuelita
@@ -187,12 +186,6 @@ export default function Sidebar() {
                         active ? "app-nav-active" : "app-nav-link"
                       }`}
                     >
-                      {active && (
-                        <span
-                          className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full"
-                          style={{ background: "#465fff", boxShadow: "0 0 6px #465fff" }}
-                        />
-                      )}
                       <span
                         style={active ? { color: "#93a8ff" } : { color: INACTIVO_ICONO }}
                         className="transition-colors group-hover:!text-white"

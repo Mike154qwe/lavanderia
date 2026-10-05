@@ -56,19 +56,19 @@ export default async function PedidosPage({
   }
 
   return (
-    <div className="p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
+            <p className="page-kicker text-brand-500">
               Gerente
             </p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">
+            <h1 className="page-title">
               Pedidos
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="page-subtitle">
               {total} pedido{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
             </p>
           </div>
@@ -107,7 +107,7 @@ export default async function PedidosPage({
       </div>
 
       {/* ── KPIs ─────────────────────────────────────────── */}
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <KpiCard
           label="Ingresados hoy"
           value={kpiHoy}
@@ -129,7 +129,7 @@ export default async function PedidosPage({
       </div>
 
       {/* ── Tabla ────────────────────────────────────────── */}
-      <div className="card mt-5 overflow-hidden">
+      <div className="card overflow-hidden">
         {pedidos.length === 0 ? (
           <EmptyState
             icon={
@@ -293,7 +293,8 @@ function KpiCard({
 
   return (
     <div className="card p-5">
-      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${palette}`}>
+      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-well)] ${palette}`}
+        style={{ boxShadow: "inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent)" }}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
           {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
         </svg>

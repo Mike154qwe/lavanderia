@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import { Wallet } from "lucide-react";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -59,19 +60,19 @@ export default async function GastosEmpleadoPage({
   const totalGastos = gastos.reduce((s: number, g: any) => s + g.valor, 0);
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       <EmpleadoHero
         kicker="Caja"
         title="Gastos del día"
         subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
-        icon="💵"
+        icon={<Wallet size={20} strokeWidth={1.75} />}
         tone="amber"
         links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
       />
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
 
         {/* ── Formulario ───────────────────────────────────── */}
         <form action={registrarGastoEmpleado} className="card p-5">
@@ -91,7 +92,7 @@ export default async function GastosEmpleadoPage({
                   required
                   className="sr-only"
                 />
-                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-white/10">
+      <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-[var(--radius-well)] figure-well">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-red-500">
                     {item.icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
                   </svg>
@@ -178,7 +179,9 @@ export default async function GastosEmpleadoPage({
             </div>
           ) : (
             <div className="empty-state rounded-[var(--radius-well)] border border-dashed border-[color:var(--border-1)]">
-              <p className="text-3xl">💸</p>
+              <span className="mx-auto figure-well h-12 w-12">
+                <Wallet size={22} strokeWidth={1.75} aria-hidden="true" />
+              </span>
               <p className="empty-state__title">No hay gastos registrados hoy.</p>
             </div>
           )}

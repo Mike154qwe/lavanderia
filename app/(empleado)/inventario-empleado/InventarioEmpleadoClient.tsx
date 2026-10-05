@@ -6,6 +6,7 @@ import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import { PackageCheck } from "lucide-react";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -58,7 +59,7 @@ export default function InventarioEmpleadoClient({
   }
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       {/* ── Buscador ─────────────────────────────────────── */}
@@ -66,7 +67,7 @@ export default function InventarioEmpleadoClient({
         kicker="Salida"
         title="Llegó a recoger"
         subtitle="Busca el recibo, cobra el saldo y entrega las prendas."
-        icon="📦"
+        icon={<PackageCheck size={22} strokeWidth={1.75} />}
         tone="indigo"
         links={[
           { href: "/entrega-empleado", label: "Escanear recibo" },
@@ -96,16 +97,18 @@ export default function InventarioEmpleadoClient({
       </EmpleadoHero>
 
       {!q && !pedido && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <HintCard n="1" title="Escribe el recibo" desc="El número de 5 dígitos, el nombre o el teléfono." />
-          <HintCard n="2" title="Cobra si hay saldo" desc="Si debe, registra el pago antes de entregar." />
-          <HintCard n="3" title="Entrega" desc="Parcial o completo. El gerente lo ve en el día." />
+        <div className="card px-4 py-3 sm:px-5">
+          <ol className="grid gap-3 sm:grid-cols-3">
+            <HintStep n="1" title="Escribe el recibo" desc="El número de 5 dígitos, el nombre o el teléfono." />
+            <HintStep n="2" title="Cobra si hay saldo" desc="Si debe, registra el pago antes de entregar." />
+            <HintStep n="3" title="Entrega" desc="Parcial o completo. El gerente lo ve en el día." />
+          </ol>
         </div>
       )}
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && pedidos.length === 0 && (
-        <div className="card empty-state mt-4">
+        <div className="card empty-state">
           <p className="text-3xl">🔍</p>
           <p className="empty-state__title">
             No se encontró ningún pedido activo para "<span className="text-[color:var(--text-1)]">{q}</span>".
@@ -116,7 +119,7 @@ export default function InventarioEmpleadoClient({
 
       {/* ── Lista de resultados ──────────────────────────── */}
       {!pedido && pedidos.length > 1 && (
-        <div className="card mt-4 p-5">
+        <div className="card p-5">
           <h2 className="mb-4 font-bold text-gray-900">
             {pedidos.length} resultados — selecciona el pedido
           </h2>
@@ -153,19 +156,19 @@ export default function InventarioEmpleadoClient({
 
       {/* ── Detalle del pedido activo ─────────────────────── */}
       {pedido && (
-        <div className="mt-4 space-y-4">
+        <div className="space-y-4">
 
           {/* Cabecera */}
           <div className="card overflow-hidden">
-            <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-5 dark:border-white/[0.07]">
+            <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border-1)] px-4 py-3.5 sm:px-5">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-2xl font-bold text-gray-900">#{fmt(pedido.id)}</span>
+                  <span className="font-mono text-xl font-bold text-gray-900">#{fmt(pedido.id)}</span>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-600"}`}>
                     {pedido.estado}
                   </span>
                 </div>
-                <p className="mt-1 text-lg font-bold text-gray-800">{pedido.cliente.nombre}</p>
+                <p className="mt-1 font-bold text-gray-800">{pedido.cliente.nombre}</p>
                 <p className="text-sm text-gray-400">
                   {pedido.cliente.telefono ?? "Sin teléfono"} ·{" "}
                   {new Date(pedido.createdAt).toLocaleDateString("es-CO")}
@@ -180,18 +183,17 @@ export default function InventarioEmpleadoClient({
               </button>
             </div>
 
-            {/* Mini-stats */}
-            <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-white/[0.07]">
-              <div className="p-4 text-center">
-                <p className="text-xs font-bold uppercase text-gray-400">Total</p>
+            <div className="grid grid-cols-3 gap-2 p-3 sm:gap-3 sm:p-4">
+              <div className="card-well px-3 py-3 text-center">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400">Total</p>
                 <p className="mt-1 text-lg font-black text-gray-900">{money(pedido.total)}</p>
               </div>
-              <div className="p-4 text-center">
-                <p className="text-xs font-bold uppercase text-green-600">Pagado</p>
+              <div className="card-well px-3 py-3 text-center">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-green-600">Pagado</p>
                 <p className="mt-1 text-lg font-black text-green-600">{money(abonado)}</p>
               </div>
-              <div className="p-4 text-center">
-                <p className={`text-xs font-bold uppercase ${saldo > 0 ? "text-red-500" : "text-green-600"}`}>Saldo</p>
+              <div className="card-well px-3 py-3 text-center">
+                <p className={`text-[11px] font-bold uppercase tracking-wide ${saldo > 0 ? "text-red-500" : "text-green-600"}`}>Saldo</p>
                 <p className={`mt-1 text-lg font-black ${saldo > 0 ? "text-red-500" : "text-green-600"}`}>
                   {saldo > 0 ? money(saldo) : "✓ Listo"}
                 </p>
@@ -236,8 +238,8 @@ export default function InventarioEmpleadoClient({
           )}
 
           {/* Prendas */}
-          <div className="card p-5">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="card p-4 sm:p-5">
+            <div className="mb-3 flex items-center justify-between">
               <h2 className="font-bold text-gray-900">Prendas del pedido</h2>
               <span className="text-sm font-semibold text-gray-400">
                 {prendasPendientes} pendiente{prendasPendientes !== 1 ? "s" : ""}
@@ -375,14 +377,16 @@ export default function InventarioEmpleadoClient({
   );
 }
 
-function HintCard({ n, title, desc }: { n: string; title: string; desc: string }) {
+function HintStep({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
-    <div className="card p-4">
-      <p className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
+    <li className="flex gap-3">
+      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
         {n}
-      </p>
-      <p className="mt-2 text-sm font-bold text-gray-900">{title}</p>
-      <p className="mt-0.5 text-xs text-gray-500">{desc}</p>
-    </div>
+      </span>
+      <span>
+        <span className="block text-sm font-bold text-gray-900">{title}</span>
+        <span className="mt-0.5 block text-xs text-gray-500">{desc}</span>
+      </span>
+    </li>
   );
 }

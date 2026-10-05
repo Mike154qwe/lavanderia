@@ -68,14 +68,14 @@ export default async function MovimientosPage({
   );
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ──────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-          <h1 className="mt-1 text-2xl font-black text-gray-900">Entradas y salidas</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="page-kicker text-brand-500">Gerente</p>
+          <h1 className="page-title">Entradas y salidas</h1>
+          <p className="page-subtitle">
             Actividad operacional del año — haz clic en un día para ver el detalle
           </p>
         </div>
