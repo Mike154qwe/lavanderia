@@ -147,8 +147,8 @@ export default async function DetallePedidoPage({
   const terminado   = pedido.estado === "ENTREGADO" || pedido.estado === "CANCELADO";
 
   return (
-    <div className="p-6">
-      <div className="mx-auto max-w-4xl space-y-5">
+    <div className="page-frame page-frame--wide">
+      <div className="mx-auto w-full max-w-4xl space-y-5">
 
         {/* ── Back + acciones rápidas ─────────────────────── */}
         <div className="flex flex-wrap items-center justify-between gap-3">

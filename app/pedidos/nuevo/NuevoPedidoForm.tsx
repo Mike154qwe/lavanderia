@@ -123,23 +123,23 @@ export default function NuevoPedidoForm({
   }
 
   return (
-    <div className="p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
+        <p className="page-kicker text-brand-500">
           Nueva entrada
         </p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">
+        <h1 className="page-title">
           Registrar pedido
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="page-subtitle">
           Selecciona o crea el cliente, luego agrega las prendas.
         </p>
       </div>
 
       {/* ── Selección / creación de cliente ──────────────── */}
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
 
         {/* Clientes existentes */}
         <div className="card p-6">

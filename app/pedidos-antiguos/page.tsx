@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPedido } from "@/lib/format";
+import { CircleCheck } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Pedidos antiguos" };
@@ -38,16 +39,17 @@ export default async function PedidosAntiguosPage() {
   });
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
       <section className="space-y-5">
         <div className="card p-6">
           <div className="flex items-center justify-between gap-5">
             <div>
-              <h1 className="text-2xl font-black text-gray-900">
+              <p className="page-kicker text-brand-500">Gerente</p>
+              <h1 className="page-title">
                 Pedidos antiguos
               </h1>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="page-subtitle">
                 Pedidos con 3 meses o más en lavandería pendientes por recoger.
               </p>
             </div>
@@ -58,7 +60,7 @@ export default async function PedidosAntiguosPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           <Kpi
             title="Pedidos antiguos"
             value={pedidos.length}
@@ -188,7 +190,9 @@ export default async function PedidosAntiguosPage() {
 
           {pedidos.length === 0 && (
             <div className="card p-12 text-center">
-              <p className="text-4xl">✅</p>
+              <span className="mx-auto figure-well figure-well--aqua h-12 w-12">
+                <CircleCheck size={24} strokeWidth={1.75} aria-hidden="true" />
+              </span>
               <p className="mt-3 text-lg font-bold text-gray-500">
                 No hay pedidos con más de 3 meses pendientes.
               </p>

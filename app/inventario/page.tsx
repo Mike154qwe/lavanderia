@@ -9,6 +9,7 @@ import { money, fmt, ESTADO_BADGE } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
 import { PrendaIcon } from "@/components/PrendaIcon";
+import { AlertTriangle, CircleCheck, ClipboardList, Layers } from "lucide-react";
 
 export const metadata: Metadata = { title: "Inventario" };
 
@@ -185,15 +186,15 @@ export default async function InventarioPage({
   ];
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">Inventario en piso</h1>
-            <p className="mt-0.5 text-sm text-gray-400">
+            <p className="page-kicker text-brand-500">Gerente</p>
+            <h1 className="page-title">Inventario en piso</h1>
+            <p className="page-subtitle">
               {total} pedido{total !== 1 ? "s" : ""} activo{total !== 1 ? "s" : ""}
             </p>
           </div>
@@ -253,10 +254,10 @@ export default async function InventarioPage({
 
       {/* ── KPIs ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KpiCard icon="📋" label="Pedidos activos"    value={pedidos.length} color="blue"   />
-        <KpiCard icon="🧺" label="Prendas pendientes" value={kpiPrendas}     color="purple" />
-        <KpiCard icon="⚠️" label="Con saldo"          value={kpiSaldo}       color="red"    />
-        <KpiCard icon="✅" label="Listos para recoger" value={kpiListos}     color="green"  />
+        <KpiCard icon={<ClipboardList size={18} strokeWidth={1.75} />} label="Pedidos activos"    value={pedidos.length} color="blue"   />
+        <KpiCard icon={<Layers size={18} strokeWidth={1.75} />} label="Prendas pendientes" value={kpiPrendas}     color="purple" />
+        <KpiCard icon={<AlertTriangle size={18} strokeWidth={1.75} />} label="Con saldo"          value={kpiSaldo}       color="red"    />
+        <KpiCard icon={<CircleCheck size={18} strokeWidth={1.75} />} label="Listos para recoger" value={kpiListos}     color="green"  />
       </div>
 
       {/* ── Banner de resultado de escaneo ──────────────── */}
@@ -711,25 +712,25 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 /* ── Sub-componentes ─────────────────────────────────────────── */
 
 function KpiCard({ icon, label, value, color }: {
-  icon: string; label: string; value: number;
+  icon: React.ReactNode; label: string; value: number;
   color: "blue" | "purple" | "red" | "green";
 }) {
   const ring: Record<string, string> = {
-    blue:   "ring-blue-100 bg-blue-50",
-    purple: "ring-purple-100 bg-purple-50",
-    red:    "ring-red-100 bg-red-50",
-    green:  "ring-green-100 bg-green-50",
+    blue:   "figure-well--indigo",
+    purple: "text-violet-700",
+    red:    "bg-red-50 text-red-600",
+    green:  "figure-well--aqua",
   };
   const num: Record<string, string> = {
     blue: "text-blue-700", purple: "text-purple-700", red: "text-red-600", green: "text-green-700",
   };
   return (
     <div className="card p-5">
-      <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl text-lg ring-1 ${ring[color]}`}>
+      <div className={`mb-3 figure-well h-10 w-10 ${ring[color]}`}>
         {icon}
       </div>
       <p className={`text-3xl font-black ${num[color]}`}>{value}</p>
-      <p className="mt-0.5 text-xs font-bold text-gray-500">{label}</p>
+      <p className="mt-0.5 text-xs font-bold text-[color:var(--text-2)]">{label}</p>
     </div>
   );
 }

@@ -53,19 +53,19 @@ export default async function ClientesPage({
   });
 
   return (
-    <div className="p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">
+            <p className="page-kicker text-brand-500">
               Gerente
             </p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">
+            <h1 className="page-title">
               Clientes
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="page-subtitle">
               {total} registrados · {nuevosMes} nuevos este mes
             </p>
           </div>
@@ -89,7 +89,7 @@ export default async function ClientesPage({
       </div>
 
       {/* ── KPIs ─────────────────────────────────────────── */}
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <KpiCard
           label="Total clientes"
           value={total}
@@ -111,7 +111,7 @@ export default async function ClientesPage({
       </div>
 
       {/* ── Formulario nuevo cliente ──────────────────────── */}
-      <details className="group card mt-5 overflow-hidden">
+      <details className="group card overflow-hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-500 text-white">
@@ -154,7 +154,7 @@ export default async function ClientesPage({
       </details>
 
       {/* ── Tabla ────────────────────────────────────────── */}
-      <div className="card mt-5 overflow-hidden">
+      <div className="card overflow-hidden">
         {clientes.length === 0 ? (
           <EmptyState
             icon={
@@ -302,7 +302,7 @@ function KpiCard({
 
   return (
     <div className="card p-5">
-      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${palette}`}>
+      <div className={`mb-3 figure-well h-10 w-10 ${palette}`}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
           {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
         </svg>

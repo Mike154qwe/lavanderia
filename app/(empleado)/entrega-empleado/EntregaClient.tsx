@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { money } from "@/lib/format";
+import { CircleAlert, CircleCheck, CircleX, ScanLine, Search } from "lucide-react";
 
 export type PedidoEntrega = {
   id: number;
@@ -128,8 +128,8 @@ export default function EntregaClient({
 
         {/* ── HEADER ────────────────────────────────── */}
         <div className="mb-5">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-[var(--radius-well)] bg-brand-500 text-3xl shadow-soft">
-            🔫
+          <div className="mb-2 figure-well figure-well--indigo h-12 w-12">
+            <ScanLine size={22} strokeWidth={1.75} aria-hidden="true" />
           </div>
           <p className="page-kicker text-brand-500">Salida</p>
           <h1 className="page-title">Entrega y cobro</h1>
@@ -149,7 +149,13 @@ export default function EntregaClient({
           status === "loading" ? "ring-brand-300 animate-pulse" : "ring-brand-500"
         }`}>
           <div className="flex items-center gap-3 px-4 py-4">
-            <span className="text-2xl">{status === "loading" ? "⏳" : "🔍"}</span>
+            <span className="figure-well figure-well--indigo h-10 w-10">
+              {status === "loading" ? (
+                <Search size={18} strokeWidth={1.75} aria-hidden="true" />
+              ) : (
+                <ScanLine size={18} strokeWidth={1.75} aria-hidden="true" />
+              )}
+            </span>
             <input
               ref={inputRef}
               value={codigo}
@@ -181,7 +187,9 @@ export default function EntregaClient({
         {/* ── NOT FOUND ─────────────────────────────── */}
         {status === "not-found" && (
           <div className="card mb-4 flex items-center gap-3 p-5">
-            <span className="text-3xl">❌</span>
+            <span className="figure-well h-10 w-10 bg-red-50 text-red-600">
+              <CircleX size={20} strokeWidth={1.75} aria-hidden="true" />
+            </span>
             <div className="text-left">
               <p className="font-bold text-red-700 dark:text-red-400">Recibo no encontrado</p>
               <p className="text-sm text-[color:var(--text-3)]">
@@ -194,7 +202,9 @@ export default function EntregaClient({
         {/* ── SUCCESS ENTREGADO ─────────────────────── */}
         {status === "success-entrega" && pedido && (
           <div className="mb-4 flex flex-col items-center gap-2 rounded-2xl bg-emerald-50 px-5 py-8 text-center ring-1 ring-emerald-200">
-            <span className="text-5xl">✅</span>
+            <span className="figure-well figure-well--aqua h-12 w-12">
+              <CircleCheck size={26} strokeWidth={1.75} aria-hidden="true" />
+            </span>
             <p className="text-xl font-bold text-emerald-700">¡Entregado!</p>
             <p className="text-sm font-bold text-emerald-600">
               Pedido #{pedido.codigoFormateado} — {pedido.cliente.nombre}
@@ -237,7 +247,7 @@ export default function EntregaClient({
             {/* Aviso si no está listo */}
             {(pedido.estado === "RECIBIDO" || pedido.estado === "EN_PROCESO") && (
               <div className="flex items-center gap-2 border-b border-yellow-100 bg-yellow-50 px-5 py-2.5">
-                <span>⚠️</span>
+                <CircleAlert size={14} strokeWidth={2} className="shrink-0 text-yellow-700" aria-hidden="true" />
                 <p className="text-xs font-bold text-yellow-700">
                   Este pedido aún no está listo para entrega
                 </p>
