@@ -2,9 +2,26 @@
 
 import { Fragment, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Phone, User, WashingMachine } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ClipboardList,
+  Minus,
+  Phone,
+  Plus,
+  Receipt,
+  Trash2,
+  User,
+  Users,
+  WashingMachine,
+} from "lucide-react";
 import { money } from "@/lib/format";
 import { PrendaIcon, ServicioIcon } from "@/components/PrendaIcon";
+import FieldIcon from "@/components/FieldIcon";
 
 type ItemPedido = {
   id: number;
@@ -89,10 +106,10 @@ function StepCircle({ done }: { done: boolean }) {
       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
         done
           ? "bg-emerald-500 text-white"
-          : "bg-gray-200 text-gray-500"
+          : "bg-[color:var(--surface-2)] text-[color:var(--text-3)]"
       }`}
     >
-      {done ? "✓" : ""}
+      {done ? <Check size={14} strokeWidth={2.5} aria-hidden="true" /> : ""}
     </div>
   );
 }
@@ -245,23 +262,28 @@ export default function PedidoRapidoForm({
               </div>
             </div>
 
-            <ol className="flex items-center gap-1.5">
+            <ol className="flex items-center gap-1">
               {PASOS.map((label, i) => {
                 const n = i + 1;
-                const pill = `flex min-h-9 items-center rounded-full px-3 text-xs font-bold ${
+                const pill = `inline-flex min-h-9 items-center rounded-full px-3 text-xs font-bold ${
                   paso === n
                     ? "bg-teal-500 text-white"
                     : paso > n
-                      ? "bg-teal-50 text-teal-700 dark:text-teal-300"
-                      : "bg-gray-100 text-gray-500"
+                      ? "bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300"
+                      : "bg-[color:var(--surface-2)] text-[color:var(--text-3)]"
                 }`;
                 return (
                   <Fragment key={label}>
-                    {i > 0 && <li aria-hidden="true" className="text-gray-300">→</li>}
+                    {i > 0 && (
+                      <li aria-hidden="true" className="text-[color:var(--text-4)]">
+                        <ChevronRight size={14} strokeWidth={2} />
+                      </li>
+                    )}
                     <li aria-current={paso === n ? "step" : undefined}>
                       {paso > n ? (
-                        <button type="button" onClick={() => setPaso(n)} className={pill}>
-                          ✓ {label}
+                        <button type="button" onClick={() => setPaso(n)} className={`${pill} gap-1`}>
+                          <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+                          {label}
                         </button>
                       ) : (
                         <span className={pill}>{n} {label}</span>
@@ -275,25 +297,26 @@ export default function PedidoRapidoForm({
             {paso === 1 && (
               <Link
                 href="/clientes-empleado"
-                className="rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+                className="btn-dark gap-1.5 px-3 py-2 text-xs"
               >
+                <Users size={14} strokeWidth={2} aria-hidden="true" />
                 Clientes
               </Link>
             )}
 
             {paso >= 2 && (
-              <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-2 ring-1 ring-gray-200">
+              <div className="flex items-center gap-3 rounded-[var(--radius-well)] bg-[color:var(--surface-2)] px-4 py-2 ring-1 ring-[color:var(--border-1)]">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">
                   {nombre.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-bold leading-tight text-gray-800">{nombre}</p>
-                  <p className="text-xs text-gray-400">{telefono}</p>
+                  <p className="text-sm font-bold leading-tight text-[color:var(--text-1)]">{nombre}</p>
+                  <p className="text-xs text-[color:var(--text-3)]">{telefono}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPaso(1)}
-                  className="ml-1 min-h-10 rounded-lg bg-white px-3 text-xs font-bold text-gray-500 ring-1 ring-gray-200 transition hover:bg-gray-100"
+                  className="ml-1 inline-flex min-h-10 items-center gap-1 rounded-[var(--radius-control)] bg-[color:var(--surface)] px-3 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
                 >
                   Cambiar
                 </button>
@@ -309,36 +332,24 @@ export default function PedidoRapidoForm({
                 <div className="mx-auto mb-3 figure-well figure-well--aqua h-16 w-16">
                   <User size={32} strokeWidth={1.75} aria-hidden="true" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Datos del cliente</h2>
-                <p className="mt-1 text-sm text-gray-400">
+                <h2 className="text-2xl font-bold text-[color:var(--text-1)]">Datos del cliente</h2>
+                <p className="mt-1 text-sm text-[color:var(--text-3)]">
                   Ingresa el nombre y teléfono para continuar
                 </p>
               </div>
 
               <div className="space-y-3">
-                <div className="relative">
-                  <User
-                    size={20}
-                    strokeWidth={1.75}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
-                    aria-hidden="true"
-                  />
+                <FieldIcon icon={<User size={20} strokeWidth={1.75} />}>
                   <input
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-                    className="input-modern w-full py-4 pl-12 pr-5 text-xl font-bold"
+                    className="input-modern w-full py-4 pr-5 text-xl font-bold"
                     placeholder="Nombre completo"
                     autoFocus
                   />
-                </div>
-                <div className="relative">
-                  <Phone
-                    size={20}
-                    strokeWidth={1.75}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
-                    aria-hidden="true"
-                  />
+                </FieldIcon>
+                <FieldIcon icon={<Phone size={20} strokeWidth={1.75} />}>
                   <input
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
@@ -349,19 +360,21 @@ export default function PedidoRapidoForm({
                       }
                     }}
                     type="tel"
-                    className="input-modern w-full py-4 pl-12 pr-5 text-xl font-bold"
+                    className="input-modern w-full py-4 pr-5 text-xl font-bold"
                     placeholder="Teléfono"
                   />
-                </div>
+                </FieldIcon>
               </div>
 
               <button
                 type="button"
                 disabled={!nombre.trim() || !telefono.trim()}
                 onClick={() => setPaso(2)}
-                className="mt-6 w-full rounded-2xl bg-brand-500 py-4 text-lg font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                className="btn-primary btn-lg mt-6 gap-2 text-lg"
               >
-                Continuar → Agregar prendas
+                Continuar
+                <ArrowRight size={18} strokeWidth={2.25} aria-hidden="true" />
+                Agregar prendas
               </button>
             </div>
           )}
@@ -388,11 +401,6 @@ export default function PedidoRapidoForm({
                         </p>
                       )}
                     </div>
-                    {steps.tipo && !steps.servicio && (
-                      <span className="animate-pulse rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-bold text-brand-600">
-                        siguiente →
-                      </span>
-                    )}
                   </div>
                   <div className="p-4">
                     <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6">
@@ -512,9 +520,10 @@ export default function PedidoRapidoForm({
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl font-bold text-gray-700 transition hover:bg-gray-200 active:scale-95"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[color:var(--surface-2)] text-[color:var(--text-1)] transition hover:bg-[color:var(--border-1)] active:scale-95"
+                          aria-label="Quitar uno"
                         >
-                          −
+                          <Minus size={18} strokeWidth={2.25} aria-hidden="true" />
                         </button>
                         <input
                           type="number"
@@ -529,9 +538,10 @@ export default function PedidoRapidoForm({
                         <button
                           type="button"
                           onClick={() => setCantidad((c) => c + 1)}
-                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-white transition hover:bg-brand-600 active:scale-95"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white transition hover:bg-brand-600 active:scale-95"
+                          aria-label="Agregar uno"
                         >
-                          +
+                          <Plus size={18} strokeWidth={2.25} aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -621,18 +631,23 @@ export default function PedidoRapidoForm({
                     onClick={() => setShowNovedades((v) => !v)}
                     className="flex w-full items-center gap-3 px-5 py-3.5 text-left"
                   >
-                    <span className="text-lg">⚠️</span>
+                    <span className="figure-well figure-well--amber h-9 w-9 text-orange-600">
+                      <AlertTriangle size={16} strokeWidth={1.75} aria-hidden="true" />
+                    </span>
                     <div className="flex-1">
                       <p className="text-sm font-bold text-gray-600">Novedades de la prenda</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-500">
                         {descripcionActual
                           ? descripcionActual
                           : "Daños, manchas, estado especial · Opcional"}
                       </p>
                     </div>
-                    <span className={`text-xs font-bold transition-transform ${showNovedades ? "rotate-180" : ""} text-gray-400`}>
-                      ▼
-                    </span>
+                    <ChevronDown
+                      size={16}
+                      strokeWidth={2}
+                      className={`shrink-0 text-gray-400 transition-transform ${showNovedades ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                    />
                   </button>
 
                   {showNovedades && (
@@ -643,13 +658,16 @@ export default function PedidoRapidoForm({
                             key={n}
                             type="button"
                             onClick={() => toggleNovedad(n)}
-                            className={`min-h-11 rounded-xl border-2 p-2 text-xs font-bold transition active:scale-[0.97] ${
+                            className={`flex min-h-11 items-center justify-center gap-1 rounded-xl border-2 p-2 text-xs font-bold transition active:scale-[0.97] ${
                               novedades.includes(n)
                                 ? "border-orange-500 bg-orange-50 text-orange-700"
                                 : "border-gray-200 text-gray-600 hover:border-orange-300"
                             }`}
                           >
-                            {novedades.includes(n) ? "⚠️ " : ""}{n}
+                            {novedades.includes(n) && (
+                              <AlertTriangle size={12} strokeWidth={2} aria-hidden="true" />
+                            )}
+                            {n}
                           </button>
                         ))}
                       </div>
@@ -669,15 +687,15 @@ export default function PedidoRapidoForm({
                   type="button"
                   onClick={agregarItem}
                   disabled={!puedeAgregar}
-                  className={`w-full rounded-2xl py-4 text-base font-bold shadow-md transition active:scale-[0.99] ${
+                  className={`btn-lg gap-2 ${
                     puedeAgregar
-                      ? "bg-gray-900 text-white hover:bg-gray-700"
-                      : "cursor-not-allowed bg-gray-100 text-gray-400"
+                      ? "btn-dark"
+                      : "cursor-not-allowed rounded-2xl bg-[color:var(--surface-2)] text-[color:var(--text-4)]"
                   }`}
                 >
                   {puedeAgregar ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span className="text-lg">➕</span>
+                      <Plus size={18} strokeWidth={2.25} aria-hidden="true" />
                       <span>
                         Agregar {cantidad > 1 ? `${cantidad}× ` : ""}{tipoFinal}
                         <span className="mx-1.5 opacity-50">·</span>
@@ -711,7 +729,7 @@ export default function PedidoRapidoForm({
                   {/* Header del panel */}
                   <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-base">🧾</span>
+                      <Receipt size={16} strokeWidth={1.75} className="text-brand-500" aria-hidden="true" />
                       <p className="text-sm font-bold text-gray-700">Pedido</p>
                     </div>
                     {totalPrendas > 0 && (
@@ -724,9 +742,11 @@ export default function PedidoRapidoForm({
                   {/* Lista de ítems */}
                   {items.length === 0 ? (
                     <div className="px-4 py-10 text-center">
-                      <p className="text-3xl">📋</p>
-                      <p className="mt-2 text-sm font-bold text-gray-300">Sin prendas aún</p>
-                      <p className="text-xs text-gray-300">Completa los 4 datos y presiona Agregar</p>
+                      <span className="mx-auto figure-well h-12 w-12 text-[color:var(--text-3)]">
+                        <ClipboardList size={22} strokeWidth={1.75} aria-hidden="true" />
+                      </span>
+                      <p className="mt-2 text-sm font-bold text-[color:var(--text-2)]">Sin prendas aún</p>
+                      <p className="text-xs text-[color:var(--text-3)]">Completa los 4 datos y presiona Agregar</p>
                     </div>
                   ) : (
                     <div className="max-h-80 divide-y divide-gray-50 overflow-y-auto dark:divide-white/[0.06]">
@@ -744,8 +764,9 @@ export default function PedidoRapidoForm({
                             </p>
                             <p className="text-xs font-semibold text-gray-400">{item.servicio}</p>
                             {item.descripcion && (
-                              <p className="mt-0.5 text-xs font-bold leading-tight text-orange-500">
-                                ⚠ {item.descripcion}
+                              <p className="mt-0.5 flex items-start gap-1 text-xs font-bold leading-tight text-orange-600">
+                                <AlertTriangle size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                                {item.descripcion}
                               </p>
                             )}
                           </div>
@@ -756,9 +777,9 @@ export default function PedidoRapidoForm({
                                 type="button"
                                 onClick={() => eliminarItem(item.id)}
                                 aria-label={`Quitar ${item.tipo}`}
-                                className="ml-auto flex h-9 w-9 items-center justify-center text-xs font-bold text-red-300 transition hover:text-red-500"
+                                className="ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-red-400 transition hover:bg-red-50 hover:text-red-600"
                               >
-                                ✕
+                                <Trash2 size={14} strokeWidth={2} aria-hidden="true" />
                               </button>
                             )}
                           </div>
@@ -784,9 +805,11 @@ export default function PedidoRapidoForm({
                         type="button"
                         disabled={items.length === 0}
                         onClick={() => setPaso(3)}
-                        className="w-full rounded-2xl bg-brand-500 py-4 text-base font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none dark:disabled:bg-white/10"
+                        className="btn-primary btn-lg gap-2"
                       >
-                        Continuar → Recibo
+                        Continuar
+                        <ArrowRight size={18} strokeWidth={2.25} aria-hidden="true" />
+                        Recibo
                       </button>
                     </div>
                   )}
@@ -795,8 +818,8 @@ export default function PedidoRapidoForm({
                   {paso === 3 && (
                     <div className="space-y-3 p-4">
                       <div>
-                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-400">
-                          💵 Abono inicial
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
+                          Abono inicial
                         </label>
                         <input
                           type="number"
@@ -816,11 +839,11 @@ export default function PedidoRapidoForm({
                           onChange={(e) => setMetodo(e.target.value)}
                           className="w-full rounded-xl border-2 border-gray-200 p-3 text-base font-bold focus:border-brand-500 focus:outline-none"
                         >
-                          <option value="Efectivo">💵 Efectivo</option>
-                          <option value="Nequi">📱 Nequi</option>
-                          <option value="Daviplata">📱 Daviplata</option>
-                          <option value="Transferencia">🏦 Transferencia</option>
-                          <option value="Tarjeta">💳 Tarjeta</option>
+                          <option value="Efectivo">Efectivo</option>
+                          <option value="Nequi">Nequi</option>
+                          <option value="Daviplata">Daviplata</option>
+                          <option value="Transferencia">Transferencia</option>
+                          <option value="Tarjeta">Tarjeta</option>
                         </select>
                       </div>
 
@@ -832,22 +855,27 @@ export default function PedidoRapidoForm({
                       )}
                       {saldo <= 0 && abono > 0 && (
                         <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center dark:bg-emerald-500/10">
-                          <p className="text-xs font-bold text-emerald-600">✅ Pagado completo</p>
+                          <p className="flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-600">
+                            <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                            Pagado completo
+                          </p>
                         </div>
                       )}
 
                       <button
                         type="submit"
-                        className="w-full rounded-2xl bg-brand-500 py-4 text-lg font-bold text-white shadow-md transition hover:bg-brand-600 active:scale-[0.99]"
+                        className="btn-primary btn-lg gap-2 text-lg"
                       >
-                        ✅ Confirmar e imprimir recibo
+                        <Check size={18} strokeWidth={2.25} aria-hidden="true" />
+                        Confirmar e imprimir recibo
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaso(2)}
-                        className="min-h-11 w-full rounded-2xl text-sm font-bold text-gray-500 transition hover:bg-gray-100 dark:hover:bg-white/5"
+                        className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-2xl text-sm font-bold text-[color:var(--text-3)] transition hover:bg-[color:var(--surface-2)]"
                       >
-                        ← Volver a prendas
+                        <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
+                        Volver a prendas
                       </button>
                     </div>
                   )}

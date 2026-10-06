@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  ArrowRight,
   CircleCheck,
   ClipboardList,
   PackageCheck,
@@ -152,11 +153,12 @@ function PathCard({
       </ol>
 
       <p
-        className={`mt-5 text-sm font-bold ${
+        className={`mt-5 inline-flex items-center gap-1.5 text-sm font-bold ${
           aqua ? "text-teal-600 group-hover:text-teal-700" : "text-brand-500 group-hover:text-brand-600"
         }`}
       >
-        {cta} →
+        {cta}
+        <ArrowRight size={14} strokeWidth={2.25} aria-hidden="true" />
       </p>
     </Link>
   );

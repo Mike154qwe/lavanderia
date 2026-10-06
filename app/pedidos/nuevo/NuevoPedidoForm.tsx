@@ -3,6 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
+import FieldIcon from "@/components/FieldIcon";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  MapPin,
+  Phone,
+  Plus,
+  Search,
+  Trash2,
+  User,
+  Users,
+} from "lucide-react";
 
 type Cliente = {
   id: number;
@@ -154,12 +168,14 @@ export default function NuevoPedidoForm({
           </div>
 
           <form className="mt-4 flex gap-2">
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Buscar por nombre o teléfono…"
-              className="input-modern flex-1"
-            />
+            <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder="Buscar por nombre o teléfono…"
+                className="input-modern w-full"
+              />
+            </FieldIcon>
             <button className="btn-primary whitespace-nowrap">Buscar</button>
           </form>
 
@@ -193,9 +209,7 @@ export default function NuevoPedidoForm({
                     </p>
                   </div>
                   {activo && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-brand-500">
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
+                    <Check size={16} strokeWidth={2.5} className="shrink-0 text-brand-500" aria-hidden="true" />
                   )}
                 </Link>
               );
@@ -214,26 +228,28 @@ export default function NuevoPedidoForm({
             <div className="mt-4 flex items-center justify-between">
               <Link
                 href={`/pedidos/nuevo?q=${q}&page=${Math.max(currentPage - 1, 1)}`}
-                className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+                className={`inline-flex items-center gap-1 rounded-xl px-4 py-2 text-sm font-bold transition ${
                   currentPage === 1
                     ? "pointer-events-none text-gray-300"
                     : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
                 }`}
               >
-                ← Anterior
+                <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
+                Anterior
               </Link>
               <span className="text-xs font-semibold text-gray-400">
                 {currentPage} / {totalPages}
               </span>
               <Link
                 href={`/pedidos/nuevo?q=${q}&page=${Math.min(currentPage + 1, totalPages)}`}
-                className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+                className={`inline-flex items-center gap-1 rounded-xl px-4 py-2 text-sm font-bold transition ${
                   currentPage >= totalPages
                     ? "pointer-events-none text-gray-300"
                     : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
                 }`}
               >
-                Siguiente →
+                Siguiente
+                <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
               </Link>
             </div>
           )}
@@ -251,15 +267,21 @@ export default function NuevoPedidoForm({
               <label className="mb-1.5 block text-xs font-bold text-gray-500">
                 Nombre <span className="text-red-400">*</span>
               </label>
-              <input name="nombre" required placeholder="Ej. María García" className="input-modern" />
+              <FieldIcon icon={<User size={16} strokeWidth={1.75} />}>
+                <input name="nombre" required placeholder="Ej. María García" className="input-modern w-full" />
+              </FieldIcon>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-bold text-gray-500">Teléfono</label>
-              <input name="telefono" placeholder="Ej. 3001234567" className="input-modern" />
+              <FieldIcon icon={<Phone size={16} strokeWidth={1.75} />}>
+                <input name="telefono" placeholder="Ej. 3001234567" className="input-modern w-full" />
+              </FieldIcon>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-bold text-gray-500">Dirección</label>
-              <input name="direccion" placeholder="Ej. Calle 5 # 10-20" className="input-modern" />
+              <FieldIcon icon={<MapPin size={16} strokeWidth={1.75} />}>
+                <input name="direccion" placeholder="Ej. Calle 5 # 10-20" className="input-modern w-full" />
+              </FieldIcon>
             </div>
             <button className="btn-primary mt-1">
               Crear y seleccionar cliente
@@ -301,11 +323,9 @@ export default function NuevoPedidoForm({
               <button
                 type="button"
                 onClick={agregarServicio}
-                className="flex items-center gap-1.5 rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 transition hover:bg-brand-500 hover:text-white dark:bg-brand-500/15 dark:text-brand-400 dark:hover:bg-brand-500 dark:hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 transition hover:bg-brand-500 hover:text-white dark:bg-brand-500/15 dark:text-brand-400 dark:hover:bg-brand-500 dark:hover:text-white"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
+                <Plus size={14} strokeWidth={2.5} aria-hidden="true" />
                 Agregar prenda
               </button>
             </div>
@@ -317,7 +337,7 @@ export default function NuevoPedidoForm({
                 const mostrarSelectItem = item.categoria !== "" && !esPersonalizada;
 
                 return (
-                <div key={item.id} className="rounded-xl border border-gray-100 bg-gray-50 p-5 dark:border-white/[0.06] dark:bg-white/[0.02]">
+                <div key={item.id} className="card-well p-5">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-500 text-xs font-bold text-white">
@@ -329,8 +349,9 @@ export default function NuevoPedidoForm({
                       <button
                         type="button"
                         onClick={() => eliminarServicio(item.id)}
-                        className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 dark:hover:bg-red-500/10"
+                        className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 dark:hover:bg-red-500/10"
                       >
+                        <Trash2 size={13} strokeWidth={2} aria-hidden="true" />
                         Eliminar
                       </button>
                     )}
@@ -455,10 +476,8 @@ export default function NuevoPedidoForm({
             </div>
 
             <div className="mt-6 flex items-center gap-4">
-              <button className="btn-primary flex items-center gap-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                </svg>
+              <button className="btn-primary gap-2">
+                <FileText size={16} strokeWidth={2} aria-hidden="true" />
                 Guardar y generar recibo
               </button>
               <p className="text-xs text-gray-400">
@@ -469,12 +488,10 @@ export default function NuevoPedidoForm({
         </form>
       ) : (
         <div className="card mt-5 p-12 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7 text-gray-400">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
+          <div className="mx-auto mb-4 figure-well h-14 w-14">
+            <Users size={28} strokeWidth={1.5} className="text-[color:var(--text-3)]" aria-hidden="true" />
           </div>
-          <p className="font-bold text-gray-500">
+          <p className="font-bold text-[color:var(--text-3)]">
             Selecciona un cliente o crea uno nuevo para continuar.
           </p>
         </div>

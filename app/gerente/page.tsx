@@ -1,11 +1,21 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  Banknote,
+  ClipboardList,
+  Printer,
+  Shield,
+  Smartphone,
+  TrendingDown,
+  TriangleAlert,
+  Wallet,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import IngresosDiarios from "@/components/charts/IngresosDiarios";
 import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaLarga, fechaCorta } from "@/lib/format";
 import PedidoLink from "@/components/PedidoLink";
 import { calcularCaja, ventanaDeCierre, enVentana } from "@/lib/caja";
 import {
@@ -14,6 +24,9 @@ import {
   type PanelRemotoData,
 } from "@/lib/panel-remoto";
 import { guardarPanelRemotoEnFirestore } from "@/lib/panel-remoto-admin";
+import MonthCalendar from "@/components/MonthCalendar";
+import DateField from "@/components/DateField";
+import YearPager from "@/components/YearPager";
 
 export const metadata: Metadata = { title: "Gerente" };
 
@@ -153,11 +166,13 @@ export default async function GerentePage({
 }) {
   const params = searchParams ? await searchParams : {};
   const hoy    = new Date();
-  const year   = Number(params.year || hoy.getFullYear());
 
   const fechaSeleccionada = params.fecha
     ? new Date(params.fecha + "T00:00:00")
     : inicioDia(hoy);
+  const year = params.fecha
+    ? fechaSeleccionada.getFullYear()
+    : Number(params.year || hoy.getFullYear());
 
   const inicio = inicioDia(fechaSeleccionada);
   const fin    = finDia(fechaSeleccionada);
@@ -249,6 +264,17 @@ export default async function GerentePage({
 
   const fechaLinkActual = `${fechaSeleccionada.getFullYear()}-${String(fechaSeleccionada.getMonth() + 1).padStart(2,"0")}-${String(fechaSeleccionada.getDate()).padStart(2,"0")}`;
   const esHoy = sameDay(fechaSeleccionada, hoy);
+  const mesVista = fechaSeleccionada.getMonth();
+  const yearVista = fechaSeleccionada.getFullYear();
+  const diasDelMesVista = new Date(yearVista, mesVista + 1, 0).getDate();
+  let mesSinMovimiento = true;
+  for (let dia = 1; dia <= diasDelMesVista; dia++) {
+    const k = dayKey(new Date(yearVista, mesVista, dia));
+    if ((pedidosAnoMap.get(k) ?? 0) + (salidasAnoMap.get(k) ?? 0) + (gastosAnoMap.get(k) ?? 0) > 0) {
+      mesSinMovimiento = false;
+      break;
+    }
+  }
 
   return (
     <div className="page-frame page-frame--wide">
@@ -261,28 +287,24 @@ export default async function GerentePage({
               Gerente · {esHoy ? "Hoy" : "Día seleccionado"}
             </p>
             <h1 className="page-title">Panel financiero</h1>
-            <p className="page-subtitle capitalize">
-              {fechaSeleccionada.toLocaleDateString("es-CO", {
-                weekday: "long", year: "numeric", month: "long", day: "numeric",
-              })}
+            <p className="page-subtitle">
+              {fechaLarga(fechaSeleccionada)}
             </p>
           </div>
-          <form className="flex gap-2">
-            <input
-              type="date"
+          <form className="flex items-center gap-2">
+            <DateField
               name="fecha"
               defaultValue={fechaLinkActual}
-              className="input-modern w-auto"
+              display={fechaCorta(fechaSeleccionada)}
             />
-            <input type="hidden" name="year" value={year} />
-            <button className="btn-primary whitespace-nowrap">Ver día</button>
+            <button type="submit" className="sr-only">Ver día</button>
           </form>
         </div>
 
         <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-3">
-          <KpiCard label="Dinero recibido" value={money(totalRecibido)} color="green"  icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          <KpiCard label="Ventas del día"  value={money(totalVentas)}   color="blue"   icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
-          <KpiCard label="Gastos"          value={money(totalGastos)}   color="red"    icon="M17 7 7 17M7 7l10 10" danger />
+          <KpiCard label="Dinero recibido" value={money(totalRecibido)} color="green"  icon={<Banknote size={18} strokeWidth={1.75} />} />
+          <KpiCard label="Ventas del día"  value={money(totalVentas)}   color="blue"   icon={<ClipboardList size={18} strokeWidth={1.75} />} />
+          <KpiCard label="Gastos"          value={money(totalGastos)}   color="red"    icon={<TrendingDown size={18} strokeWidth={1.75} />} danger />
         </div>
 
         <div className="grid gap-3 border-t border-[color:var(--border-1)] p-4 sm:grid-cols-2">
@@ -291,7 +313,7 @@ export default async function GerentePage({
             hint="Todo lo recibido menos todos los gastos, en cualquier medio de pago."
             value={money(caja.gananciaNeta)}
             color="purple"
-            icon="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+            icon={<Shield size={18} strokeWidth={1.75} />}
             danger={caja.gananciaNeta < 0}
           />
           <KpiCard
@@ -299,10 +321,50 @@ export default async function GerentePage({
             hint="Efectivo recibido menos solo los gastos pagados en efectivo. Para cuadrar el cajón."
             value={money(caja.efectivoEnCaja)}
             color="green"
-            icon="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"
+            icon={<Wallet size={18} strokeWidth={1.75} />}
             danger={caja.efectivoEnCaja < 0}
           />
         </div>
+      </div>
+
+      {/* ── Calendario del mes (visible, no plegado) ─────── */}
+      <div className="card overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--border-1)] px-5 py-4">
+          <div>
+            <p className="page-kicker text-brand-500">Calendario</p>
+            <h2 className="page-title !text-xl">
+              {MESES[fechaSeleccionada.getMonth()]} {fechaSeleccionada.getFullYear()}
+            </h2>
+            <p className="page-subtitle">
+              {mesSinMovimiento
+                ? "Este mes aún no hay caja. Toca un día para consultarlo."
+                : "Toca un día para ver su caja. Azul entra, verde sale, rojo gasto."}
+            </p>
+          </div>
+          <div className="cal-legend">
+            <span className="cal-legend__item"><span className="cal-stat cal-stat--in">1</span> Entradas</span>
+            <span className="cal-legend__item"><span className="cal-stat cal-stat--out">1</span> Salidas</span>
+            <span className="cal-legend__item"><span className="cal-stat cal-stat--gas">1</span> Gastos</span>
+          </div>
+        </div>
+        <MonthCalendar
+          year={fechaSeleccionada.getFullYear()}
+          month={fechaSeleccionada.getMonth()}
+          today={hoy}
+          selected={fechaSeleccionada}
+          showGastos
+          hrefFor={(d) =>
+            `/gerente?year=${d.getFullYear()}&fecha=${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+          }
+          getStats={(d) => {
+            const k = dayKey(d);
+            return {
+              entradas: pedidosAnoMap.get(k) ?? 0,
+              salidas: salidasAnoMap.get(k) ?? 0,
+              gastos: gastosAnoMap.get(k) ?? 0,
+            };
+          }}
+        />
       </div>
 
       {/* ── Nivel 1 · Cierre de caja (acción principal) ───── */}
@@ -310,7 +372,7 @@ export default async function GerentePage({
         <div className="border-b border-[color:var(--border-1)] px-5 py-4">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Acción principal</p>
           <h2 className="mt-1 text-lg font-bold text-gray-900">Cierre de caja</h2>
-          <p className="mt-0.5 text-sm text-gray-400">
+          <p className="mt-0.5 text-sm text-[color:var(--text-3)]">
             Toma los movimientos desde el último cierre hasta ahora.
           </p>
         </div>
@@ -319,7 +381,7 @@ export default async function GerentePage({
         <form action={hacerCierreCaja} className="card-well grid gap-3 p-3 sm:grid-cols-[1fr_1fr_auto] sm:p-4">
           <input name="responsable" placeholder="Responsable" defaultValue="Gerente" className="input-modern" />
           <input name="observacion" placeholder="Observación opcional" className="input-modern" />
-          <button className="btn-dark whitespace-nowrap">Hacer cierre →</button>
+          <button className="btn-primary whitespace-nowrap">Hacer cierre</button>
         </form>
 
         {cierresDia.length > 0 && (
@@ -328,7 +390,7 @@ export default async function GerentePage({
               <div key={cierre.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
                 <div>
                   <p className="font-bold text-gray-900">Cierre #{fmt(cierre.id)}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">
+                  <p className="mt-0.5 text-xs text-[color:var(--text-3)]">
                     {cierre.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {cierre.responsable || "Sin responsable"}
                   </p>
                   <p className="mt-1 text-sm font-black text-brand-500">
@@ -338,8 +400,8 @@ export default async function GerentePage({
                     Efectivo en caja: {money(c.efectivoEnCaja)}
                   </p>
                 </div>
-                <Link href={`/cierres-caja/${cierre.id}/ticket`} className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-600">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+                <Link href={`/cierres-caja/${cierre.id}/ticket`} className="inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-600">
+                  <Printer size={14} strokeWidth={2} aria-hidden="true" />
                   Imprimir ticket
                 </Link>
               </div>
@@ -360,8 +422,8 @@ export default async function GerentePage({
         <p className="page-kicker">Detalle del día</p>
         <h2 className="mb-5 mt-1 text-lg font-bold text-gray-900">Facturación del día</h2>
         <div className="grid gap-5 xl:grid-cols-2">
-          <PagosGrupo titulo="Efectivo" icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" pagos={pagosEfectivo} />
-          <PagosGrupo titulo="Pagos digitales" icon="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 14l4 4-4 4" pagos={pagosDigitales} />
+          <PagosGrupo titulo="Efectivo" icon={<Banknote size={16} strokeWidth={1.75} />} pagos={pagosEfectivo} />
+          <PagosGrupo titulo="Pagos digitales" icon={<Smartphone size={16} strokeWidth={1.75} />} pagos={pagosDigitales} />
         </div>
       </div>
 
@@ -442,90 +504,47 @@ export default async function GerentePage({
         </div>
       </details>
 
-      {/* ── Nivel 3 · Calendario anual (secundario, plegado) ─ */}
-      <details className="space-y-4">
-        <summary className="card cursor-pointer list-none px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200">
+      {/* ── Calendario anual ─────────────────────────────── */}
+      <details className="card overflow-hidden">
+        <summary className="cursor-pointer list-none px-6 py-4 text-sm font-bold text-[color:var(--text-1)]">
           Calendario anual {year}
-          <span className="ml-2 text-xs font-semibold text-gray-400">secundario</span>
+          <span className="ml-2 text-xs font-semibold text-[color:var(--text-3)]">el resto de meses</span>
         </summary>
-        <div className="space-y-4 pt-2">
+        <div className="space-y-4 border-t border-[color:var(--border-1)] p-4">
         <div className="flex items-center gap-2 px-1">
-          <Link href={`/gerente?year=${year - 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
-            ← {year - 1}
-          </Link>
-          <span className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">{year}</span>
-          <Link href={`/gerente?year=${year + 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
-            {year + 1} →
-          </Link>
+          <YearPager year={year} hrefFor={(y) => `/gerente?year=${y}`} />
         </div>
         {MESES.map((mes, mesIndex) => {
-          const diasDelMes = new Date(year, mesIndex + 1, 0).getDate();
           const esMesActual = year === hoy.getFullYear() && mesIndex === hoy.getMonth();
 
           return (
-            <div key={mes} className="card overflow-hidden">
-              <div className={`flex items-center gap-3 border-b border-gray-100 px-6 py-4 dark:border-white/[0.07] ${esMesActual ? "bg-brand-50 dark:bg-brand-500/10" : ""}`}>
+            <div key={mes} className="overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border-1)]">
+              <div className={`flex items-center gap-3 border-b border-[color:var(--border-1)] px-5 py-3 ${esMesActual ? "bg-brand-50 dark:bg-brand-500/10" : ""}`}>
                 {esMesActual && (
                   <span className="rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-bold text-white">Actual</span>
                 )}
-                <h2 className={`font-bold ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-gray-900"}`}>
+                <h2 className={`font-bold ${esMesActual ? "text-brand-600 dark:text-brand-400" : "text-[color:var(--text-1)]"}`}>
                   {mes} {year}
                 </h2>
               </div>
-
-              <div className="grid grid-cols-7 gap-1.5 p-4 sm:grid-cols-10 xl:grid-cols-[repeat(auto-fill,minmax(70px,1fr))]">
-                {Array.from({ length: diasDelMes }).map((_, dayIndex) => {
-                  const dia  = dayIndex + 1;
-                  const fecha = new Date(year, mesIndex, dia);
-                  const seleccionado = sameDay(fechaSeleccionada, fecha);
-                  const esHoyFlag    = sameDay(fecha, hoy);
-                  const k        = dayKey(fecha);
-                  const entradas = pedidosAnoMap.get(k) ?? 0;
-                  const salidas  = salidasAnoMap.get(k) ?? 0;
-                  const gastos   = gastosAnoMap.get(k)  ?? 0;
-                  const activo       = entradas > 0 || salidas > 0 || gastos > 0;
-                  const fechaLink    = `${year}-${String(mesIndex + 1).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
-
-                  let cellClass = "";
-                  if (seleccionado) {
-                    cellClass = "border-brand-400 bg-brand-50 ring-2 ring-brand-300 dark:border-brand-500/50 dark:bg-brand-500/10 dark:ring-brand-500/30";
-                  } else if (esHoyFlag) {
-                    cellClass = "border-orange-400 bg-orange-50 ring-2 ring-orange-300 dark:border-orange-500/50 dark:bg-orange-500/10 dark:ring-orange-500/30";
-                  } else if (activo) {
-                    cellClass = "border-brand-200 bg-brand-50/60 hover:border-brand-400 dark:border-brand-500/20 dark:bg-brand-500/5";
-                  } else {
-                    cellClass = "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/[0.02]";
-                  }
-
-                  return (
-                    <Link
-                      key={dia}
-                      id={esHoyFlag ? "hoy" : undefined}
-                      href={`/gerente?year=${year}&fecha=${fechaLink}`}
-                      className={`rounded-xl border p-2.5 transition ${cellClass}`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <span className={`text-lg font-bold leading-none ${
-                          seleccionado ? "text-brand-600 dark:text-brand-300"
-                          : esHoyFlag   ? "text-orange-600 dark:text-orange-400"
-                          : activo      ? "text-brand-500"
-                          : "text-gray-400"
-                        }`}>{dia}</span>
-                        {esHoyFlag && (
-                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-bold leading-none text-white">HOY</span>
-                        )}
-                      </div>
-                      {activo && (
-                        <div className="mt-1.5 space-y-0.5">
-                          {entradas > 0 && <p className="text-[10px] font-bold text-blue-500">↑ {entradas}</p>}
-                          {salidas  > 0 && <p className="text-[10px] font-bold text-green-500">↓ {salidas}</p>}
-                          {gastos   > 0 && <p className="text-[10px] font-bold text-red-500">💸 {gastos}</p>}
-                        </div>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
+              <MonthCalendar
+                year={year}
+                month={mesIndex}
+                today={hoy}
+                selected={fechaSeleccionada}
+                showGastos
+                hrefFor={(d) =>
+                  `/gerente?year=${year}&fecha=${year}-${String(mesIndex + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+                }
+                getStats={(d) => {
+                  const k = dayKey(d);
+                  return {
+                    entradas: pedidosAnoMap.get(k) ?? 0,
+                    salidas: salidasAnoMap.get(k) ?? 0,
+                    gastos: gastosAnoMap.get(k) ?? 0,
+                  };
+                }}
+              />
             </div>
           );
         })}
@@ -540,7 +559,7 @@ export default async function GerentePage({
 function KpiCard({
   label, value, color, icon, danger, hint,
 }: {
-  label: string; value: string; color: "green" | "blue" | "red" | "purple"; icon: string; danger?: boolean; hint?: string;
+  label: string; value: string; color: "green" | "blue" | "red" | "purple"; icon: React.ReactNode; danger?: boolean; hint?: string;
 }) {
   const palette = {
     green:  "bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400",
@@ -552,31 +571,27 @@ function KpiCard({
   return (
     <div className="card-well p-4">
       <div className="flex items-start gap-3">
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${palette}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
-            {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-          </svg>
+        <div className={`icon-motion flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${palette}`}>
+          {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-gray-500">{label}</p>
-          <p className={`mt-0.5 text-xl font-black tabular-nums ${danger ? "text-red-500" : "text-gray-900"}`}>{value}</p>
-          {hint && <p className="mt-1 text-[11px] leading-snug text-gray-400">{hint}</p>}
+          <p className="text-xs font-semibold text-[color:var(--text-3)]">{label}</p>
+          <p className={`mt-0.5 text-xl font-black tabular-nums ${danger ? "text-red-500" : "text-[color:var(--text-1)]"}`}>{value}</p>
+          {hint && <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-3)]">{hint}</p>}
         </div>
       </div>
     </div>
   );
 }
 
-function PagosGrupo({ titulo, icon, pagos }: { titulo: string; icon: string; pagos: any[] }) {
+function PagosGrupo({ titulo, icon, pagos }: { titulo: string; icon: React.ReactNode; pagos: any[] }) {
   const total = pagos.reduce((s: number, p: any) => s + p.valor, 0);
 
   return (
     <div className="card-well">
       <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3.5 dark:border-white/[0.07]">
         <div className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-brand-500">
-            {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-          </svg>
+          <span className="text-brand-500">{icon}</span>
           <h3 className="font-bold text-gray-900">{titulo}</h3>
         </div>
         <span className="font-black text-brand-500">{money(total)}</span>
@@ -672,8 +687,9 @@ function PedidoRow({ pedido, fechaMovimiento }: { pedido: any; fechaMovimiento?:
               </div>
               <p className="text-xs text-gray-400">{prenda.servicio}</p>
               {prenda.descripcion && (
-                <p className="mt-1.5 rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-                  ⚠️ {prenda.descripcion}
+                <p className="mt-1.5 flex items-start gap-1.5 rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+                  <TriangleAlert size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                  {prenda.descripcion}
                 </p>
               )}
             </div>

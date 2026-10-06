@@ -1,9 +1,13 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowDownRight, ArrowUpRight, Search, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
 import EmpleadoLinks from "@/components/EmpleadoLinks";
 import PedidoRow from "./PedidoRow";
+import MonthCalendar from "@/components/MonthCalendar";
+import YearPager from "@/components/YearPager";
+import FieldIcon from "@/components/FieldIcon";
 
 export const metadata: Metadata = { title: "Lo de hoy" };
 
@@ -85,27 +89,22 @@ export default async function EntradasSalidasEmpleadoPage({
               ]}
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Link href={`/entradas-salidas-empleado?year=${year - 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              ← {year - 1}
-            </Link>
-            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-              {year}
-            </span>
-            <Link href={`/entradas-salidas-empleado?year=${year + 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              {year + 1} →
-            </Link>
-          </div>
+          <YearPager
+            year={year}
+            hrefFor={(y) => `/entradas-salidas-empleado?year=${y}&q=${encodeURIComponent(q)}&tipo=${tipoFiltro}`}
+          />
         </div>
 
         {/* Filtros */}
         <form className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_160px_auto_auto]">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar recibo, cliente o teléfono…"
-            className="input-modern"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar recibo, cliente o teléfono…"
+              className="input-modern w-full"
+            />
+          </FieldIcon>
           <select name="tipo" defaultValue={tipoFiltro} className="input-modern">
             <option value="todos">Todos</option>
             <option value="entradas">Solo entradas</option>
@@ -122,11 +121,13 @@ export default async function EntradasSalidasEmpleadoPage({
 
         {/* Totales del año */}
         <div className="mt-4 flex flex-wrap gap-3">
-          <span className="rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-400">
-            ↑ {pedidosAno.length} entradas
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-400">
+            <ArrowUpRight size={14} strokeWidth={2.25} aria-hidden="true" />
+            {pedidosAno.length} entradas
           </span>
-          <span className="rounded-xl bg-green-50 px-3 py-2 text-xs font-bold text-green-700 dark:bg-green-500/15 dark:text-green-400">
-            ↓ {salidasAno.length} salidas
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-green-50 px-3 py-2 text-xs font-bold text-green-700 dark:bg-green-500/15 dark:text-green-400">
+            <ArrowDownRight size={14} strokeWidth={2.25} aria-hidden="true" />
+            {salidasAno.length} salidas
           </span>
         </div>
       </div>
@@ -141,8 +142,9 @@ export default async function EntradasSalidasEmpleadoPage({
                 {fechaSeleccionada.toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </h2>
             </div>
-            <Link href={`/entradas-salidas-empleado?year=${year}&q=${q}&tipo=${tipoFiltro}`} className="rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50 dark:border-white/10">
-              Cerrar ✕
+            <Link href={`/entradas-salidas-empleado?year=${year}&q=${q}&tipo=${tipoFiltro}`} className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50 dark:border-white/10">
+              <X size={14} strokeWidth={2.25} aria-hidden="true" />
+              Cerrar
             </Link>
           </div>
 
@@ -199,7 +201,6 @@ export default async function EntradasSalidasEmpleadoPage({
       <div className="mt-4 space-y-4">
         {MESES.map((mes, mesIndex) => {
           if (mesIndex > mesHoy) return null;
-          const diasDelMes  = new Date(year, mesIndex + 1, 0).getDate();
           const esMesActual = mesIndex === mesHoy && year === hoy.getFullYear();
 
           return (
@@ -213,62 +214,24 @@ export default async function EntradasSalidasEmpleadoPage({
                 </h2>
               </div>
 
-              <div className="grid grid-cols-7 gap-1.5 p-4 sm:grid-cols-10 xl:grid-cols-[repeat(auto-fill,minmax(70px,1fr))]">
-                {Array.from({ length: diasDelMes }).map((_, dayIndex) => {
-                  const dia  = dayIndex + 1;
-                  const fecha = new Date(year, mesIndex, dia);
-                  const esHoyFlag    = sameDay(fecha, hoy);
-                  const seleccionado = fechaSeleccionada && sameDay(fechaSeleccionada, fecha);
-
-                  const entradas = tipoFiltro !== "salidas"
-                    ? pedidosAno.filter((p: any) => sameDay(p.createdAt, fecha)).length
-                    : 0;
-                  const salidas  = tipoFiltro !== "entradas"
-                    ? salidasAno.filter((s: any) => sameDay(s.createdAt, fecha)).length
-                    : 0;
-                  const activo   = entradas > 0 || salidas > 0;
-
-                  const fechaLink = `${year}-${String(mesIndex + 1).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
-
-                  let cellClass = "";
-                  if (seleccionado) {
-                    cellClass = "border-brand-400 bg-brand-50 ring-2 ring-brand-300 dark:border-brand-500/50 dark:bg-brand-500/10 dark:ring-brand-500/30";
-                  } else if (esHoyFlag) {
-                    cellClass = "border-orange-400 bg-orange-50 ring-2 ring-orange-300 dark:border-orange-500/50 dark:bg-orange-500/10 dark:ring-orange-500/30";
-                  } else if (activo) {
-                    cellClass = "border-brand-200 bg-brand-50/60 hover:border-brand-400 dark:border-brand-500/20 dark:bg-brand-500/5";
-                  } else {
-                    cellClass = "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/[0.02]";
-                  }
-
-                  return (
-                    <Link
-                      key={dia}
-                      id={esHoyFlag ? "hoy" : undefined}
-                      href={`/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${q}&tipo=${tipoFiltro}`}
-                      className={`rounded-[var(--radius-well)] border p-1.5 transition sm:p-2.5 ${cellClass}`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <span className={`text-base font-bold leading-none sm:text-lg ${
-                          seleccionado ? "text-brand-600 dark:text-brand-300"
-                          : esHoyFlag   ? "text-orange-600 dark:text-orange-400"
-                          : activo      ? "text-brand-500"
-                          : "text-gray-400"
-                        }`}>{dia}</span>
-                        {esHoyFlag && (
-                          <span className="rounded bg-orange-500 px-1 py-0.5 text-[9px] font-bold leading-none text-white">HOY</span>
-                        )}
-                      </div>
-                      {activo && (
-                        <div className="mt-1.5 space-y-0.5">
-                          {entradas > 0 && <p className="text-[10px] font-bold text-blue-500">↑ {entradas}</p>}
-                          {salidas  > 0 && <p className="text-[10px] font-bold text-green-500">↓ {salidas}</p>}
-                        </div>
-                      )}
-                    </Link>
-                  );
+              <MonthCalendar
+                year={year}
+                month={mesIndex}
+                today={hoy}
+                selected={fechaSeleccionada}
+                hrefFor={(d) => {
+                  const fechaLink = `${year}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                  return `/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${encodeURIComponent(q)}&tipo=${tipoFiltro}`;
+                }}
+                getStats={(d) => ({
+                  entradas: tipoFiltro !== "salidas"
+                    ? pedidosAno.filter((p: any) => sameDay(p.createdAt, d)).length
+                    : 0,
+                  salidas: tipoFiltro !== "entradas"
+                    ? salidasAno.filter((s: any) => sameDay(s.createdAt, d)).length
+                    : 0,
                 })}
-              </div>
+              />
             </div>
           );
         })}

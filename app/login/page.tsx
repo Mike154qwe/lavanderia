@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { AlertTriangle, LayoutDashboard, Lock, Package, User, Wallet } from "lucide-react";
+import { AlertTriangle, LayoutDashboard, Lock, LogIn, Package, User, Wallet } from "lucide-react";
 import LaundryBackdrop from "@/components/login/LaundryBackdrop";
 import BrandMark from "@/components/BrandMark";
+import FieldIcon from "@/components/FieldIcon";
 import { loginAction } from "./actions";
 
 export const metadata: Metadata = { title: "Acceso gerente" };
@@ -90,58 +91,47 @@ export default async function LoginPage({
                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[color:var(--text-2)]">
                   Usuario
                 </label>
-                <div className="relative">
-                  <User
-                    size={18}
-                    strokeWidth={1.75}
-                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
-                    aria-hidden="true"
-                  />
+                <FieldIcon icon={<User size={18} strokeWidth={1.75} />}>
                   <input
                     name="usuario"
                     required
                     autoComplete="username"
                     placeholder="Nombre de usuario"
-                    className="input-modern w-full py-3.5 pl-11 pr-4 text-base font-semibold"
+                    className="input-modern w-full py-3.5 pr-4 text-base font-semibold"
                   />
-                </div>
+                </FieldIcon>
               </div>
 
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[color:var(--text-2)]">
                   Contraseña
                 </label>
-                <div className="relative">
-                  <Lock
-                    size={18}
-                    strokeWidth={1.75}
-                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--text-3)]"
-                    aria-hidden="true"
-                  />
+                <FieldIcon icon={<Lock size={18} strokeWidth={1.75} />}>
                   <input
                     name="password"
                     type="password"
                     required
                     autoComplete="current-password"
                     placeholder="••••••••••"
-                    className="input-modern w-full py-3.5 pl-11 pr-4 text-base font-semibold"
+                    className="input-modern w-full py-3.5 pr-4 text-base font-semibold"
                   />
-                </div>
+                </FieldIcon>
               </div>
 
               <button
-                className="btn-primary mt-2 w-full py-4 text-base"
+                className="btn-primary mt-2 w-full gap-2 py-4 text-base"
               >
-                Entrar al sistema →
+                Entrar al sistema
+                <LogIn size={18} strokeWidth={2.25} aria-hidden="true" />
               </button>
             </form>
 
             <div className="mt-8 border-t border-[color:var(--border-1)] pt-6 text-center">
               <a
                 href="/empleado-login"
-                className="text-sm font-semibold text-[color:var(--text-2)] transition hover:text-brand-500"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--text-2)] transition hover:text-brand-500"
               >
-                ¿Eres empleado? Ingresa aquí →
+                ¿Eres empleado? Ingresa aquí
               </a>
             </div>
           </div>

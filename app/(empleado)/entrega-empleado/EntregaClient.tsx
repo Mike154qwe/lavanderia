@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleAlert, CircleCheck, CircleX, FileText, ScanLine, Search } from "lucide-react";
+import { ArrowLeft, CircleAlert, CircleCheck, CircleX, FileText, Info, Phone, ScanLine, Search, TriangleAlert, Wallet, X } from "lucide-react";
+import { money } from "@/lib/format";
+import EstadoBadge from "@/components/EstadoBadge";
 
 export type PedidoEntrega = {
   id: number;
@@ -23,14 +25,6 @@ export type PedidoEntrega = {
 };
 
 type Status = "idle" | "loading" | "found" | "not-found" | "success-entrega" | "success-pago";
-
-const ESTADO_STYLE: Record<string, { bg: string; text: string; dot: string; label: string }> = {
-  RECIBIDO:   { bg: "bg-blue-50",   text: "text-blue-700",  dot: "bg-blue-400",  label: "Recibido"   },
-  EN_PROCESO: { bg: "bg-yellow-50", text: "text-yellow-700",dot: "bg-yellow-400",label: "En proceso" },
-  LISTO:      { bg: "bg-emerald-50",text: "text-emerald-700",dot:"bg-emerald-400",label: "Listo ✓"   },
-  ENTREGADO:  { bg: "bg-gray-50",   text: "text-gray-500",  dot: "bg-gray-400",  label: "Entregado"  },
-  CANCELADO:  { bg: "bg-red-50",    text: "text-red-600",   dot: "bg-red-400",   label: "Cancelado"  },
-};
 
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
 
@@ -120,8 +114,6 @@ export default function EntregaClient({
     }
   }
 
-  const estadoInfo = pedido ? (ESTADO_STYLE[pedido.estado] ?? ESTADO_STYLE["RECIBIDO"]) : null;
-
   return (
     <div className="page-frame">
       <div className="mx-auto max-w-lg">
@@ -138,9 +130,10 @@ export default function EntregaClient({
           </p>
           <Link
             href="/inventario-empleado"
-            className="mt-3 inline-flex rounded-[var(--radius-control)] px-3 py-1.5 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-[var(--radius-control)] px-3 py-1.5 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
           >
-            ← Buscar / entregar
+            <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
+            Buscar / entregar
           </Link>
         </div>
 
@@ -173,9 +166,10 @@ export default function EntregaClient({
               <button
                 type="button"
                 onClick={reset}
-                className="text-gray-300 transition hover:text-gray-500"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[color:var(--text-3)] transition hover:bg-gray-100 hover:text-[color:var(--text-1)]"
+                aria-label="Limpiar"
               >
-                ✕
+                <X size={16} strokeWidth={2.25} aria-hidden="true" />
               </button>
             )}
           </div>
@@ -216,32 +210,29 @@ export default function EntregaClient({
         {/* ── SUCCESS PAGO ──────────────────────────── */}
         {status === "success-pago" && pedido && (
           <div className="mb-2 flex items-center gap-3 rounded-2xl bg-emerald-50 px-5 py-3 ring-1 ring-emerald-200">
-            <span className="text-2xl">💰</span>
+            <span className="figure-well figure-well--aqua h-10 w-10">
+              <Wallet size={20} strokeWidth={1.75} aria-hidden="true" />
+            </span>
             <p className="font-bold text-emerald-700">Pago registrado correctamente</p>
           </div>
         )}
 
         {/* ── PEDIDO ENCONTRADO ─────────────────────── */}
-        {(status === "found" || status === "success-pago") && pedido && estadoInfo && (
+        {(status === "found" || status === "success-pago") && pedido && (
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
 
             {/* Encabezado del pedido */}
-            <div className={`flex items-center justify-between px-5 py-4 ${estadoInfo.bg}`}>
+            <div className="flex items-center justify-between border-b border-[color:var(--border-1)] px-5 py-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                <p className="text-xs font-bold uppercase tracking-widest text-[color:var(--text-3)]">
                   Pedido
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-[color:var(--text-1)]">
                   #{pedido.codigoFormateado}
                 </p>
-                <p className="text-xs text-gray-400">{pedido.fechaFormateada}</p>
+                <p className="text-xs text-[color:var(--text-3)]">{pedido.fechaFormateada}</p>
               </div>
-              <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${estadoInfo.bg} ring-1 ring-current/20`}>
-                <span className={`h-2 w-2 rounded-full ${estadoInfo.dot}`} />
-                <span className={`text-sm font-bold ${estadoInfo.text}`}>
-                  {estadoInfo.label}
-                </span>
-              </div>
+              <EstadoBadge estado={pedido.estado} size="md" />
             </div>
 
             {/* Aviso si no está listo */}
@@ -257,7 +248,7 @@ export default function EntregaClient({
             {/* Aviso si ya fue entregado */}
             {pedido.estado === "ENTREGADO" && (
               <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-5 py-2.5">
-                <span>ℹ️</span>
+                <Info size={14} strokeWidth={2} className="shrink-0 text-gray-500" aria-hidden="true" />
                 <p className="text-xs font-bold text-gray-500">
                   Este pedido ya fue marcado como entregado
                 </p>
@@ -271,7 +262,10 @@ export default function EntregaClient({
               </div>
               <div>
                 <p className="font-bold text-gray-900">{pedido.cliente.nombre}</p>
-                <p className="text-sm text-gray-400">📞 {pedido.cliente.telefono || "Sin teléfono"}</p>
+                <p className="flex items-center gap-1.5 text-sm text-[color:var(--text-3)]">
+                  <Phone size={14} strokeWidth={1.75} aria-hidden="true" />
+                  {pedido.cliente.telefono || "Sin teléfono"}
+                </p>
               </div>
             </div>
 
@@ -292,7 +286,10 @@ export default function EntregaClient({
                       </p>
                       <p className="text-xs text-gray-400">{p.servicio}</p>
                       {p.descripcion && (
-                        <p className="mt-0.5 text-xs font-bold text-orange-500">⚠ {p.descripcion}</p>
+                        <p className="mt-0.5 flex items-start gap-1 text-xs font-bold text-orange-600">
+                          <TriangleAlert size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                          {p.descripcion}
+                        </p>
                       )}
                     </div>
                     <p className="text-sm font-black text-gray-700">{money(p.valor)}</p>
@@ -318,7 +315,10 @@ export default function EntregaClient({
                 </div>
               ) : (
                 <div className="mt-1 flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 ring-1 ring-emerald-200">
-                  <span className="font-bold text-emerald-600">✅ Pagado completo</span>
+                  <span className="inline-flex items-center gap-1.5 font-bold text-emerald-600">
+                    <CircleCheck size={16} strokeWidth={2} aria-hidden="true" />
+                    Pagado completo
+                  </span>
                   <span className="font-black text-emerald-600">{money(pedido.total)}</span>
                 </div>
               )}
@@ -327,7 +327,7 @@ export default function EntregaClient({
             {/* Formulario de cobro (expandible) */}
             {showPago && (
               <div className="border-b border-gray-100 bg-gray-50 px-5 py-4">
-                <p className="mb-3 text-sm font-bold text-gray-700">💰 Registrar cobro</p>
+                <p className="mb-3 text-sm font-bold text-gray-700">Registrar cobro</p>
                 <div className="space-y-3">
                   <div>
                     <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-400">
@@ -391,9 +391,10 @@ export default function EntregaClient({
                     type="button"
                     onClick={() => { setShowPago(true); setPagoValor(pedido.saldo); }}
                     disabled={isPending}
-                    className="flex-1 rounded-xl bg-gray-900 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-gray-700 disabled:opacity-50"
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-900 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-gray-700 disabled:opacity-50"
                   >
-                    💰 Cobrar {money(pedido.saldo)}
+                    <Wallet size={16} strokeWidth={2} aria-hidden="true" />
+                    Cobrar {money(pedido.saldo)}
                   </button>
                 )}
                 <button
@@ -402,7 +403,12 @@ export default function EntregaClient({
                   disabled={isPending}
                   className="flex-1 rounded-xl bg-brand-500 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.99] disabled:opacity-50"
                 >
-                  {isPending ? "Guardando…" : "✅ Marcar entregado"}
+                  {isPending ? "Guardando…" : (
+                    <span className="inline-flex items-center justify-center gap-2">
+                      <CircleCheck size={16} strokeWidth={2} aria-hidden="true" />
+                      Marcar entregado
+                    </span>
+                  )}
                 </button>
               </div>
             )}
@@ -413,9 +419,10 @@ export default function EntregaClient({
                 <button
                   type="button"
                   onClick={reset}
-                  className="w-full rounded-xl border-2 border-gray-200 py-3 text-sm font-bold text-gray-500 transition hover:bg-gray-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-3 text-sm font-bold text-gray-500 transition hover:bg-gray-50"
                 >
-                  🔍 Escanear otro recibo
+                  <ScanLine size={16} strokeWidth={2} aria-hidden="true" />
+                  Escanear otro recibo
                 </button>
               </div>
             )}

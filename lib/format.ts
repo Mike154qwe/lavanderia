@@ -11,6 +11,24 @@ export function money(value: number) {
   return value < 0 ? `-$${abs}` : `$${abs}`;
 }
 
+/** "Martes, 6 de octubre de 2026" — solo la primera letra en mayúscula. */
+export function fechaLarga(d: Date) {
+  const raw = d.toLocaleDateString("es-CO", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+/** "06/10/2026" día/mes/año */
+export function fechaCorta(d: Date) {
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
 export const ESTADO_BADGE: Record<string, string> = {
   RECIBIDO:   "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
   EN_PROCESO: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400",
@@ -18,3 +36,15 @@ export const ESTADO_BADGE: Record<string, string> = {
   ENTREGADO:  "bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400",
   CANCELADO:  "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
 };
+
+export const ESTADO_LABEL: Record<string, string> = {
+  RECIBIDO:   "Recibido",
+  EN_PROCESO: "En proceso",
+  LISTO:      "Listo",
+  ENTREGADO:  "Entregado",
+  CANCELADO:  "Cancelado",
+};
+
+export function estadoLabel(estado: string) {
+  return ESTADO_LABEL[estado] ?? estado.replaceAll("_", " ");
+}
