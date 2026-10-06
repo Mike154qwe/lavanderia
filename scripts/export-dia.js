@@ -17,9 +17,9 @@ const GDRIVE    = path.join("G:\\Mi unidad", "LaManuelita_Exportaciones");
 
 // --- Fecha de hoy ---
 const hoy       = new Date();
-const fechaStr  = hoy.toISOString().slice(0, 10); // YYYY-MM-DD
+const fechaStr  = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(hoy); // YYYY-MM-DD
 const mes       = fechaStr.slice(0, 7);            // YYYY-MM
-const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+const inicioDia = Date.parse(`${fechaStr}T00:00:00-05:00`);
 const finDia    = inicioDia + 86_400_000;
 
 // --- Abrir BD ---
@@ -77,7 +77,7 @@ function formatMoney(v) {
   return `$${Number(v).toLocaleString("es-CO")}`;
 }
 function formatFecha(ts) {
-  return new Date(ts).toLocaleString("es-CO", { hour12: false });
+  return new Date(ts).toLocaleString("es-CO", { timeZone: "America/Bogota", hour12: false });
 }
 function csvRow(...cols) {
   return cols.map(c => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",");

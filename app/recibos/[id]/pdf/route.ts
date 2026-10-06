@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
-import { money, formatPedido } from "@/lib/format";
+import { money, formatPedido, fechaCorta, fechaHora } from "@/lib/format";
 import bwipjs from "bwip-js/node";
 
 export const runtime = "nodejs";
@@ -285,8 +285,8 @@ export async function GET(
       sep();
 
       // ── Datos del cliente ─────────────────────────────────────
-      draw(`Fecha:    ${pedidoData.createdAt.toLocaleDateString("es-CO")}`);
-      draw(`Hora:     ${pedidoData.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}`);
+      draw(`Fecha:    ${fechaCorta(pedidoData.createdAt)}`);
+      draw(`Hora:     ${fechaHora(pedidoData.createdAt)}`);
       draw(`Cliente:  ${pedidoData.cliente.nombre}`);
       draw(`Telefono: ${pedidoData.cliente.telefono ?? "No registrado"}`);
       sep();

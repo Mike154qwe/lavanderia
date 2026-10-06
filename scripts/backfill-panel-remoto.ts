@@ -55,20 +55,10 @@ cargarEnv(path.join(RAIZ, ".env"));
 
 import { PrismaClient } from "@prisma/client";
 import { calcularCaja, ventanaDeCierre } from "../lib/caja.ts";
+import { inicioDia, finDia, isoFecha } from "../lib/format.ts";
 import type { PanelRemotoData, MovimientoRemoto } from "../lib/panel-remoto.ts";
 
 const prisma = new PrismaClient();
-
-function inicioDiaLocal(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-}
-function finDiaLocal(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + 1);
-}
-/** YYYY-MM-DD en hora LOCAL (no UTC) -- mismo criterio que formatearFecha() en lib/panel-remoto.ts. */
-function fechaLocal(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 async function clienteFirestore() {
   const { initializeApp, getApps, cert } = await import("firebase-admin/app");
@@ -97,10 +87,10 @@ async function main() {
   const cierres = await prisma.cierreCaja.findMany({ orderBy: { createdAt: "asc" } });
   console.log(`[${new Date().toISOString()}] ${cierres.length} cierres en la base local.`);
 
-  // Agrupa por día LOCAL -- panelRemoto es un documento por día, no por cierre.
+  // Agrupa por día civil de Bogotá -- panelRemoto es un documento por día, no por cierre.
   const porDia = new Map<string, typeof cierres>();
   for (const c of cierres) {
-    const clave = fechaLocal(c.createdAt);
+    const clave = isoFecha(c.createdAt);
     if (!porDia.has(clave)) porDia.set(clave, []);
     porDia.get(clave)!.push(c);
   }
@@ -117,8 +107,8 @@ async function main() {
       continue;
     }
 
-    const inicio = inicioDiaLocal(cierresDelDia[0].createdAt);
-    const fin = finDiaLocal(cierresDelDia[0].createdAt);
+    const inicio = inicioDia(cierresDelDia[0].createdAt);
+    const fin = finDia(cierresDelDia[0].createdAt);
     const ultimoCierre = cierresDelDia.reduce((a, b) => (b.createdAt > a.createdAt ? b : a));
 
     // Ventana del ÚLTIMO cierre del día -- misma regla que hacerCierreCaja/el

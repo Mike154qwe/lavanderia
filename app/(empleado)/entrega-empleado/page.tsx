@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { formatPedido } from "@/lib/format";
+import { formatPedido, fechaLarga, fechaHora } from "@/lib/format";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import EntregaClient, { type PedidoEntrega } from "./EntregaClient";
 
@@ -25,10 +25,7 @@ async function buscarPedidoAction(codigo: string): Promise<PedidoEntrega | null>
     id:                pedido.id,
     codigoFormateado:  formatPedido(pedido.id),
     estado:            pedido.estado,
-    fechaFormateada:   pedido.createdAt.toLocaleDateString("es-CO", {
-      weekday: "short", day: "numeric", month: "short",
-      hour: "2-digit", minute: "2-digit",
-    }),
+    fechaFormateada:   `${fechaLarga(pedido.createdAt)} · ${fechaHora(pedido.createdAt)}`,
     cliente: {
       nombre:   pedido.cliente.nombre,
       telefono: pedido.cliente.telefono ?? "",

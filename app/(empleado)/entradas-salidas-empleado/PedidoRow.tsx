@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaHora } from "@/lib/format";
 
 // Extraído de page.tsx (que es un Server Component -- consulta Prisma
 // directamente): el <Link> de acá abajo necesita onClick para que el clic en
@@ -29,7 +29,7 @@ export default function PedidoRow({ pedido, tipo, fechaMovimiento }: { pedido: a
           <p className="mt-0.5 text-sm font-bold text-gray-800">{pedido.cliente.nombre}</p>
           <p className="text-xs text-gray-400">
             {totalPrendas} prendas · {money(pedido.total)} ·{" "}
-            {(fechaMovimiento || pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+            {fechaHora(fechaMovimiento || pedido.createdAt)}
           </p>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-gray-400 transition duration-200 group-open:rotate-180">

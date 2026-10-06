@@ -15,7 +15,11 @@ import IngresosDiarios from "@/components/charts/IngresosDiarios";
 import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { money, fmt, fechaLarga, fechaCorta } from "@/lib/format";
+import {
+  money, fmt, fechaLarga, fechaCorta, fechaHora, fechaDiaMes, fechaMesAno,
+  inicioDia, finDia, sameDay, dayKey, isoFecha, parseFechaParam,
+  inicioAno, inicioMes, partesBogota, civilBogota,
+} from "@/lib/format";
 import PedidoLink from "@/components/PedidoLink";
 import { calcularCaja, ventanaDeCierre, enVentana } from "@/lib/caja";
 import {
@@ -30,22 +34,8 @@ import YearPager from "@/components/YearPager";
 
 export const metadata: Metadata = { title: "Gerente" };
 
-function inicioDia(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-}
-function finDia(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + 1);
-}
-function sameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
 function sumarMetodo(pagos: any[], metodo: string) {
   return pagos.filter((p) => p.metodo === metodo).reduce((s, p) => s + p.valor, 0);
-}
-/** Clave única por día: "YYYY-M-D" */
-function dayKey(d: Date): string {
-  const dd = new Date(d);
-  return `${dd.getFullYear()}-${dd.getMonth()}-${dd.getDate()}`;
 }
 /** Construye un Map<dayKey, count> a partir de un array con campo createdAt */
 function buildDayMap(rows: { createdAt: Date }[]): Map<string, number> {
@@ -166,18 +156,20 @@ export default async function GerentePage({
 }) {
   const params = searchParams ? await searchParams : {};
   const hoy    = new Date();
+  const hoyB   = partesBogota(hoy);
 
   const fechaSeleccionada = params.fecha
-    ? new Date(params.fecha + "T00:00:00")
+    ? parseFechaParam(params.fecha)
     : inicioDia(hoy);
+  const selB = partesBogota(fechaSeleccionada);
   const year = params.fecha
-    ? fechaSeleccionada.getFullYear()
-    : Number(params.year || hoy.getFullYear());
+    ? selB.year
+    : Number(params.year || hoyB.year);
 
   const inicio = inicioDia(fechaSeleccionada);
   const fin    = finDia(fechaSeleccionada);
-  const inicioAno = new Date(year, 0, 1);
-  const finAno    = new Date(year + 1, 0, 1);
+  const inicioAnoVista = inicioAno(year);
+  const finAno         = inicioAno(year + 1);
 
   const [pedidosDia, pagosDia, gastosDia, salidasDia, cierresDia, pedidosAno, salidasAno, gastosAno] =
     await Promise.all([
@@ -205,34 +197,34 @@ export default async function GerentePage({
         orderBy: { createdAt: "desc" },
       }),
       prisma.pedido.findMany({
-        where: { createdAt: { gte: inicioAno, lt: finAno } },
+        where: { createdAt: { gte: inicioAnoVista, lt: finAno } },
         select: { id: true, createdAt: true },
       }),
       prisma.historialEstado.findMany({
-        where: { estado: "ENTREGADO", createdAt: { gte: inicioAno, lt: finAno } },
+        where: { estado: "ENTREGADO", createdAt: { gte: inicioAnoVista, lt: finAno } },
         select: { createdAt: true },
       }),
       prisma.gastoCaja.findMany({
-        where: { createdAt: { gte: inicioAno, lt: finAno } },
+        where: { createdAt: { gte: inicioAnoVista, lt: finAno } },
         select: { createdAt: true },
       }),
     ]);
 
   /* Charts */
-  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const desdeMes = inicioMes(hoyB.year, hoyB.month - 1);
   const pagosMes = await prisma.pago.findMany({
-    where: { createdAt: { gte: inicioMes } },
+    where: { createdAt: { gte: desdeMes } },
     select: { valor: true, createdAt: true },
   });
 
   // Agregar en Map<día_del_mes, total> — O(n) en vez de O(n×días)
   const pagosMesMap = new Map<number, number>();
   for (const p of pagosMes) {
-    const d = new Date(p.createdAt).getDate();
+    const d = partesBogota(p.createdAt).day;
     pagosMesMap.set(d, (pagosMesMap.get(d) ?? 0) + (p.valor as number));
   }
 
-  const diasEnMes       = hoy.getDate();
+  const diasEnMes       = hoyB.day;
   const ingresosDiarios = Array.from({ length: diasEnMes }, (_, i) => ({
     dia:   String(i + 1),
     total: pagosMesMap.get(i + 1) ?? 0,
@@ -262,14 +254,14 @@ export default async function GerentePage({
   const pagosEfectivo  = pagosDia.filter((p: any) => p.metodo === "Efectivo");
   const pagosDigitales = pagosDia.filter((p: any) => ["Nequi","Daviplata","Transferencia","Tarjeta"].includes(p.metodo));
 
-  const fechaLinkActual = `${fechaSeleccionada.getFullYear()}-${String(fechaSeleccionada.getMonth() + 1).padStart(2,"0")}-${String(fechaSeleccionada.getDate()).padStart(2,"0")}`;
+  const fechaLinkActual = isoFecha(fechaSeleccionada);
   const esHoy = sameDay(fechaSeleccionada, hoy);
-  const mesVista = fechaSeleccionada.getMonth();
-  const yearVista = fechaSeleccionada.getFullYear();
+  const mesVista = selB.month - 1;
+  const yearVista = selB.year;
   const diasDelMesVista = new Date(yearVista, mesVista + 1, 0).getDate();
   let mesSinMovimiento = true;
   for (let dia = 1; dia <= diasDelMesVista; dia++) {
-    const k = dayKey(new Date(yearVista, mesVista, dia));
+    const k = dayKey(civilBogota(yearVista, mesVista, dia));
     if ((pedidosAnoMap.get(k) ?? 0) + (salidasAnoMap.get(k) ?? 0) + (gastosAnoMap.get(k) ?? 0) > 0) {
       mesSinMovimiento = false;
       break;
@@ -333,7 +325,7 @@ export default async function GerentePage({
           <div>
             <p className="page-kicker text-brand-500">Calendario</p>
             <h2 className="page-title !text-xl">
-              {MESES[fechaSeleccionada.getMonth()]} {fechaSeleccionada.getFullYear()}
+              {MESES[selB.month - 1]} {selB.year}
             </h2>
             <p className="page-subtitle">
               {mesSinMovimiento
@@ -348,13 +340,13 @@ export default async function GerentePage({
           </div>
         </div>
         <MonthCalendar
-          year={fechaSeleccionada.getFullYear()}
-          month={fechaSeleccionada.getMonth()}
+          year={selB.year}
+          month={selB.month - 1}
           today={hoy}
           selected={fechaSeleccionada}
           showGastos
           hrefFor={(d) =>
-            `/gerente?year=${d.getFullYear()}&fecha=${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+            `/gerente?year=${partesBogota(d).year}&fecha=${isoFecha(d)}`
           }
           getStats={(d) => {
             const k = dayKey(d);
@@ -391,7 +383,7 @@ export default async function GerentePage({
                 <div>
                   <p className="font-bold text-gray-900">Cierre #{fmt(cierre.id)}</p>
                   <p className="mt-0.5 text-xs text-[color:var(--text-3)]">
-                    {cierre.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {cierre.responsable || "Sin responsable"}
+                    {fechaHora(cierre.createdAt)} · {cierre.responsable || "Sin responsable"}
                   </p>
                   <p className="mt-1 text-sm font-black text-brand-500">
                     Ganancia neta: {money(c.gananciaNeta)}
@@ -460,7 +452,7 @@ export default async function GerentePage({
                 <p className="mt-0.5 text-sm text-gray-500">{gasto.descripcion || "Sin descripción"}</p>
                 <p className="mt-0.5 text-xs text-gray-400">
                   {gasto.metodo} · {gasto.responsable || "—"} ·{" "}
-                  {gasto.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                  {fechaHora(gasto.createdAt)}
                 </p>
               </div>
               <p className="shrink-0 font-black text-red-500">-{money(gasto.valor)}</p>
@@ -482,7 +474,7 @@ export default async function GerentePage({
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Ingresos diarios</p>
                 <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  {new Date(hoy.getFullYear(), hoy.getMonth()).toLocaleDateString("es-CO", { month: "long", year: "numeric" })}
+                  {fechaMesAno(hoy)}
                 </p>
               </div>
               <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
@@ -496,7 +488,7 @@ export default async function GerentePage({
             <div className="mb-4">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Pagos por método</p>
               <p className="mt-0.5 text-sm font-semibold text-gray-600 dark:text-gray-400">
-                {fechaSeleccionada.toLocaleDateString("es-CO", { day: "numeric", month: "long" })}
+                {fechaDiaMes(fechaSeleccionada)}
               </p>
             </div>
             <MetodosPago data={metodosPagoData} />
@@ -515,7 +507,7 @@ export default async function GerentePage({
           <YearPager year={year} hrefFor={(y) => `/gerente?year=${y}`} />
         </div>
         {MESES.map((mes, mesIndex) => {
-          const esMesActual = year === hoy.getFullYear() && mesIndex === hoy.getMonth();
+          const esMesActual = year === hoyB.year && mesIndex === hoyB.month - 1;
 
           return (
             <div key={mes} className="overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--border-1)]">
@@ -534,7 +526,7 @@ export default async function GerentePage({
                 selected={fechaSeleccionada}
                 showGastos
                 hrefFor={(d) =>
-                  `/gerente?year=${year}&fecha=${year}-${String(mesIndex + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+                  `/gerente?year=${year}&fecha=${isoFecha(d)}`
                 }
                 getStats={(d) => {
                   const k = dayKey(d);
@@ -604,7 +596,7 @@ function PagosGrupo({ titulo, icon, pagos }: { titulo: string; icon: React.React
                 #{fmt(pago.pedido.id)} · {pago.pedido.cliente.nombre}
               </p>
               <p className="mt-0.5 text-xs text-gray-400">
-                {pago.metodo} · {pago.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                {pago.metodo} · {fechaHora(pago.createdAt)}
               </p>
             </div>
             <span className="font-black text-green-600 dark:text-green-400">{money(pago.valor)}</span>
@@ -654,7 +646,7 @@ function PedidoRow({ pedido, fechaMovimiento }: { pedido: any; fechaMovimiento?:
           </p>
           <p className="mt-0.5 text-xs text-gray-400">
             {totalPrendas} prendas · {money(pedido.total)} ·{" "}
-            {(fechaMovimiento || pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+            {fechaHora(fechaMovimiento || pedido.createdAt)}
           </p>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-gray-400 transition duration-200 group-open:rotate-180">
@@ -701,7 +693,7 @@ function PedidoRow({ pedido, fechaMovimiento }: { pedido: any; fechaMovimiento?:
             <p className="mb-1.5 text-xs font-bold text-blue-700 dark:text-blue-400">Pagos</p>
             {pedido.pagos.map((pago: any) => (
               <p key={pago.id} className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                {money(pago.valor)} · {pago.metodo} · {pago.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                {money(pago.valor)} · {pago.metodo} · {fechaHora(pago.createdAt)}
               </p>
             ))}
           </div>

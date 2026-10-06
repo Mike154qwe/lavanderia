@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/EmptyState";
 import FieldIcon from "@/components/FieldIcon";
 import EstadoBadge from "@/components/EstadoBadge";
 import Pager from "@/components/Pager";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaDiaMes, fechaHora, diasCalendarioDesde } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
 import { PrendaIcon } from "@/components/PrendaIcon";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Inventario" };
 const PAGE_SIZE = 20;
 
 function diasDesde(fecha: Date) {
-  return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
+  return diasCalendarioDesde(fecha);
 }
 function diasColor(d: number) {
   if (d <= 2) return "bg-green-50 text-green-700";
@@ -481,9 +481,9 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               Recibo{" "}
               <span className="font-bold text-brand-500">#{fmt(pedido.id)}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              {new Date(pedido.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
+              {fechaDiaMes(new Date(pedido.createdAt))}
               {" "}
-              {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+              {fechaHora(new Date(pedido.createdAt))}
             </p>
           </div>
         </div>
@@ -605,7 +605,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                         <p key={e.id} className="inline-flex items-center gap-1.5 text-xs text-gray-400">
                           <ArrowDownToLine size={11} strokeWidth={2} aria-hidden="true" />
                           {e.cantidad} retiradas ·{" "}
-                          {new Date(e.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
+                          {fechaDiaMes(new Date(e.createdAt))}
                           {e.observacion ? ` · ${e.observacion}` : ""}
                         </p>
                       ))}
@@ -684,7 +684,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                 {pedido.pagos.map((pago: any) => (
                   <div key={pago.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
                     <p className="text-xs text-gray-400">
-                      {pago.metodo} · {new Date(pago.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
+                      {pago.metodo} · {fechaDiaMes(new Date(pago.createdAt))}
                     </p>
                     <p className="text-xs font-black text-brand-500">{money(pago.valor)}</p>
                   </div>

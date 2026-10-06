@@ -4,6 +4,7 @@ import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
 import FieldIcon from "@/components/FieldIcon";
 import { ArrowRight, Search, User, X, Zap } from "lucide-react";
+import { fechaCorta } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -166,7 +167,7 @@ export default async function ClientesEmpleadoPage({
 
                       {ultimoPedido && (
                         <span className="text-xs text-gray-400">
-                          Último: {new Date(ultimoPedido.createdAt).toLocaleDateString("es-CO")}
+                          Último: {fechaCorta(new Date(ultimoPedido.createdAt))}
                         </span>
                       )}
                     </div>

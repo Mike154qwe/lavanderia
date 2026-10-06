@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaCorta } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
@@ -145,7 +145,7 @@ export default function InventarioEmpleadoClient({
                   </div>
                   <p className="mt-1 font-bold text-gray-800">{item.cliente.nombre}</p>
                   <p className="text-xs text-gray-400">
-                    {item.cliente.telefono ?? "Sin teléfono"} · {new Date(item.createdAt).toLocaleDateString("es-CO")}
+                    {item.cliente.telefono ?? "Sin teléfono"} · {fechaCorta(new Date(item.createdAt))}
                   </p>
                   <p className={`mt-2 text-sm font-black ${sal > 0 ? "text-red-500" : "text-green-600"}`}>
                     {sal > 0 ? `Saldo: ${money(sal)}` : "Pagado"}
@@ -172,7 +172,7 @@ export default function InventarioEmpleadoClient({
                 <p className="mt-1 font-bold text-gray-800">{pedido.cliente.nombre}</p>
                 <p className="text-sm text-gray-400">
                   {pedido.cliente.telefono ?? "Sin teléfono"} ·{" "}
-                  {new Date(pedido.createdAt).toLocaleDateString("es-CO")}
+                  {fechaCorta(new Date(pedido.createdAt))}
                 </p>
               </div>
               <button
