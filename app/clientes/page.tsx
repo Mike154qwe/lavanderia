@@ -75,7 +75,7 @@ export default async function ClientesPage({
         </div>
 
         {/* Búsqueda */}
-        <form className="mt-5 flex gap-3">
+        <form className="mt-5 flex flex-col gap-3 sm:flex-row">
           <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
             <input
               name="q"

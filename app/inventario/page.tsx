@@ -214,7 +214,7 @@ export default async function InventarioPage({
         </div>
 
         {/* Búsqueda */}
-        <form className="mt-4 flex gap-2">
+        <form className="mt-4 flex flex-col gap-2 sm:flex-row">
           <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
             <input
               name="q"
