@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowDownRight, ArrowUpRight, CalendarDays, Shirt, TriangleAlert } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import MovimientosMensuales from "@/components/charts/MovimientosMensuales";
+import YearPager from "@/components/YearPager";
 
 export const metadata: Metadata = { title: "Movimientos" };
 
@@ -68,34 +70,18 @@ export default async function MovimientosPage({
   );
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ──────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-          <h1 className="mt-1 text-2xl font-black text-gray-900">Entradas y salidas</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="page-kicker text-brand-500">Gerente</p>
+          <h1 className="page-title">Entradas y salidas</h1>
+          <p className="page-subtitle">
             Actividad operacional del año — haz clic en un día para ver el detalle
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/movimientos?year=${year - 1}`}
-            className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
-          >
-            ← {year - 1}
-          </Link>
-          <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600">
-            {year}
-          </span>
-          <Link
-            href={`/movimientos?year=${year + 1}`}
-            className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
-          >
-            {year + 1} →
-          </Link>
-        </div>
+        <YearPager year={year} hrefFor={(y) => `/movimientos?year=${y}`} />
       </div>
 
       {/* ── KPIs del año ──────────────────────────────────── */}
@@ -105,28 +91,28 @@ export default async function MovimientosPage({
           value={kpiEntradas}
           sub={`en ${year}`}
           color="blue"
-          icon="↑"
+          icon={<ArrowUpRight size={16} strokeWidth={2.25} />}
         />
         <KpiCard
           label="Pedidos entregados"
           value={kpiSalidas}
           sub={kpiEntradas > 0 ? `${Math.round((kpiSalidas / kpiEntradas) * 100)}% entregados` : "—"}
           color="green"
-          icon="↓"
+          icon={<ArrowDownRight size={16} strokeWidth={2.25} />}
         />
         <KpiCard
           label="Prendas procesadas"
           value={kpiPrendas}
           sub={kpiEntradas > 0 ? `~${Math.round(kpiPrendas / kpiEntradas)} por pedido` : "—"}
           color="purple"
-          icon="👗"
+          icon={<Shirt size={16} strokeWidth={1.75} />}
         />
         <KpiCard
           label="Días con actividad"
           value={kpiDiasActivos}
           sub={`mes más activo: ${MESES[mesMasActivo]}`}
           color="orange"
-          icon="📅"
+          icon={<CalendarDays size={16} strokeWidth={1.75} />}
         />
       </div>
 
@@ -140,8 +126,9 @@ export default async function MovimientosPage({
             </p>
           </div>
           {kpiEntradas > kpiSalidas && (
-            <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-600 ring-1 ring-orange-200">
-              ⚠ {kpiEntradas - kpiSalidas} pedidos pendientes de entrega
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-600 ring-1 ring-orange-200">
+              <TriangleAlert size={12} strokeWidth={2.25} aria-hidden="true" />
+              {kpiEntradas - kpiSalidas} pedidos pendientes de entrega
             </span>
           )}
         </div>
@@ -282,7 +269,7 @@ function KpiCard({
   label, value, sub, color, icon,
 }: {
   label: string; value: number; sub: string;
-  color: "blue" | "green" | "purple" | "orange"; icon: string;
+  color: "blue" | "green" | "purple" | "orange"; icon: React.ReactNode;
 }) {
   const palette: Record<string, string> = {
     blue:   "bg-blue-50 text-blue-700 ring-blue-100",

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import FieldIcon from "@/components/FieldIcon";
+import { ArrowRight, Search, User, X, Zap } from "lucide-react";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -36,13 +38,13 @@ export default async function ClientesEmpleadoPage({
   const clientes = await buscarClientes(q.trim());
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
 
       <EmpleadoHero
         kicker="Fichas"
         title="Clientes"
         subtitle="Busca a quien ya viene, o crea el recibo si es la primera vez."
-        icon="👤"
+        icon={<User size={20} strokeWidth={1.75} />}
         tone="aqua"
         links={[
           { href: "/pedidos/rapido", label: "Pedido rápido" },
@@ -50,28 +52,29 @@ export default async function ClientesEmpleadoPage({
         ]}
       >
         <form className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <input
-            name="q"
-            defaultValue={q}
-            autoFocus
-            placeholder="Nombre o teléfono del cliente…"
-            className="input-modern min-w-0 flex-1 text-base font-semibold"
-          />
-          <button className="btn-primary px-5 sm:shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+            <input
+              name="q"
+              defaultValue={q}
+              autoFocus
+              placeholder="Nombre o teléfono del cliente…"
+              className="input-modern w-full text-base font-semibold"
+            />
+          </FieldIcon>
+          <button className="btn-primary px-5 sm:shrink-0" aria-label="Buscar">
+            <Search size={18} strokeWidth={2.25} aria-hidden="true" />
           </button>
         </form>
         {q && (
-          <a href="/clientes-empleado" className="mt-2 inline-block text-sm font-semibold text-gray-400 hover:text-gray-600">
-            ✕ Limpiar búsqueda
+          <a href="/clientes-empleado" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--text-3)] hover:text-[color:var(--text-1)]">
+            <X size={14} strokeWidth={2.25} aria-hidden="true" />
+            Limpiar búsqueda
           </a>
         )}
       </EmpleadoHero>
 
       {!q && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="card p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-teal-600">Ya es cliente</p>
             <p className="mt-1 font-bold text-gray-900">Escríbelo arriba</p>
@@ -81,14 +84,17 @@ export default async function ClientesEmpleadoPage({
           </div>
           <Link
             href="/pedidos/rapido"
-            className="card p-5 transition hover:border-teal-300 hover:shadow-soft"
+            className="card card-nav p-5 hover:border-teal-300"
           >
             <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Primera vez</p>
             <p className="mt-1 font-bold text-gray-900">Crear cliente y recibo</p>
             <p className="mt-1 text-sm text-gray-500">
               Nombre, teléfono y prendas en un solo flujo.
             </p>
-            <p className="mt-3 text-sm font-bold text-brand-500">Ir al pedido rápido →</p>
+            <p className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-500">
+              Ir al pedido rápido
+              <ArrowRight size={14} strokeWidth={2.25} aria-hidden="true" />
+            </p>
           </Link>
         </div>
       )}
@@ -96,19 +102,20 @@ export default async function ClientesEmpleadoPage({
       {q && (
         <Link
           href="/pedidos/rapido"
-          className="mt-4 flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
+          className="btn-primary btn-lg gap-2"
         >
-          <span>+ Crear cliente nuevo y recibo</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          <Zap size={18} strokeWidth={2.25} aria-hidden="true" />
+          Crear cliente nuevo y recibo
+          <ArrowRight size={18} strokeWidth={2.25} aria-hidden="true" />
         </Link>
       )}
 
       {/* ── Sin resultados ───────────────────────────────── */}
       {q && clientes.length === 0 && (
-        <div className="card empty-state mt-4">
-          <p className="text-3xl">🔍</p>
+        <div className="card empty-state">
+          <span className="mx-auto figure-well h-12 w-12">
+            <Search size={22} strokeWidth={1.75} aria-hidden="true" />
+          </span>
           <p className="empty-state__title">
             No se encontró cliente con "<span className="text-[color:var(--text-1)]">{q}</span>".
           </p>
@@ -120,7 +127,7 @@ export default async function ClientesEmpleadoPage({
 
       {/* ── Resultados ──────────────────────────────────── */}
       {clientes.length > 0 && (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           {clientes.map((cliente) => {
             const activos = cliente.pedidos.filter(
               (p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO"
@@ -173,7 +180,7 @@ export default async function ClientesEmpleadoPage({
 
                   <Link
                     href={urlNuevoPedido}
-                    className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600 active:scale-[0.98]"
+                    className="btn-primary shrink-0 gap-1.5"
                   >
                     Nuevo pedido
                   </Link>

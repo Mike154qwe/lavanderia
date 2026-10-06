@@ -35,8 +35,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <AppHeader />
-            <main className="flex-1 overflow-y-auto">
-              {children}
+            <main className="app-canvas flex-1 overflow-y-auto">
+              <div className="page-stage">{children}</div>
             </main>
           </div>
         </AppShell>

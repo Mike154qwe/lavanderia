@@ -2,7 +2,7 @@ import { SkeletonBox, SkeletonKpi } from "@/components/Skeleton";
 
 export default function LoadingMovimientos() {
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame page-frame--wide">
       {/* Header */}
       <div className="card p-5">
         <div className="flex items-center justify-between gap-4">

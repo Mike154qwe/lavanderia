@@ -5,19 +5,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import FieldIcon from "@/components/FieldIcon";
+import EstadoBadge from "@/components/EstadoBadge";
+import Pager from "@/components/Pager";
+import { money, fmt } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
+import { PrendaIcon } from "@/components/PrendaIcon";
+import { AlertTriangle, ArrowDownToLine, Check, ChevronDown, ChevronRight, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, Search, X, Zap } from "lucide-react";
 
 export const metadata: Metadata = { title: "Inventario" };
 
 const PAGE_SIZE = 20;
-
-const PRENDA_EMOJI: Record<string, string> = {
-  Camisa: "👔", Pantalón: "👖", Chaqueta: "🧥", Cubrelecho: "🛏️",
-  Tenis: "👟", Traje: "🤵", Vestido: "👗", Cobija: "🧺", Tapete: "🟫",
-};
-function pEmoji(tipo: string) { return PRENDA_EMOJI[tipo] ?? "👕"; }
 
 function diasDesde(fecha: Date) {
   return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
@@ -184,21 +183,21 @@ export default async function InventarioPage({
   const CHIPS = [
     { value: "TODOS",     label: "Todos",           count: total },
     { value: "RECIBIDO",  label: "Recibidos",        count: null },
-    { value: "LISTO",     label: "✓ Listos",         count: null },
+    { value: "LISTO",     label: "Listos",           count: null },
     { value: "CON_SALDO", label: "Con saldo",        count: null },
     { value: "PAGADOS",   label: "Pagados",          count: null },
   ];
 
   return (
-    <div className="space-y-5 p-6">
+    <div className="page-frame page-frame--wide">
 
       {/* ── Cabecera ─────────────────────────────────────── */}
       <div className="card p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Gerente</p>
-            <h1 className="mt-1 text-2xl font-black text-gray-900">Inventario en piso</h1>
-            <p className="mt-0.5 text-sm text-gray-400">
+            <p className="page-kicker text-brand-500">Gerente</p>
+            <h1 className="page-title">Inventario en piso</h1>
+            <p className="page-subtitle">
               {total} pedido{total !== 1 ? "s" : ""} activo{total !== 1 ? "s" : ""}
             </p>
           </div>
@@ -206,25 +205,28 @@ export default async function InventarioPage({
             <BarcodeListener />
             <Link
               href="/pedidos/rapido"
-              className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+              className="btn-primary gap-2"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <Zap size={16} strokeWidth={2.25} aria-hidden="true" />
               Pedido rápido
             </Link>
           </div>
         </div>
 
         {/* Búsqueda */}
-        <form className="mt-4 flex gap-2">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar por recibo, cliente o teléfono…"
-            className="input-modern flex-1"
-          />
+        <form className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar por recibo, cliente o teléfono…"
+              className="input-modern w-full"
+            />
+          </FieldIcon>
           {q && (
-            <Link href="/inventario" className="flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50">
-              ✕ Limpiar
+            <Link href="/inventario" className="btn-dark gap-1 whitespace-nowrap">
+              <X size={14} strokeWidth={2.25} aria-hidden="true" />
+              Limpiar
             </Link>
           )}
           <button className="btn-primary whitespace-nowrap">Buscar</button>
@@ -258,10 +260,10 @@ export default async function InventarioPage({
 
       {/* ── KPIs ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KpiCard icon="📋" label="Pedidos activos"    value={pedidos.length} color="blue"   />
-        <KpiCard icon="🧺" label="Prendas pendientes" value={kpiPrendas}     color="purple" />
-        <KpiCard icon="⚠️" label="Con saldo"          value={kpiSaldo}       color="red"    />
-        <KpiCard icon="✅" label="Listos para recoger" value={kpiListos}     color="green"  />
+        <KpiCard icon={<ClipboardList size={18} strokeWidth={1.75} />} label="Pedidos activos"    value={pedidos.length} color="blue"   />
+        <KpiCard icon={<Layers size={18} strokeWidth={1.75} />} label="Prendas pendientes" value={kpiPrendas}     color="purple" />
+        <KpiCard icon={<AlertTriangle size={18} strokeWidth={1.75} />} label="Con saldo"          value={kpiSaldo}       color="red"    />
+        <KpiCard icon={<CircleCheck size={18} strokeWidth={1.75} />} label="Listos para recoger" value={kpiListos}     color="green"  />
       </div>
 
       {/* ── Banner de resultado de escaneo ──────────────── */}
@@ -271,7 +273,9 @@ export default async function InventarioPage({
             ? "bg-green-50 text-green-700 ring-1 ring-green-200"
             : "bg-red-50 text-red-600 ring-1 ring-red-200"
         }`}>
-          <span className="text-lg">{pedidos.length > 0 ? "✅" : "❌"}</span>
+          {pedidos.length > 0
+            ? <CircleCheck size={18} strokeWidth={2} aria-hidden="true" />
+            : <CircleX size={18} strokeWidth={2} aria-hidden="true" />}
           {pedidos.length > 0
             ? `Recibo #${String(parseInt(q, 10)).padStart(5, "0")} encontrado — ${pedidos[0].cliente.nombre}`
             : `No se encontró el recibo #${String(parseInt(q, 10)).padStart(5, "0")}`}
@@ -285,21 +289,15 @@ export default async function InventarioPage({
       <div className="card overflow-hidden">
         {pedidos.length === 0 ? (
           <EmptyState
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
-                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
-            }
+            icon={<Layers size={22} strokeWidth={1.75} />}
             title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos activos"}
             description={q || estadoFiltro !== "TODOS" ? "Prueba con otros filtros." : "Los pedidos que recibas aparecerán aquí."}
             action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
           />
         ) : (
-          <div className="divide-y divide-gray-100">
-            {/* Encabezado */}
-            <div className="grid grid-cols-[56px_1fr_110px_80px_120px_90px_80px] gap-x-3 bg-gray-50 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              <span>#</span>
+          <div className="divide-y divide-[color:var(--border-1)]">
+            <div className="hidden grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] gap-x-4 bg-[color:var(--surface-2)] px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-3)] md:grid">
+              <span>Recibo</span>
               <span>Cliente</span>
               <span>Estado</span>
               <span className="text-center">Prendas</span>
@@ -322,26 +320,12 @@ export default async function InventarioPage({
         )}
       </div>
 
-      {/* ── Paginación ───────────────────────────────────── */}
-      {totalPages > 1 && (
-        <div className="card flex items-center justify-between p-4">
-          <Link
-            href={buildUrl(Math.max(currentPage - 1, 1), q, estadoFiltro)}
-            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${currentPage === 1 ? "pointer-events-none text-gray-300" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            ← Anterior
-          </Link>
-          <span className="text-sm font-semibold text-gray-500">
-            Página {currentPage} / {totalPages}
-          </span>
-          <Link
-            href={buildUrl(Math.min(currentPage + 1, totalPages), q, estadoFiltro)}
-            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${currentPage >= totalPages ? "pointer-events-none text-gray-300" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            Siguiente →
-          </Link>
-        </div>
-      )}
+      <Pager
+        page={currentPage}
+        totalPages={totalPages}
+        hrefFor={(p) => buildUrl(p, q, estadoFiltro)}
+        className="card flex items-center justify-between p-4"
+      />
     </div>
   );
 }
@@ -361,26 +345,44 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const totalEnt     = pedido.prendas.reduce((s: number, p: any) =>
     s + p.entregasParciales.reduce((es: number, e: any) => es + e.cantidad, 0), 0);
   const dias         = diasDesde(pedido.createdAt);
-  const estadoInfo   = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
     <details className="group" open={autoOpen}>
       {/* ── Fila compacta (siempre visible) ── */}
-      <summary className="grid cursor-pointer list-none grid-cols-[56px_1fr_110px_80px_120px_90px_80px] items-center gap-x-3 px-4 py-3 transition hover:bg-gray-50 group-open:bg-brand-50">
-
-        {/* # Recibo */}
-        <span className="text-xs font-bold text-brand-500">#{fmt(pedido.id)}</span>
-
-        {/* Cliente */}
-        <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-gray-900">{pedido.cliente.nombre}</p>
-          <p className="truncate text-xs text-gray-400">{pedido.cliente.telefono ?? "—"}</p>
+      <summary className="cursor-pointer list-none transition hover:bg-[color:var(--surface-2)] group-open:bg-brand-50 dark:group-open:bg-brand-500/10">
+        <div className="flex items-start justify-between gap-3 px-4 py-3.5 md:hidden">
+          <div className="min-w-0">
+            <p className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</p>
+            <p className="truncate text-sm font-bold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <EstadoBadge estado={pedido.estado} />
+              {saldo > 0 ? (
+                <span className="text-xs font-black text-red-600">{money(saldo)}</span>
+              ) : (
+                <span className="text-xs font-bold text-green-600">Pagado</span>
+              )}
+              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
+                {diasLabel(dias)}
+              </span>
+            </div>
+          </div>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            aria-hidden="true"
+            className="mt-1 shrink-0 text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+          />
         </div>
 
-        {/* Estado */}
-        <span className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-          {pedido.estado}
-        </span>
+        <div className="hidden grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] items-center gap-x-4 px-5 py-4 md:grid">
+        <span className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</span>
+
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+          <p className="truncate text-xs text-[color:var(--text-3)]">{pedido.cliente.telefono ?? "—"}</p>
+        </div>
+
+        <EstadoBadge estado={pedido.estado} />
 
         {/* Prendas */}
         <div className="text-center">
@@ -398,7 +400,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           {saldo > 0 ? (
             <span className="text-sm font-black text-red-600">{money(saldo)}</span>
           ) : (
-            <span className="text-sm font-bold text-green-600">✅ Pagado</span>
+            <span className="text-sm font-bold text-green-600">Pagado</span>
           )}
         </div>
 
@@ -409,17 +411,18 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           </span>
         </div>
 
-        {/* Flecha */}
         <div className="flex justify-end">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
-            className="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            aria-hidden="true"
+            className="text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+          />
+        </div>
         </div>
       </summary>
 
-      {/* ── Panel expandido (solo al abrir) ── */}
-      <div className="border-t border-brand-100 bg-brand-50/30">
+      <div className="border-t border-[color:var(--border-1)] bg-[color:var(--surface-2)]">
         <PedidoCard
           pedido={pedido}
           agregarAbono={agregarAbono}
@@ -447,10 +450,9 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const pendientes      = totalPrendas - totalEntregadas;
   const progresoPct     = totalPrendas > 0 ? Math.round((totalEntregadas / totalPrendas) * 100) : 0;
   const dias            = diasDesde(pedido.createdAt);
-  const estadoInfo      = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
-    <div className="card overflow-hidden">
+    <div>
 
       {/* ── Cabecera ── */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 p-5">
@@ -467,15 +469,14 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               >
                 {pedido.cliente.nombre}
               </Link>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-                {pedido.estado}
-              </span>
+              <EstadoBadge estado={pedido.estado} />
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
                 {diasLabel(dias)}
               </span>
             </div>
-            <p className="mt-0.5 text-xs text-gray-400">
-              📞 {pedido.cliente.telefono ?? "Sin teléfono"}
+            <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-[color:var(--text-3)]">
+              <Phone size={12} strokeWidth={2} aria-hidden="true" />
+              {pedido.cliente.telefono ?? "Sin teléfono"}
               <span className="mx-1.5 opacity-40">·</span>
               Recibo{" "}
               <span className="font-bold text-brand-500">#{fmt(pedido.id)}</span>
@@ -494,13 +495,15 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             target="_blank"
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:border-brand-300 hover:text-brand-600"
           >
-            🖨️ Recibo
+            <Printer size={13} strokeWidth={2} aria-hidden="true" />
+            Recibo
           </Link>
           <Link
             href={`/pedidos/${pedido.id}`}
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:border-brand-300 hover:text-brand-600"
           >
-            Ver detalle →
+            Ver detalle
+            <ChevronRight size={13} strokeWidth={2.25} aria-hidden="true" />
           </Link>
         </div>
       </div>
@@ -526,7 +529,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               </span>
             ) : (
               <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 ring-1 ring-green-200">
-                ✅ Pagado
+                Pagado
               </span>
             )}
           </div>
@@ -558,7 +561,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                   }`}
                 >
                   <div className="flex items-center gap-3 px-4 py-3">
-                    <span className="text-xl leading-none">{pEmoji(prenda.tipo)}</span>
+                    <PrendaIcon tipo={prenda.tipo} size={20} className="shrink-0 text-gray-600 dark:text-gray-300" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-bold text-sm text-gray-900 truncate">
@@ -576,7 +579,12 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                           />
                         </div>
                         <span className={`text-xs font-bold ${done ? "text-green-600" : "text-gray-500"}`}>
-                          {done ? "✓ Listo" : `${ent}/${prenda.cantidad}`}
+                          {done ? (
+                            <span className="inline-flex items-center gap-1">
+                              <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+                              Listo
+                            </span>
+                          ) : `${ent}/${prenda.cantidad}`}
                         </span>
                       </div>
                     </div>
@@ -584,15 +592,19 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
                   {prenda.descripcion && (
                     <div className="border-t border-orange-100 bg-orange-50 px-4 py-1.5">
-                      <p className="text-xs font-bold text-orange-600">⚠️ {prenda.descripcion}</p>
+                      <p className="flex items-start gap-1.5 text-xs font-bold text-orange-600">
+                        <AlertTriangle size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                        {prenda.descripcion}
+                      </p>
                     </div>
                   )}
 
                   {prenda.entregasParciales.length > 0 && (
                     <div className="border-t border-gray-100 bg-gray-50 px-4 py-2">
                       {prenda.entregasParciales.map((e: any) => (
-                        <p key={e.id} className="text-xs text-gray-400">
-                          ↓ {e.cantidad} retiradas ·{" "}
+                        <p key={e.id} className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                          <ArrowDownToLine size={11} strokeWidth={2} aria-hidden="true" />
+                          {e.cantidad} retiradas ·{" "}
                           {new Date(e.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
                           {e.observacion ? ` · ${e.observacion}` : ""}
                         </p>
@@ -603,8 +615,11 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                   {pend > 0 && (
                     <details className="group border-t border-gray-100">
                       <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-2.5 text-xs font-bold text-brand-600 hover:bg-brand-50">
-                        <span>↓ Registrar retiro de esta prenda</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 transition duration-200 group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg>
+                        <span className="inline-flex items-center gap-1.5">
+                          <ArrowDownToLine size={13} strokeWidth={2} aria-hidden="true" />
+                          Registrar retiro de esta prenda
+                        </span>
+                        <ChevronDown size={14} strokeWidth={2} className="transition duration-200 group-open:rotate-180" aria-hidden="true" />
                       </summary>
                       <form action={registrarEntregaParcial} className="grid gap-2 bg-gray-50 px-4 pb-4 pt-2 sm:grid-cols-2">
                         <input type="hidden" name="pedidoId" value={pedido.id} />
@@ -656,7 +671,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               </div>
               <div className={`mt-2 flex justify-between rounded-xl px-3 py-2.5 ${saldo > 0 ? "bg-red-50 ring-1 ring-red-200" : "bg-green-50 ring-1 ring-green-200"}`}>
                 <span className={`font-bold ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
-                  {saldo > 0 ? "Saldo" : "✅ Pagado"}
+                  {saldo > 0 ? "Saldo" : "Pagado"}
                 </span>
                 <span className={`text-lg font-black ${saldo > 0 ? "text-red-600" : "text-green-600"}`}>
                   {money(Math.max(saldo, 0))}
@@ -694,10 +709,10 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Estado</p>
             <div className="space-y-2">
               {pedido.estado === "RECIBIDO" && (
-                <EstadoBtn pedidoId={pedido.id} nuevoEstado="LISTO" label="✅ Marcar como LISTO" color="green" action={cambiarEstado} />
+                <EstadoBtn pedidoId={pedido.id} nuevoEstado="LISTO" label="Marcar como LISTO" color="green" action={cambiarEstado} />
               )}
               {pedido.estado === "LISTO" && saldo <= 0 && (
-                <EstadoBtn pedidoId={pedido.id} nuevoEstado="ENTREGADO" label="📦 Entregar pedido completo" color="brand" action={cambiarEstado} />
+                <EstadoBtn pedidoId={pedido.id} nuevoEstado="ENTREGADO" label="Entregar pedido completo" color="brand" action={cambiarEstado} />
               )}
               {pedido.estado === "LISTO" && saldo > 0 && (
                 <p className="rounded-xl bg-red-50 p-3 text-xs font-bold text-red-600">
@@ -716,25 +731,25 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 /* ── Sub-componentes ─────────────────────────────────────────── */
 
 function KpiCard({ icon, label, value, color }: {
-  icon: string; label: string; value: number;
+  icon: React.ReactNode; label: string; value: number;
   color: "blue" | "purple" | "red" | "green";
 }) {
   const ring: Record<string, string> = {
-    blue:   "ring-blue-100 bg-blue-50",
-    purple: "ring-purple-100 bg-purple-50",
-    red:    "ring-red-100 bg-red-50",
-    green:  "ring-green-100 bg-green-50",
+    blue:   "figure-well--indigo",
+    purple: "text-violet-700",
+    red:    "bg-red-50 text-red-600",
+    green:  "figure-well--aqua",
   };
   const num: Record<string, string> = {
     blue: "text-blue-700", purple: "text-purple-700", red: "text-red-600", green: "text-green-700",
   };
   return (
     <div className="card p-5">
-      <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl text-lg ring-1 ${ring[color]}`}>
+      <div className={`mb-3 figure-well h-10 w-10 ${ring[color]}`}>
         {icon}
       </div>
       <p className={`text-3xl font-black ${num[color]}`}>{value}</p>
-      <p className="mt-0.5 text-xs font-bold text-gray-500">{label}</p>
+      <p className="mt-0.5 text-xs font-bold text-[color:var(--text-2)]">{label}</p>
     </div>
   );
 }

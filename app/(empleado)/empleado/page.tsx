@@ -1,4 +1,13 @@
 import Link from "next/link";
+import {
+  ArrowRight,
+  CircleCheck,
+  ClipboardList,
+  PackageCheck,
+  User,
+  Wallet,
+  WashingMachine,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export default async function EmpleadoPage() {
@@ -8,7 +17,7 @@ export default async function EmpleadoPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+    <div className="page-frame">
       <div>
         <p className="page-kicker text-teal-600 dark:text-teal-400">
           Mostrador
@@ -23,7 +32,7 @@ export default async function EmpleadoPage() {
         <PathCard
           href="/pedidos/rapido"
           tone="aqua"
-          emoji="🧺"
+          icon={<WashingMachine size={28} strokeWidth={1.75} />}
           kicker="Entrada"
           title="Llegó a dejar"
           desc="Recibir prendas, crear el recibo y cobrar el abono."
@@ -33,7 +42,7 @@ export default async function EmpleadoPage() {
         <PathCard
           href="/inventario-empleado"
           tone="indigo"
-          emoji="📦"
+          icon={<PackageCheck size={28} strokeWidth={1.75} />}
           kicker="Salida"
           title="Llegó a recoger"
           desc="Buscar el recibo, cobrar el saldo y entregar."
@@ -60,9 +69,9 @@ export default async function EmpleadoPage() {
       <div>
         <p className="mb-3 page-kicker">También</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <SideLink href="/gastos-empleado" emoji="💵" title="Gastos del día" desc="Jabones, insumos, pagos" />
-          <SideLink href="/clientes-empleado" emoji="👤" title="Clientes" desc="Buscar o crear ficha" />
-          <SideLink href="/entradas-salidas-empleado" emoji="📋" title="Lo de hoy" desc="Qué entró y qué salió hoy" />
+          <SideLink href="/gastos-empleado" icon={<Wallet size={22} strokeWidth={1.75} />} title="Gastos del día" desc="Jabones, insumos, pagos" />
+          <SideLink href="/clientes-empleado" icon={<User size={22} strokeWidth={1.75} />} title="Clientes" desc="Buscar o crear ficha" />
+          <SideLink href="/entradas-salidas-empleado" icon={<ClipboardList size={22} strokeWidth={1.75} />} title="Lo de hoy" desc="Qué entró y qué salió hoy" />
         </div>
       </div>
     </div>
@@ -72,7 +81,7 @@ export default async function EmpleadoPage() {
 function PathCard({
   href,
   tone,
-  emoji,
+  icon,
   kicker,
   title,
   desc,
@@ -81,7 +90,7 @@ function PathCard({
 }: {
   href: string;
   tone: "aqua" | "indigo";
-  emoji: string;
+  icon: React.ReactNode;
   kicker: string;
   title: string;
   desc: string;
@@ -93,7 +102,7 @@ function PathCard({
     <Link
       href={href}
       aria-label={`${title}: ${cta}`}
-      className={`card group relative overflow-hidden p-6 outline-none transition hover:shadow-soft active:scale-[0.995] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg)] ${
+      className={`card card-nav group relative overflow-hidden p-6 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg)] ${
         aqua
           ? "hover:border-teal-300 focus-visible:ring-teal-400 dark:hover:border-teal-500/40"
           : "hover:border-brand-300 focus-visible:ring-brand-400 dark:hover:border-brand-500/40"
@@ -106,11 +115,11 @@ function PathCard({
       />
       <div className="flex items-start gap-4">
         <span
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-well)] text-3xl ${
-            aqua ? "bg-teal-50 dark:bg-teal-500/15" : "bg-brand-50 dark:bg-brand-500/15"
+          className={`icon-motion figure-well h-14 w-14 ${
+            aqua ? "figure-well--aqua" : "figure-well--indigo"
           }`}
         >
-          {emoji}
+          {icon}
         </span>
         <div className="min-w-0">
           <p
@@ -144,11 +153,12 @@ function PathCard({
       </ol>
 
       <p
-        className={`mt-5 text-sm font-bold ${
+        className={`mt-5 inline-flex items-center gap-1.5 text-sm font-bold ${
           aqua ? "text-teal-600 group-hover:text-teal-700" : "text-brand-500 group-hover:text-brand-600"
         }`}
       >
-        {cta} →
+        {cta}
+        <ArrowRight size={14} strokeWidth={2.25} aria-hidden="true" />
       </p>
     </Link>
   );
@@ -170,7 +180,7 @@ function StatTile({
   if (value === 0) {
     return (
       <div className="card flex items-center gap-3 p-4">
-        <span className="text-2xl">✅</span>
+        <CircleCheck size={22} strokeWidth={1.75} className="shrink-0 text-teal-600 dark:text-teal-400" aria-hidden="true" />
         <p className="text-sm font-semibold text-[color:var(--text-3)]">{emptyText}</p>
       </div>
     );
@@ -188,21 +198,23 @@ function StatTile({
 
 function SideLink({
   href,
-  emoji,
+  icon,
   title,
   desc,
 }: {
   href: string;
-  emoji: string;
+  icon: React.ReactNode;
   title: string;
   desc: string;
 }) {
   return (
     <Link
       href={href}
-      className="card flex items-center gap-3 p-4 transition hover:border-teal-300 hover:shadow-soft dark:hover:border-teal-500/40"
+      className="card card-nav group flex items-center gap-3 p-4 hover:border-teal-300 dark:hover:border-teal-500/40"
     >
-      <span className="text-2xl">{emoji}</span>
+      <span className="icon-motion figure-well h-10 w-10">
+        {icon}
+      </span>
       <span className="min-w-0">
         <span className="block text-sm font-bold text-[color:var(--text-1)]">{title}</span>
         <span className="block text-xs text-[color:var(--text-3)]">{desc}</span>
