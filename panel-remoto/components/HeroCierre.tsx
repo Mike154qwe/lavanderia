@@ -17,7 +17,8 @@ export default function HeroCierre({
   // toLocaleDateString devuelve "martes, 22 de septiembre" todo en minúscula
   // -- la clase de Tailwind "capitalize" mayusculiza CADA palabra (también el
   // conector "de"), así que esto se hace a mano: solo la primera letra.
-  const fechaCruda = new Date(datos.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+  const fechaCruda = new Date(datos.fecha + "T12:00:00-05:00").toLocaleDateString("es-CO", {
+    timeZone: "America/Bogota",
     weekday: "long",
     day: "numeric",
     month: "long",

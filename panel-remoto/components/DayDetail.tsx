@@ -76,7 +76,7 @@ function MovSection({
             <div>
               <p className="font-bold text-gray-900 dark:text-white">#{fmt(m.pedidoId)} · {m.cliente}</p>
               <p className="mt-0.5 text-xs text-gray-400">
-                {money(m.total)} · {new Date(m.hora).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                {money(m.total)} · {new Date(m.hora).toLocaleTimeString("es-CO", { timeZone: "America/Bogota", hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
             <span className="shrink-0 font-bold text-brand-500">{money(m.abonado)}</span>

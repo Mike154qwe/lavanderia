@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatPedido, money, fechaCorta } from "@/lib/format";
+import { formatPedido, money, fechaCorta, haceMeses, diasCalendarioDesde } from "@/lib/format";
 import { ChevronDown, CircleCheck, Clock, Layers, Wallet } from "lucide-react";
 import EstadoBadge from "@/components/EstadoBadge";
 import { EmptyState } from "@/components/EmptyState";
@@ -16,10 +16,7 @@ function mensajeRecordatorio(pedidoId: number) {
 }
 
 export default async function PedidosAntiguosPage() {
-  const hoy = new Date();
-
-  const limite = new Date(hoy);
-  limite.setMonth(limite.getMonth() - 3);
+  const limite = haceMeses(new Date(), 3);
 
   const pedidos = await prisma.pedido.findMany({
     where: {
@@ -113,10 +110,7 @@ export default async function PedidosAntiguosPage() {
               0
             );
 
-            const diasEnLavanderia = Math.floor(
-              (hoy.getTime() - pedido.createdAt.getTime()) /
-                (1000 * 60 * 60 * 24)
-            );
+            const diasEnLavanderia = diasCalendarioDesde(pedido.createdAt);
 
             return (
               <div key={pedido.id} className="card p-5">

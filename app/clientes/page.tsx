@@ -4,7 +4,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { EmptyState } from "@/components/EmptyState";
 import FieldIcon from "@/components/FieldIcon";
-import { fechaCorta } from "@/lib/format";
+import { fechaCorta, inicioMes, partesBogota } from "@/lib/format";
 import { sanearNombre, sanearTelefono, sanearDireccion } from "@/lib/validacion-cliente";
 import { ChevronDown, MapPin, Phone, Plus, Search, User, UserPlus, Users } from "lucide-react";
 
@@ -49,10 +49,10 @@ export default async function ClientesPage({
     prisma.cliente.count(),
   ]);
 
-  const hoy = new Date();
-  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const hoyB = partesBogota(new Date());
+  const desdeMes = inicioMes(hoyB.year, hoyB.month - 1);
   const nuevosMes = await prisma.cliente.count({
-    where: { createdAt: { gte: inicioMes } },
+    where: { createdAt: { gte: desdeMes } },
   });
 
   return (

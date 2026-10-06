@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { civilBogota, sameDay } from "@/lib/format";
 
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
@@ -7,14 +8,6 @@ export type DayStats = {
   salidas?: number;
   gastos?: number;
 };
-
-function sameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
 
 export default function MonthCalendar({
   year,
@@ -49,7 +42,7 @@ export default function MonthCalendar({
         ))}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const dia = i + 1;
-          const fecha = new Date(year, month, dia);
+          const fecha = civilBogota(year, month, dia);
           const stats = getStats(fecha);
           const entradas = stats.entradas ?? 0;
           const salidas = stats.salidas ?? 0;

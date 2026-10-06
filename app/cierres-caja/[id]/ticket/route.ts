@@ -1,14 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { money, formatPedido } from "@/lib/format";
+import { money, formatPedido, fechaLarga, fechaHora, inicioDia, finDia } from "@/lib/format";
 import { calcularCaja, ventanaDeCierre } from "@/lib/caja";
-
-function inicioDia(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-}
-
-function finDia(fecha: Date) {
-  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + 1);
-}
 
 function pagosPorMetodo(pagos: any[], metodo: string) {
   return pagos.filter((p) => p.metodo === metodo);
@@ -19,10 +11,7 @@ function totalPagos(pagos: any[]) {
 }
 
 function hora(date: Date | string) {
-  return new Date(date).toLocaleTimeString("es-CO", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return fechaHora(new Date(date));
 }
 
 /** Renderiza una sección de pagos por método. Omite si está vacía. */
@@ -331,7 +320,7 @@ body{
 <div class="header">
   <h1>Lavaseco La Manuelita</h1>
   <div class="cierre-id">CIERRE DE CAJA #${String(cierre.id).padStart(5, "0")}</div>
-  <small>${new Date(cierre.createdAt).toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</small>
+  <small>${fechaLarga(new Date(cierre.createdAt))}</small>
 </div>
 
 <!-- Datos del cierre -->

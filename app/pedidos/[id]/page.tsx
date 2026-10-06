@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { money, fmt, fechaCorta, fechaLarga, estadoLabel } from "@/lib/format";
+import { money, fmt, fechaCorta, fechaLarga, fechaHora, estadoLabel } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
@@ -190,7 +190,7 @@ export default async function DetallePedidoPage({
                 #{fmt(pedido.id)}
               </h1>
               <p className="mt-1 text-sm text-[color:var(--text-3)]">
-                {fechaLarga(new Date(pedido.createdAt))} · {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                {fechaLarga(new Date(pedido.createdAt))} · {fechaHora(new Date(pedido.createdAt))}
               </p>
             </div>
             <EstadoBadge estado={pedido.estado} size="md" />
@@ -438,8 +438,8 @@ export default async function DetallePedidoPage({
                   <div>
                     <p className="font-semibold text-gray-900">{p.metodo}</p>
                     <p className="mt-0.5 text-xs text-gray-400">
-                      {new Date(p.createdAt).toLocaleDateString("es-CO")} ·{" "}
-                      {new Date(p.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                      {fechaCorta(new Date(p.createdAt))} ·{" "}
+                      {fechaHora(new Date(p.createdAt))}
                     </p>
                   </div>
                   <span className="font-black text-green-600 dark:text-green-400">{money(p.valor)}</span>
@@ -528,7 +528,7 @@ export default async function DetallePedidoPage({
                     <EstadoBadge estado={h.estado} />
                     <span className="text-xs text-[color:var(--text-3)]">
                       {fechaCorta(new Date(h.createdAt))} ·{" "}
-                      {new Date(h.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                      {fechaHora(new Date(h.createdAt))}
                     </span>
                   </div>
                 </li>

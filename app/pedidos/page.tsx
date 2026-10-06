@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import FieldIcon from "@/components/FieldIcon";
 import EstadoBadge from "@/components/EstadoBadge";
 import Pager from "@/components/Pager";
-import { money, fmt, fechaCorta } from "@/lib/format";
+import { money, fmt, fechaCorta, inicioDia } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
@@ -33,8 +33,7 @@ export default async function PedidosPage({
     ];
   }
 
-  const hoy = new Date();
-  const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  const inicio = inicioDia(new Date());
 
   const [pedidos, total, kpiHoy, kpiActivos] = await Promise.all([
     prisma.pedido.findMany({

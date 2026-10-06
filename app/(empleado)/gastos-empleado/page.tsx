@@ -15,9 +15,11 @@ import {
   Wallet,
 } from "lucide-react";
 
-export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { inicioDia, finDia, fechaHora } from "@/lib/format";
+
+export const metadata: Metadata = { title: "Gastos del día" };
 
 function parseMoney(value: FormDataEntryValue | null) {
   return Number(String(value || "0").replace(/\D/g, ""));
@@ -57,9 +59,8 @@ export default async function GastosEmpleadoPage({
   searchParams: Promise<{ flash?: string; error?: string }>;
 }) {
   const { flash, error } = await searchParams;
-  const hoy   = new Date();
-  const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-  const fin    = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
+  const inicio = inicioDia(new Date());
+  const fin    = finDia(new Date());
 
   const gastos = await prisma.gastoCaja.findMany({
     where: { createdAt: { gte: inicio, lt: fin } },
@@ -175,7 +176,7 @@ export default async function GastosEmpleadoPage({
                     </p>
                     <p className="mt-0.5 text-xs text-gray-400">
                       {gasto.metodo} · {gasto.responsable} ·{" "}
-                      {gasto.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                      {fechaHora(gasto.createdAt)}
                     </p>
                   </div>
                   <p className="shrink-0 font-black text-red-500">

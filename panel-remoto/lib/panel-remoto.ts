@@ -57,12 +57,12 @@ export function claveCachePanelRemoto(fecha: string): string {
 /** Clave de caché para el historial completo (todos los días). */
 export const CLAVE_CACHE_HISTORIAL = "panelRemoto:historial";
 
-/** Formatea una fecha como YYYY-MM-DD (hora local) — id del documento del día. */
+/** Formatea una fecha como YYYY-MM-DD en calendario America/Bogota — id del documento del día. */
 export function formatearFecha(fecha: Date): string {
-  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(fecha);
 }
 
-/** Fecha de hoy en formato YYYY-MM-DD (hora local). */
+/** Fecha de hoy (Bogotá) en formato YYYY-MM-DD. */
 export function fechaHoy(): string {
   return formatearFecha(new Date());
 }

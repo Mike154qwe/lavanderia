@@ -4,8 +4,11 @@
 // después de cada cierre de caja exitoso, vía lib/panel-remoto-admin.ts:
 // colección "panelRemoto", un documento por día con id "YYYY-MM-DD".
 //
-// Este archivo solo tiene los TIPOS compartidos y helpers sin dependencias
-// de Firestore -- la lectura (traerPanelRemotoDeFirestore) y la caché
+import { isoFecha } from "@/lib/format";
+
+// Este archivo solo tiene los TIPOS compartidos y helpers sin Firestore --
+// formatearFecha delega en lib/format.ts (calendario America/Bogota). La lectura
+// (traerPanelRemotoDeFirestore) y la caché
 // offline (claveCachePanelRemoto/fechaHoy, que la acompañaban) se borraron
 // el 23-sep-2026 junto con app/gerente/remoto/: esa página nunca tuvo login
 // propio, así que quedó rota sin arreglo simple en cuanto firestore.rules
@@ -50,7 +53,7 @@ export type PanelRemotoData = {
 
 export const COLECCION_PANEL_REMOTO = "panelRemoto";
 
-/** Formatea una fecha como YYYY-MM-DD (hora local) — id del documento del día. */
+/** Id del documento del día: YYYY-MM-DD en calendario de Bogotá, no la hora local del servidor. */
 export function formatearFecha(fecha: Date): string {
-  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
+  return isoFecha(fecha);
 }

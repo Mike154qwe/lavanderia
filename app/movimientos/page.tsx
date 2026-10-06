@@ -4,6 +4,7 @@ import { ArrowDownRight, ArrowUpRight, CalendarDays, Shirt, TriangleAlert } from
 import { prisma } from "@/lib/prisma";
 import MovimientosMensuales from "@/components/charts/MovimientosMensuales";
 import YearPager from "@/components/YearPager";
+import { partesBogota, inicioAno } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Movimientos" };
 
@@ -20,13 +21,14 @@ export default async function MovimientosPage({
 }) {
   const params  = searchParams ? await searchParams : {};
   const hoy     = new Date();
-  const year    = Number(params.year || hoy.getFullYear());
-  const mesHoy  = hoy.getMonth();
-  const diaHoy  = hoy.getDate();
-  const esAnioActual = year === hoy.getFullYear();
+  const hoyB    = partesBogota(hoy);
+  const year    = Number(params.year || hoyB.year);
+  const mesHoy  = hoyB.month - 1;
+  const diaHoy  = hoyB.day;
+  const esAnioActual = year === hoyB.year;
 
-  const inicioAnio = new Date(year, 0, 1);
-  const finAnio    = new Date(year + 1, 0, 1);
+  const inicioAnio = inicioAno(year);
+  const finAnio    = inicioAno(year + 1);
 
   const [pedidosAnio, salidasAnio] = await Promise.all([
     prisma.pedido.findMany({
@@ -50,7 +52,10 @@ export default async function MovimientosPage({
     (s, p) => s + p.prendas.reduce((ps, pr) => ps + pr.cantidad, 0), 0,
   );
   const diasActivosSet = new Set(
-    pedidosAnio.map((p) => `${p.createdAt.getMonth()}-${p.createdAt.getDate()}`),
+    pedidosAnio.map((p) => {
+      const b = partesBogota(p.createdAt);
+      return `${b.month}-${b.day}`;
+    }),
   );
   const kpiDiasActivos = diasActivosSet.size;
 
@@ -58,8 +63,8 @@ export default async function MovimientosPage({
   const limiteMes = esAnioActual ? mesHoy : 11;
   const datosMensuales = MESES.slice(0, limiteMes + 1).map((_, i) => ({
     mes:      MESES_CORTO[i],
-    entradas: pedidosAnio.filter((p) => p.createdAt.getMonth() === i).length,
-    salidas:  salidasAnio.filter((s) => s.createdAt.getMonth() === i).length,
+    entradas: pedidosAnio.filter((p) => partesBogota(p.createdAt).month - 1 === i).length,
+    salidas:  salidasAnio.filter((s) => partesBogota(s.createdAt).month - 1 === i).length,
   }));
 
   const maxEntradasMes = Math.max(...datosMensuales.map((d) => d.entradas), 1);
@@ -141,9 +146,9 @@ export default async function MovimientosPage({
           if (esAnioActual && mesIndex > mesHoy) return null;
 
           const diasDelMes   = new Date(year, mesIndex + 1, 0).getDate();
-          const pedidosMes   = pedidosAnio.filter((p) => p.createdAt.getMonth() === mesIndex);
+          const pedidosMes   = pedidosAnio.filter((p) => partesBogota(p.createdAt).month - 1 === mesIndex);
           const entradasMes  = pedidosMes.length;
-          const salidasMes   = salidasAnio.filter((s) => s.createdAt.getMonth() === mesIndex).length;
+          const salidasMes   = salidasAnio.filter((s) => partesBogota(s.createdAt).month - 1 === mesIndex).length;
           const prendasMes   = pedidosMes.reduce(
             (s, p) => s + p.prendas.reduce((ps, pr) => ps + pr.cantidad, 0), 0,
           );
@@ -204,9 +209,12 @@ export default async function MovimientosPage({
                 {Array.from({ length: diasDelMes }).map((_, dayIndex) => {
                   const dia        = dayIndex + 1;
                   const esHoyFlag  = esMesActual && dia === diaHoy;
-                  const pedidosDia = pedidosMes.filter((p) => p.createdAt.getDate() === dia);
+                  const pedidosDia = pedidosMes.filter((p) => partesBogota(p.createdAt).day === dia);
                   const salidasDia = salidasAnio.filter(
-                    (s) => s.createdAt.getMonth() === mesIndex && s.createdAt.getDate() === dia,
+                    (s) => {
+                      const b = partesBogota(s.createdAt);
+                      return b.month - 1 === mesIndex && b.day === dia;
+                    },
                   ).length;
                   const entradas   = pedidosDia.length;
                   const activo     = entradas > 0 || salidasDia > 0;

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Search, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaLarga, sameDay, parseFechaParam, inicioAno, partesBogota, isoFecha } from "@/lib/format";
 import EmpleadoLinks from "@/components/EmpleadoLinks";
 import PedidoRow from "./PedidoRow";
 import MonthCalendar from "@/components/MonthCalendar";
@@ -12,9 +12,6 @@ import FieldIcon from "@/components/FieldIcon";
 export const metadata: Metadata = { title: "Lo de hoy" };
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-function sameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
 function normalizar(s: string) { return s.trim().toLowerCase(); }
 function coincide(pedido: any, q: string) {
   if (!q) return true;
@@ -34,23 +31,24 @@ export default async function EntradasSalidasEmpleadoPage({
 }) {
   const params = await searchParams;
   const hoy    = new Date();
-  const year   = Number(params.year || hoy.getFullYear());
+  const hoyB   = partesBogota(hoy);
+  const year   = Number(params.year || hoyB.year);
   const q      = params.q?.trim() || "";
   const tipoFiltro = params.tipo || "todos";
 
-  const fechaSeleccionada = params.fecha ? new Date(params.fecha + "T00:00:00") : null;
+  const fechaSeleccionada = params.fecha ? parseFechaParam(params.fecha) : null;
 
-  const inicioAno = new Date(year, 0, 1);
-  const finAno    = new Date(year + 1, 0, 1);
+  const desdeAno = inicioAno(year);
+  const hastaAno = inicioAno(year + 1);
 
   const [pedidosRaw, salidasRaw]: [any[], any[]] = await Promise.all([
     prisma.pedido.findMany({
-      where: { createdAt: { gte: inicioAno, lt: finAno } },
+      where: { createdAt: { gte: desdeAno, lt: hastaAno } },
       include: { cliente: true, prendas: true, pagos: true },
       orderBy: { createdAt: "asc" },
     }),
     prisma.historialEstado.findMany({
-      where: { estado: "ENTREGADO", createdAt: { gte: inicioAno, lt: finAno } },
+      where: { estado: "ENTREGADO", createdAt: { gte: desdeAno, lt: hastaAno } },
       include: { pedido: { include: { cliente: true, prendas: true, pagos: true } } },
       orderBy: { createdAt: "asc" },
     }),
@@ -67,7 +65,7 @@ export default async function EntradasSalidasEmpleadoPage({
     ? salidasAno.filter((s: any) => sameDay(s.createdAt, fechaSeleccionada))
     : [];
 
-  const mesHoy = year === hoy.getFullYear() ? hoy.getMonth() : 11;
+  const mesHoy = year === hoyB.year ? hoyB.month - 1 : 11;
 
   return (
     <div className="page-frame">
@@ -139,7 +137,7 @@ export default async function EntradasSalidasEmpleadoPage({
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Día seleccionado</p>
               <h2 className="mt-0.5 text-lg font-bold capitalize text-gray-900">
-                {fechaSeleccionada.toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                {fechaLarga(fechaSeleccionada)}
               </h2>
             </div>
             <Link href={`/entradas-salidas-empleado?year=${year}&q=${q}&tipo=${tipoFiltro}`} className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50 dark:border-white/10">
@@ -201,7 +199,7 @@ export default async function EntradasSalidasEmpleadoPage({
       <div className="mt-4 space-y-4">
         {MESES.map((mes, mesIndex) => {
           if (mesIndex > mesHoy) return null;
-          const esMesActual = mesIndex === mesHoy && year === hoy.getFullYear();
+          const esMesActual = mesIndex === mesHoy && year === hoyB.year;
 
           return (
             <div key={mes} className="card overflow-hidden">
@@ -220,7 +218,7 @@ export default async function EntradasSalidasEmpleadoPage({
                 today={hoy}
                 selected={fechaSeleccionada}
                 hrefFor={(d) => {
-                  const fechaLink = `${year}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                  const fechaLink = isoFecha(d);
                   return `/entradas-salidas-empleado?year=${year}&fecha=${fechaLink}&q=${encodeURIComponent(q)}&tipo=${tipoFiltro}`;
                 }}
                 getStats={(d) => ({
