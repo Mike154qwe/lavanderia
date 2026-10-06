@@ -16,7 +16,7 @@ import IngresosDiarios from "@/components/charts/IngresosDiarios";
 import MetodosPago from "@/components/charts/MetodosPago";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { money, fmt } from "@/lib/format";
+import { money, fmt, fechaLarga, fechaCorta } from "@/lib/format";
 import PedidoLink from "@/components/PedidoLink";
 import { calcularCaja, ventanaDeCierre, enVentana } from "@/lib/caja";
 import {
@@ -25,7 +25,6 @@ import {
   type PanelRemotoData,
 } from "@/lib/panel-remoto";
 import { guardarPanelRemotoEnFirestore } from "@/lib/panel-remoto-admin";
-import FieldIcon from "@/components/FieldIcon";
 import MonthCalendar from "@/components/MonthCalendar";
 
 export const metadata: Metadata = { title: "Gerente" };
@@ -166,11 +165,13 @@ export default async function GerentePage({
 }) {
   const params = searchParams ? await searchParams : {};
   const hoy    = new Date();
-  const year   = Number(params.year || hoy.getFullYear());
 
   const fechaSeleccionada = params.fecha
     ? new Date(params.fecha + "T00:00:00")
     : inicioDia(hoy);
+  const year = params.fecha
+    ? fechaSeleccionada.getFullYear()
+    : Number(params.year || hoy.getFullYear());
 
   const inicio = inicioDia(fechaSeleccionada);
   const fin    = finDia(fechaSeleccionada);
@@ -262,6 +263,17 @@ export default async function GerentePage({
 
   const fechaLinkActual = `${fechaSeleccionada.getFullYear()}-${String(fechaSeleccionada.getMonth() + 1).padStart(2,"0")}-${String(fechaSeleccionada.getDate()).padStart(2,"0")}`;
   const esHoy = sameDay(fechaSeleccionada, hoy);
+  const mesVista = fechaSeleccionada.getMonth();
+  const yearVista = fechaSeleccionada.getFullYear();
+  const diasDelMesVista = new Date(yearVista, mesVista + 1, 0).getDate();
+  let mesSinMovimiento = true;
+  for (let dia = 1; dia <= diasDelMesVista; dia++) {
+    const k = dayKey(new Date(yearVista, mesVista, dia));
+    if ((pedidosAnoMap.get(k) ?? 0) + (salidasAnoMap.get(k) ?? 0) + (gastosAnoMap.get(k) ?? 0) > 0) {
+      mesSinMovimiento = false;
+      break;
+    }
+  }
 
   return (
     <div className="page-frame page-frame--wide">
@@ -274,23 +286,21 @@ export default async function GerentePage({
               Gerente · {esHoy ? "Hoy" : "Día seleccionado"}
             </p>
             <h1 className="page-title">Panel financiero</h1>
-            <p className="page-subtitle capitalize">
-              {fechaSeleccionada.toLocaleDateString("es-CO", {
-                weekday: "long", year: "numeric", month: "long", day: "numeric",
-              })}
+            <p className="page-subtitle">
+              {fechaLarga(fechaSeleccionada)}
             </p>
           </div>
-          <form className="flex items-end gap-2">
-            <FieldIcon icon={<CalendarDays size={18} strokeWidth={1.75} />}>
+          <form className="flex items-center gap-2">
+            <label className="date-field">
+              <CalendarDays size={16} strokeWidth={1.75} aria-hidden="true" />
+              <span>{fechaCorta(fechaSeleccionada)}</span>
               <input
                 type="date"
                 name="fecha"
                 defaultValue={fechaLinkActual}
-                className="input-modern w-auto"
                 aria-label="Elegir día"
               />
-            </FieldIcon>
-            <input type="hidden" name="year" value={year} />
+            </label>
             <button className="btn-primary whitespace-nowrap">Ver día</button>
           </form>
         </div>
@@ -337,6 +347,11 @@ export default async function GerentePage({
             <span className="cal-legend__item"><span className="cal-stat cal-stat--gas">1</span> Gastos</span>
           </div>
         </div>
+        {mesSinMovimiento && (
+          <p className="border-b border-[color:var(--border-1)] px-5 py-3 text-sm font-semibold text-[color:var(--text-3)]">
+            Este mes aún no hay caja registrada. El calendario sirve para elegir el día.
+          </p>
+        )}
         <MonthCalendar
           year={fechaSeleccionada.getFullYear()}
           month={fechaSeleccionada.getMonth()}
@@ -380,7 +395,7 @@ export default async function GerentePage({
               <div key={cierre.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-5 py-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
                 <div>
                   <p className="font-bold text-gray-900">Cierre #{fmt(cierre.id)}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">
+                  <p className="mt-0.5 text-xs text-[color:var(--text-3)]">
                     {cierre.createdAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {cierre.responsable || "Sin responsable"}
                   </p>
                   <p className="mt-1 text-sm font-black text-brand-500">

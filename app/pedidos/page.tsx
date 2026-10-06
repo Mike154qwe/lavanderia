@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { ClipboardList, Layers, Plus } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { money, fmt, ESTADO_BADGE, fechaCorta } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
@@ -74,9 +75,9 @@ export default async function PedidosPage({
           </div>
           <Link
             href="/pedidos/nuevo"
-            className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M12 5v14M5 12h14"/></svg>
+            <Plus size={16} strokeWidth={2.25} aria-hidden="true" />
             Nuevo pedido
           </Link>
         </div>
@@ -112,19 +113,19 @@ export default async function PedidosPage({
           label="Ingresados hoy"
           value={kpiHoy}
           color="blue"
-          icon="M12 5v14M5 12h14"
+          icon={<Plus size={18} strokeWidth={1.75} />}
         />
         <KpiCard
           label="En piso (activos)"
           value={kpiActivos}
           color="yellow"
-          icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"
+          icon={<Layers size={18} strokeWidth={1.75} />}
         />
         <KpiCard
           label="Total en filtro"
           value={total}
           color="purple"
-          icon="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"
+          icon={<ClipboardList size={18} strokeWidth={1.75} />}
         />
       </div>
 
@@ -132,13 +133,7 @@ export default async function PedidosPage({
       <div className="card overflow-hidden">
         {pedidos.length === 0 ? (
           <EmptyState
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
-                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                <rect x="9" y="3" width="6" height="4" rx="2"/>
-                <path d="M9 12h6M9 16h4"/>
-              </svg>
-            }
+            icon={<ClipboardList size={22} strokeWidth={1.75} />}
             title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos todavía"}
             description={q || estadoFiltro !== "TODOS" ? "Intenta con otros filtros o borra la búsqueda." : "Crea el primer pedido para empezar a gestionar el inventario."}
             action={
@@ -153,25 +148,25 @@ export default async function PedidosPage({
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-white/[0.07]">
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Recibo
                     </th>
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Cliente
                     </th>
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Estado
                     </th>
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Total
                     </th>
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Saldo
                     </th>
-                    <th className="hidden px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400 md:table-cell">
+                    <th className="hidden px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)] md:table-cell">
                       Fecha
                     </th>
-                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Acción
                     </th>
                   </tr>
@@ -182,8 +177,7 @@ export default async function PedidosPage({
                     const saldo   = pedido.total - abonado;
 
                     return (
-                      <tr key={pedido.id} className="group transition hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                        {/* ID */}
+                      <tr key={pedido.id} className="group transition hover:bg-[color:var(--surface-2)]">
                         <td className="px-5 py-4">
                           <Link
                             href={`/pedidos/${pedido.id}`}
@@ -192,48 +186,34 @@ export default async function PedidosPage({
                             #{fmt(pedido.id)}
                           </Link>
                         </td>
-
-                        {/* Cliente */}
                         <td className="px-5 py-4">
-                          <p className="font-semibold text-gray-900">{pedido.cliente.nombre}</p>
+                          <p className="font-semibold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
                           {pedido.cliente.telefono && (
-                            <p className="text-xs text-gray-400">{pedido.cliente.telefono}</p>
+                            <p className="text-xs text-[color:var(--text-3)]">{pedido.cliente.telefono}</p>
                           )}
                         </td>
-
-                        {/* Estado */}
                         <td className="px-5 py-4">
                           <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
                             {pedido.estado}
                           </span>
                         </td>
-
-                        {/* Total */}
-                        <td className="px-5 py-4 font-bold text-gray-900">
+                        <td className="px-5 py-4 font-bold text-[color:var(--text-1)]">
                           {money(pedido.total)}
                         </td>
-
-                        {/* Saldo */}
                         <td className="px-5 py-4">
                           {saldo > 0 ? (
                             <span className="font-bold text-red-500">{money(saldo)}</span>
                           ) : (
-                            <span className="font-semibold text-green-600 dark:text-green-400">✓ Pagado</span>
+                            <span className="font-semibold text-green-600 dark:text-green-400">Pagado</span>
                           )}
                         </td>
-
-                        {/* Fecha */}
-                        <td className="hidden px-5 py-4 text-gray-400 md:table-cell">
-                          {new Date(pedido.createdAt).toLocaleDateString("es-CO", {
-                            day: "2-digit", month: "2-digit", year: "numeric",
-                          })}
+                        <td className="hidden px-5 py-4 text-sm text-[color:var(--text-3)] md:table-cell">
+                          {fechaCorta(new Date(pedido.createdAt))}
                         </td>
-
-                        {/* Acción */}
                         <td className="px-5 py-4">
                           <Link
                             href={`/pedidos/${pedido.id}`}
-                            className="inline-flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-500 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:text-gray-400"
+                            className="inline-flex items-center gap-1 rounded-xl border border-[color:var(--border-1)] px-3 py-1.5 text-xs font-semibold text-[color:var(--text-2)] transition hover:border-brand-300 hover:text-brand-600"
                           >
                             Ver →
                           </Link>
@@ -258,7 +238,7 @@ export default async function PedidosPage({
                 >
                   ← Anterior
                 </Link>
-                <span className="text-sm font-semibold text-gray-400">
+                <span className="text-sm font-semibold text-[color:var(--text-3)]">
                   Página {page} / {totalPages}
                 </span>
                 <Link
@@ -283,7 +263,7 @@ export default async function PedidosPage({
 function KpiCard({
   label, value, color, icon,
 }: {
-  label: string; value: number; color: "blue" | "yellow" | "purple"; icon: string;
+  label: string; value: number; color: "blue" | "yellow" | "purple"; icon: React.ReactNode;
 }) {
   const palette = {
     blue:   "bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
@@ -295,12 +275,10 @@ function KpiCard({
     <div className="card p-5">
       <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius-well)] ${palette}`}
         style={{ boxShadow: "inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent)" }}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-          {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-        </svg>
+        {icon}
       </div>
-      <p className="text-2xl font-black text-gray-900">{value.toLocaleString("es-CO")}</p>
-      <p className="mt-0.5 text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-2xl font-black text-[color:var(--text-1)]">{value.toLocaleString("es-CO")}</p>
+      <p className="mt-0.5 text-sm font-medium text-[color:var(--text-3)]">{label}</p>
     </div>
   );
 }

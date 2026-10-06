@@ -11,6 +11,24 @@ export function money(value: number) {
   return value < 0 ? `-$${abs}` : `$${abs}`;
 }
 
+/** "Martes, 6 de octubre de 2026" — solo la primera letra en mayúscula. */
+export function fechaLarga(d: Date) {
+  const raw = d.toLocaleDateString("es-CO", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+/** "06/10/2026" día/mes/año */
+export function fechaCorta(d: Date) {
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
 export const ESTADO_BADGE: Record<string, string> = {
   RECIBIDO:   "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
   EN_PROCESO: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400",

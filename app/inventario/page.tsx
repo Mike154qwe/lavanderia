@@ -180,7 +180,7 @@ export default async function InventarioPage({
   const CHIPS = [
     { value: "TODOS",     label: "Todos",           count: total },
     { value: "RECIBIDO",  label: "Recibidos",        count: null },
-    { value: "LISTO",     label: "✓ Listos",         count: null },
+    { value: "LISTO",     label: "Listos",           count: null },
     { value: "CON_SALDO", label: "Con saldo",        count: null },
     { value: "PAGADOS",   label: "Pagados",          count: null },
   ];
@@ -284,21 +284,16 @@ export default async function InventarioPage({
       <div className="card overflow-hidden">
         {pedidos.length === 0 ? (
           <EmptyState
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-gray-400">
-                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
-            }
+            icon={<Layers size={22} strokeWidth={1.75} />}
             title={q || estadoFiltro !== "TODOS" ? "Sin resultados" : "No hay pedidos activos"}
             description={q || estadoFiltro !== "TODOS" ? "Prueba con otros filtros." : "Los pedidos que recibas aparecerán aquí."}
             action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
           />
         ) : (
-          <div className="divide-y divide-gray-100">
-            {/* Encabezado */}
-            <div className="grid grid-cols-[56px_1fr_110px_80px_120px_90px_80px] gap-x-3 bg-gray-50 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              <span>#</span>
+          <div className="overflow-x-auto">
+          <div className="min-w-[720px] divide-y divide-[color:var(--border-1)]">
+            <div className="grid grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] gap-x-4 bg-[color:var(--surface-2)] px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-3)]">
+              <span>Recibo</span>
               <span>Cliente</span>
               <span>Estado</span>
               <span className="text-center">Prendas</span>
@@ -318,10 +313,11 @@ export default async function InventarioPage({
               />
             ))}
           </div>
+          </div>
         )}
       </div>
 
-      {/* ── Paginación ───────────────────────────────────── */}
+      {/* Paginación */}
       {totalPages > 1 && (
         <div className="card flex items-center justify-between p-4">
           <Link
@@ -365,15 +361,13 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   return (
     <details className="group" open={autoOpen}>
       {/* ── Fila compacta (siempre visible) ── */}
-      <summary className="grid cursor-pointer list-none grid-cols-[56px_1fr_110px_80px_120px_90px_80px] items-center gap-x-3 px-4 py-3 transition hover:bg-gray-50 group-open:bg-brand-50">
+      <summary className="grid cursor-pointer list-none grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] items-center gap-x-4 px-5 py-4 transition hover:bg-[color:var(--surface-2)] group-open:bg-brand-50 dark:group-open:bg-brand-500/10">
 
-        {/* # Recibo */}
-        <span className="text-xs font-bold text-brand-500">#{fmt(pedido.id)}</span>
+        <span className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</span>
 
-        {/* Cliente */}
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-gray-900">{pedido.cliente.nombre}</p>
-          <p className="truncate text-xs text-gray-400">{pedido.cliente.telefono ?? "—"}</p>
+          <p className="truncate text-sm font-bold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+          <p className="truncate text-xs text-[color:var(--text-3)]">{pedido.cliente.telefono ?? "—"}</p>
         </div>
 
         {/* Estado */}
@@ -411,7 +405,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
         {/* Flecha */}
         <div className="flex justify-end">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
-            className="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
+            className="h-4 w-4 text-[color:var(--text-3)] transition-transform group-open:rotate-180">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </div>
