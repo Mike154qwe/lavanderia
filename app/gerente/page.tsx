@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {
   Banknote,
-  CalendarDays,
   ClipboardList,
   Printer,
   Shield,
@@ -26,6 +25,7 @@ import {
 } from "@/lib/panel-remoto";
 import { guardarPanelRemotoEnFirestore } from "@/lib/panel-remoto-admin";
 import MonthCalendar from "@/components/MonthCalendar";
+import DateField from "@/components/DateField";
 
 export const metadata: Metadata = { title: "Gerente" };
 
@@ -291,17 +291,12 @@ export default async function GerentePage({
             </p>
           </div>
           <form className="flex items-center gap-2">
-            <label className="date-field">
-              <CalendarDays size={16} strokeWidth={1.75} aria-hidden="true" />
-              <span>{fechaCorta(fechaSeleccionada)}</span>
-              <input
-                type="date"
-                name="fecha"
-                defaultValue={fechaLinkActual}
-                aria-label="Elegir día"
-              />
-            </label>
-            <button className="btn-primary whitespace-nowrap">Ver día</button>
+            <DateField
+              name="fecha"
+              defaultValue={fechaLinkActual}
+              display={fechaCorta(fechaSeleccionada)}
+            />
+            <button type="submit" className="sr-only">Ver día</button>
           </form>
         </div>
 
@@ -339,7 +334,11 @@ export default async function GerentePage({
             <h2 className="page-title !text-xl">
               {MESES[fechaSeleccionada.getMonth()]} {fechaSeleccionada.getFullYear()}
             </h2>
-            <p className="page-subtitle">Toca un día para ver su caja. Azul entra, verde sale, rojo gasto.</p>
+            <p className="page-subtitle">
+              {mesSinMovimiento
+                ? "Este mes aún no hay caja. Toca un día para consultarlo."
+                : "Toca un día para ver su caja. Azul entra, verde sale, rojo gasto."}
+            </p>
           </div>
           <div className="cal-legend">
             <span className="cal-legend__item"><span className="cal-stat cal-stat--in">1</span> Entradas</span>
@@ -347,11 +346,6 @@ export default async function GerentePage({
             <span className="cal-legend__item"><span className="cal-stat cal-stat--gas">1</span> Gastos</span>
           </div>
         </div>
-        {mesSinMovimiento && (
-          <p className="border-b border-[color:var(--border-1)] px-5 py-3 text-sm font-semibold text-[color:var(--text-3)]">
-            Este mes aún no hay caja registrada. El calendario sirve para elegir el día.
-          </p>
-        )}
         <MonthCalendar
           year={fechaSeleccionada.getFullYear()}
           month={fechaSeleccionada.getMonth()}
@@ -386,7 +380,7 @@ export default async function GerentePage({
         <form action={hacerCierreCaja} className="card-well grid gap-3 p-3 sm:grid-cols-[1fr_1fr_auto] sm:p-4">
           <input name="responsable" placeholder="Responsable" defaultValue="Gerente" className="input-modern" />
           <input name="observacion" placeholder="Observación opcional" className="input-modern" />
-          <button className="btn-dark whitespace-nowrap">Hacer cierre →</button>
+          <button className="btn-primary whitespace-nowrap">Hacer cierre</button>
         </form>
 
         {cierresDia.length > 0 && (

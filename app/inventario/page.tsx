@@ -5,11 +5,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { money, fmt, ESTADO_BADGE, estadoLabel } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
 import { PrendaIcon } from "@/components/PrendaIcon";
-import { AlertTriangle, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, Check, ChevronDown, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, X, Zap } from "lucide-react";
 
 export const metadata: Metadata = { title: "Inventario" };
 
@@ -202,9 +202,9 @@ export default async function InventarioPage({
             <BarcodeListener />
             <Link
               href="/pedidos/rapido"
-              className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+              className="btn-primary gap-2"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <Zap size={16} strokeWidth={2.25} aria-hidden="true" />
               Pedido rápido
             </Link>
           </div>
@@ -372,7 +372,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
         {/* Estado */}
         <span className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-          {pedido.estado}
+          {estadoLabel(pedido.estado)}
         </span>
 
         {/* Prendas */}
@@ -404,15 +404,16 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
 
         {/* Flecha */}
         <div className="flex justify-end">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
-            className="h-4 w-4 text-[color:var(--text-3)] transition-transform group-open:rotate-180">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            aria-hidden="true"
+            className="text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+          />
         </div>
       </summary>
 
-      {/* ── Panel expandido (solo al abrir) ── */}
-      <div className="border-t border-brand-100 bg-brand-50/30">
+      <div className="border-t border-[color:var(--border-1)] bg-[color:var(--surface-2)]">
         <PedidoCard
           pedido={pedido}
           agregarAbono={agregarAbono}
@@ -443,7 +444,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const estadoInfo      = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
-    <div className="card overflow-hidden">
+    <div>
 
       {/* ── Cabecera ── */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 p-5">
@@ -461,7 +462,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                 {pedido.cliente.nombre}
               </Link>
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-                {pedido.estado}
+                {estadoLabel(pedido.estado)}
               </span>
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
                 {diasLabel(dias)}
@@ -571,7 +572,12 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                           />
                         </div>
                         <span className={`text-xs font-bold ${done ? "text-green-600" : "text-gray-500"}`}>
-                          {done ? "✓ Listo" : `${ent}/${prenda.cantidad}`}
+                          {done ? (
+                            <span className="inline-flex items-center gap-1">
+                              <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+                              Listo
+                            </span>
+                          ) : `${ent}/${prenda.cantidad}`}
                         </span>
                       </div>
                     </div>
@@ -589,8 +595,9 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                   {prenda.entregasParciales.length > 0 && (
                     <div className="border-t border-gray-100 bg-gray-50 px-4 py-2">
                       {prenda.entregasParciales.map((e: any) => (
-                        <p key={e.id} className="text-xs text-gray-400">
-                          ↓ {e.cantidad} retiradas ·{" "}
+                        <p key={e.id} className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                          <ArrowDownToLine size={11} strokeWidth={2} aria-hidden="true" />
+                          {e.cantidad} retiradas ·{" "}
                           {new Date(e.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
                           {e.observacion ? ` · ${e.observacion}` : ""}
                         </p>
@@ -601,8 +608,11 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
                   {pend > 0 && (
                     <details className="group border-t border-gray-100">
                       <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-2.5 text-xs font-bold text-brand-600 hover:bg-brand-50">
-                        <span>↓ Registrar retiro de esta prenda</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 transition duration-200 group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg>
+                        <span className="inline-flex items-center gap-1.5">
+                          <ArrowDownToLine size={13} strokeWidth={2} aria-hidden="true" />
+                          Registrar retiro de esta prenda
+                        </span>
+                        <ChevronDown size={14} strokeWidth={2} className="transition duration-200 group-open:rotate-180" aria-hidden="true" />
                       </summary>
                       <form action={registrarEntregaParcial} className="grid gap-2 bg-gray-50 px-4 pb-4 pt-2 sm:grid-cols-2">
                         <input type="hidden" name="pedidoId" value={pedido.id} />

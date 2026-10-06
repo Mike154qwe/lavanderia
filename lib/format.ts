@@ -36,3 +36,15 @@ export const ESTADO_BADGE: Record<string, string> = {
   ENTREGADO:  "bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400",
   CANCELADO:  "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400",
 };
+
+export const ESTADO_LABEL: Record<string, string> = {
+  RECIBIDO:   "Recibido",
+  EN_PROCESO: "En proceso",
+  LISTO:      "Listo",
+  ENTREGADO:  "Entregado",
+  CANCELADO:  "Cancelado",
+};
+
+export function estadoLabel(estado: string) {
+  return ESTADO_LABEL[estado] ?? estado.replaceAll("_", " ");
+}

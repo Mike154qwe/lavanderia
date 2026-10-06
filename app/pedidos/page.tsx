@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ClipboardList, Layers, Plus } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE, fechaCorta } from "@/lib/format";
+import { money, fmt, ESTADO_BADGE, estadoLabel, fechaCorta } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
@@ -75,7 +75,7 @@ export default async function PedidosPage({
           </div>
           <Link
             href="/pedidos/nuevo"
-            className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+            className="btn-primary gap-2"
           >
             <Plus size={16} strokeWidth={2.25} aria-hidden="true" />
             Nuevo pedido
@@ -194,7 +194,7 @@ export default async function PedidosPage({
                         </td>
                         <td className="px-5 py-4">
                           <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
-                            {pedido.estado}
+                            {estadoLabel(pedido.estado)}
                           </span>
                         </td>
                         <td className="px-5 py-4 font-bold text-[color:var(--text-1)]">

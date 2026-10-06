@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
-import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { money, fmt, ESTADO_BADGE, estadoLabel } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
@@ -138,7 +138,7 @@ export default function InventarioEmpleadoClient({
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-lg font-bold text-gray-900">#{fmt(item.id)}</span>
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[item.estado] ?? "bg-gray-100 text-gray-600"}`}>
-                      {item.estado}
+                      {estadoLabel(item.estado)}
                     </span>
                   </div>
                   <p className="mt-1 font-bold text-gray-800">{item.cliente.nombre}</p>
@@ -166,7 +166,7 @@ export default function InventarioEmpleadoClient({
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-xl font-bold text-gray-900">#{fmt(pedido.id)}</span>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-600"}`}>
-                    {pedido.estado}
+                    {estadoLabel(pedido.estado)}
                   </span>
                 </div>
                 <p className="mt-1 font-bold text-gray-800">{pedido.cliente.nombre}</p>

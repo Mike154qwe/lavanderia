@@ -1,8 +1,8 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatPedido } from "@/lib/format";
-import { CircleCheck } from "lucide-react";
+import { formatPedido, money, estadoLabel, ESTADO_BADGE, fechaCorta } from "@/lib/format";
+import { ChevronDown, CircleCheck, Clock, Layers, Wallet } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Pedidos antiguos" };
@@ -54,7 +54,7 @@ export default async function PedidosAntiguosPage() {
               </p>
             </div>
 
-            <Link href="/inventario" className="btn-dark">
+            <Link href="/inventario" className="btn-dark whitespace-nowrap">
               Volver a inventario
             </Link>
           </div>
@@ -64,7 +64,7 @@ export default async function PedidosAntiguosPage() {
           <Kpi
             title="Pedidos antiguos"
             value={pedidos.length}
-            icon="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"
+            icon={<Clock size={22} strokeWidth={1.75} />}
             color="orange"
           />
           <Kpi
@@ -78,21 +78,21 @@ export default async function PedidosAntiguosPage() {
                 ),
               0
             )}
-            icon="M20 7l-8-4-8 4m16 0-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
+            icon={<Layers size={22} strokeWidth={1.75} />}
             color="brand"
           />
           <Kpi
             title="Saldo pendiente"
-            value={`$${pedidos
-              .reduce((sum, pedido) => {
+            value={money(
+              pedidos.reduce((sum, pedido) => {
                 const abonado = pedido.pagos.reduce(
                   (s: number, pago: any) => s + pago.valor,
                   0
                 );
                 return sum + Math.max(pedido.total - abonado, 0);
               }, 0)
-              .toLocaleString("es-CO")}`}
-            icon="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+            )}
+            icon={<Wallet size={22} strokeWidth={1.75} />}
             color="red"
           />
         </div>
@@ -123,24 +123,25 @@ export default async function PedidosAntiguosPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Link
                         href={`/pedidos/${pedido.id}`}
-                        className="text-xl font-bold text-gray-900 hover:text-brand-500 hover:underline underline-offset-2"
+                        className="text-xl font-bold text-[color:var(--text-1)] hover:text-brand-500 hover:underline underline-offset-2"
                       >
                         #{formatPedido(pedido.id)}
                       </Link>
-                      <span className="text-xl font-bold text-gray-700">
+                      <span className="text-xl font-bold text-[color:var(--text-1)]">
                         {pedido.cliente.nombre}
+                      </span>
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
+                        {estadoLabel(pedido.estado)}
                       </span>
                       <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-bold text-orange-700">
                         {diasEnLavanderia} días
                       </span>
                     </div>
 
-                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[color:var(--text-3)]">
                       <span>Tel: {pedido.cliente.telefono || "No registrado"}</span>
                       <span>·</span>
-                      <span>Entrada: {pedido.createdAt.toLocaleDateString("es-CO")}</span>
-                      <span>·</span>
-                      <span className="font-semibold text-orange-600">{pedido.estado}</span>
+                      <span>Entrada: {fechaCorta(pedido.createdAt)}</span>
                     </div>
                   </div>
 
@@ -169,17 +170,15 @@ export default async function PedidosAntiguosPage() {
                 </div>
 
                 <details className="group mt-4">
-                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-700">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition-transform group-open:rotate-180">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
+                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-bold text-[color:var(--text-3)] hover:text-[color:var(--text-1)]">
+                    <ChevronDown size={16} strokeWidth={2} className="transition-transform group-open:rotate-180" aria-hidden="true" />
                     Ver servicios ({pedido.prendas.length})
                   </summary>
-                  <div className="mt-3 space-y-1.5 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
+                  <div className="mt-3 space-y-1.5 rounded-xl border border-[color:var(--border-1)] bg-[color:var(--surface-2)] p-4">
                     {pedido.prendas.map((prenda: any) => (
-                      <p key={prenda.id} className="text-sm text-gray-600 dark:text-gray-400">
+                      <p key={prenda.id} className="text-sm text-[color:var(--text-2)]">
                         {prenda.servicio} · {prenda.tipo} × {prenda.cantidad} ·{" "}
-                        <span className="font-semibold">${prenda.valor.toLocaleString("es-CO")}</span>
+                        <span className="font-semibold">{money(prenda.valor)}</span>
                       </p>
                     ))}
                   </div>
@@ -218,19 +217,17 @@ function Kpi({
 }: {
   title: string;
   value: string | number;
-  icon: string;
+  icon: React.ReactNode;
   color?: string;
 }) {
   const c = KPI_COLORS[color] ?? KPI_COLORS.brand;
   return (
     <div className="card flex items-center gap-4 p-5">
       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${c.bg}`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={`h-6 w-6 ${c.icon}`}>
-          {icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-        </svg>
+        <span className={c.icon}>{icon}</span>
       </div>
       <div>
-        <p className="text-xs font-semibold text-gray-500">{title}</p>
+        <p className="text-xs font-semibold text-[color:var(--text-3)]">{title}</p>
         <p className={`mt-0.5 text-2xl font-black ${c.value}`}>{value}</p>
       </div>
     </div>
@@ -247,10 +244,10 @@ function Money({
   danger?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
-      <p className="text-xs font-semibold text-gray-500">{label}</p>
+    <div className="rounded-xl border border-[color:var(--border-1)] bg-[color:var(--surface-2)] p-4">
+      <p className="text-xs font-semibold text-[color:var(--text-3)]">{label}</p>
       <p className={`mt-1 text-xl font-black ${danger ? "text-red-600" : "text-brand-500"}`}>
-        ${value.toLocaleString("es-CO")}
+        {money(value)}
       </p>
     </div>
   );
@@ -258,9 +255,9 @@ function Money({
 
 function Info({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.07] dark:bg-white/[0.02]">
-      <p className="text-xs font-semibold text-gray-500">{label}</p>
-      <p className="mt-1 text-xl font-black text-gray-900 dark:text-white">{value}</p>
+    <div className="rounded-xl border border-[color:var(--border-1)] bg-[color:var(--surface-2)] p-4">
+      <p className="text-xs font-semibold text-[color:var(--text-3)]">{label}</p>
+      <p className="mt-1 text-xl font-black text-[color:var(--text-1)]">{value}</p>
     </div>
   );
 }
