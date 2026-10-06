@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import EmpleadoHero from "@/components/EmpleadoHero";
-import { Search, User, X } from "lucide-react";
+import FieldIcon from "@/components/FieldIcon";
+import { ArrowRight, Search, User, X, Zap } from "lucide-react";
 
 export const metadata: Metadata = { title: "Clientes" };
 
@@ -51,13 +52,15 @@ export default async function ClientesEmpleadoPage({
         ]}
       >
         <form className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <input
-            name="q"
-            defaultValue={q}
-            autoFocus
-            placeholder="Nombre o teléfono del cliente…"
-            className="input-modern min-w-0 flex-1 text-base font-semibold"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+            <input
+              name="q"
+              defaultValue={q}
+              autoFocus
+              placeholder="Nombre o teléfono del cliente…"
+              className="input-modern w-full text-base font-semibold"
+            />
+          </FieldIcon>
           <button className="btn-primary px-5 sm:shrink-0" aria-label="Buscar">
             <Search size={18} strokeWidth={2.25} aria-hidden="true" />
           </button>
@@ -88,7 +91,10 @@ export default async function ClientesEmpleadoPage({
             <p className="mt-1 text-sm text-gray-500">
               Nombre, teléfono y prendas en un solo flujo.
             </p>
-            <p className="mt-3 text-sm font-bold text-brand-500">Ir al pedido rápido →</p>
+            <p className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-500">
+              Ir al pedido rápido
+              <ArrowRight size={14} strokeWidth={2.25} aria-hidden="true" />
+            </p>
           </Link>
         </div>
       )}
@@ -96,12 +102,11 @@ export default async function ClientesEmpleadoPage({
       {q && (
         <Link
           href="/pedidos/rapido"
-          className="flex items-center justify-between rounded-xl bg-brand-500 px-5 py-4 font-bold text-white transition hover:bg-brand-600 active:scale-[0.99]"
+          className="btn-primary btn-lg gap-2"
         >
-          <span>+ Crear cliente nuevo y recibo</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          <Zap size={18} strokeWidth={2.25} aria-hidden="true" />
+          Crear cliente nuevo y recibo
+          <ArrowRight size={18} strokeWidth={2.25} aria-hidden="true" />
         </Link>
       )}
 
@@ -175,7 +180,7 @@ export default async function ClientesEmpleadoPage({
 
                   <Link
                     href={urlNuevoPedido}
-                    className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600 active:scale-[0.98]"
+                    className="btn-primary shrink-0 gap-1.5"
                   >
                     Nuevo pedido
                   </Link>

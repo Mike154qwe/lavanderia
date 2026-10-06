@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ClipboardList, Layers, Plus } from "lucide-react";
+import { ClipboardList, Layers, Plus, Search } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE, estadoLabel, fechaCorta } from "@/lib/format";
+import FieldIcon from "@/components/FieldIcon";
+import EstadoBadge from "@/components/EstadoBadge";
+import Pager from "@/components/Pager";
+import { money, fmt, fechaCorta } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
@@ -84,12 +87,14 @@ export default async function PedidosPage({
 
         {/* Filtros */}
         <form className="mt-5 grid gap-3 sm:grid-cols-[1fr_200px_auto_auto]">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar por recibo, cliente o teléfono…"
-            className="input-modern"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar por recibo, cliente o teléfono…"
+              className="input-modern w-full"
+            />
+          </FieldIcon>
           <select name="estado" defaultValue={estadoFiltro} className="input-modern">
             <option value="TODOS">Todos los estados</option>
             <option value="RECIBIDO">Recibidos</option>
@@ -144,10 +149,41 @@ export default async function PedidosPage({
           />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="divide-y divide-[color:var(--border-1)] md:hidden">
+              {pedidos.map((pedido: any) => {
+                const abonado = pedido.pagos.reduce((s: number, p: any) => s + p.valor, 0);
+                const saldo   = pedido.total - abonado;
+                return (
+                  <Link
+                    key={pedido.id}
+                    href={`/pedidos/${pedido.id}`}
+                    className="flex items-start justify-between gap-3 px-4 py-3.5 transition hover:bg-[color:var(--surface-2)]"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</p>
+                      <p className="truncate font-semibold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                        <EstadoBadge estado={pedido.estado} />
+                        <span className="text-xs font-bold text-[color:var(--text-3)]">{money(pedido.total)}</span>
+                        {saldo > 0 ? (
+                          <span className="text-xs font-bold text-red-500">{money(saldo)}</span>
+                        ) : (
+                          <span className="text-xs font-semibold text-green-600">Pagado</span>
+                        )}
+                      </div>
+                    </div>
+                    <span className="mt-1 text-xs font-semibold text-[color:var(--text-3)]">
+                      {fechaCorta(new Date(pedido.createdAt))}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-white/[0.07]">
+                  <tr className="border-b border-[color:var(--border-1)]">
                     <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Recibo
                     </th>
@@ -163,7 +199,7 @@ export default async function PedidosPage({
                     <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Saldo
                     </th>
-                    <th className="hidden px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)] md:table-cell">
+                    <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
                       Fecha
                     </th>
                     <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[color:var(--text-3)]">
@@ -193,9 +229,7 @@ export default async function PedidosPage({
                           )}
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
-                            {estadoLabel(pedido.estado)}
-                          </span>
+                          <EstadoBadge estado={pedido.estado} />
                         </td>
                         <td className="px-5 py-4 font-bold text-[color:var(--text-1)]">
                           {money(pedido.total)}
@@ -207,15 +241,15 @@ export default async function PedidosPage({
                             <span className="font-semibold text-green-600 dark:text-green-400">Pagado</span>
                           )}
                         </td>
-                        <td className="hidden px-5 py-4 text-sm text-[color:var(--text-3)] md:table-cell">
+                        <td className="px-5 py-4 text-sm text-[color:var(--text-3)]">
                           {fechaCorta(new Date(pedido.createdAt))}
                         </td>
                         <td className="px-5 py-4">
                           <Link
                             href={`/pedidos/${pedido.id}`}
-                            className="inline-flex items-center gap-1 rounded-xl border border-[color:var(--border-1)] px-3 py-1.5 text-xs font-semibold text-[color:var(--text-2)] transition hover:border-brand-300 hover:text-brand-600"
+                            className="inline-flex items-center gap-1 rounded-[var(--radius-control)] border border-[color:var(--border-1)] px-3 py-1.5 text-xs font-semibold text-[color:var(--text-2)] transition hover:border-brand-300 hover:text-brand-600"
                           >
-                            Ver →
+                            Ver
                           </Link>
                         </td>
                       </tr>
@@ -225,34 +259,7 @@ export default async function PedidosPage({
               </table>
             </div>
 
-            {/* Paginación */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4 dark:border-white/[0.07]">
-                <Link
-                  href={buildUrl(Math.max(page - 1, 1))}
-                  className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
-                    page === 1
-                      ? "pointer-events-none text-gray-300"
-                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
-                  }`}
-                >
-                  ← Anterior
-                </Link>
-                <span className="text-sm font-semibold text-[color:var(--text-3)]">
-                  Página {page} / {totalPages}
-                </span>
-                <Link
-                  href={buildUrl(Math.min(page + 1, totalPages))}
-                  className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
-                    page >= totalPages
-                      ? "pointer-events-none text-gray-300"
-                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
-                  }`}
-                >
-                  Siguiente →
-                </Link>
-              </div>
-            )}
+            <Pager page={page} totalPages={totalPages} hrefFor={buildUrl} />
           </>
         )}
       </div>

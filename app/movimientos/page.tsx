@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, CalendarDays, Shirt, TriangleAlert } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import MovimientosMensuales from "@/components/charts/MovimientosMensuales";
+import YearPager from "@/components/YearPager";
 
 export const metadata: Metadata = { title: "Movimientos" };
 
@@ -80,23 +81,7 @@ export default async function MovimientosPage({
             Actividad operacional del año — haz clic en un día para ver el detalle
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/movimientos?year=${year - 1}`}
-            className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
-          >
-            ← {year - 1}
-          </Link>
-          <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600">
-            {year}
-          </span>
-          <Link
-            href={`/movimientos?year=${year + 1}`}
-            className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
-          >
-            {year + 1} →
-          </Link>
-        </div>
+        <YearPager year={year} hrefFor={(y) => `/movimientos?year=${y}`} />
       </div>
 
       {/* ── KPIs del año ──────────────────────────────────── */}

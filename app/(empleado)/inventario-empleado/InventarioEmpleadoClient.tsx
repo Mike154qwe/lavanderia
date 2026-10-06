@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
-import { money, fmt, ESTADO_BADGE, estadoLabel } from "@/lib/format";
+import { money, fmt } from "@/lib/format";
 import { METODOS_PAGO } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
-import { Check, CircleCheck, PackageCheck, Search, TriangleAlert, X } from "lucide-react";
+import FieldIcon from "@/components/FieldIcon";
+import EstadoBadge from "@/components/EstadoBadge";
+import { ArrowLeft, Check, CircleCheck, PackageCheck, Search, TriangleAlert, X } from "lucide-react";
 
 type Pago    = { id: number; valor: number; metodo: string };
 type Entrega = { id: number; cantidad: number };
@@ -76,13 +78,15 @@ export default function InventarioEmpleadoClient({
         ]}
       >
         <form className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <input
-            name="q"
-            defaultValue={q}
-            autoFocus
-            placeholder="Número de recibo, nombre o teléfono…"
-            className="input-modern min-w-0 flex-1 text-base font-semibold"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+            <input
+              name="q"
+              defaultValue={q}
+              autoFocus
+              placeholder="Número de recibo, nombre o teléfono…"
+              className="input-modern w-full text-base font-semibold"
+            />
+          </FieldIcon>
           <button className="btn-primary px-5 sm:shrink-0" aria-label="Buscar">
             <Search size={18} strokeWidth={2.25} aria-hidden="true" />
           </button>
@@ -137,9 +141,7 @@ export default function InventarioEmpleadoClient({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-lg font-bold text-gray-900">#{fmt(item.id)}</span>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[item.estado] ?? "bg-gray-100 text-gray-600"}`}>
-                      {estadoLabel(item.estado)}
-                    </span>
+                    <EstadoBadge estado={item.estado} />
                   </div>
                   <p className="mt-1 font-bold text-gray-800">{item.cliente.nombre}</p>
                   <p className="text-xs text-gray-400">
@@ -165,9 +167,7 @@ export default function InventarioEmpleadoClient({
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-xl font-bold text-gray-900">#{fmt(pedido.id)}</span>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-600"}`}>
-                    {estadoLabel(pedido.estado)}
-                  </span>
+                  <EstadoBadge estado={pedido.estado} />
                 </div>
                 <p className="mt-1 font-bold text-gray-800">{pedido.cliente.nombre}</p>
                 <p className="text-sm text-gray-400">
@@ -178,9 +178,10 @@ export default function InventarioEmpleadoClient({
               <button
                 type="button"
                 onClick={limpiar}
-                className="shrink-0 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 dark:border-white/10"
               >
-                ← Cambiar
+                <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
+                Cambiar
               </button>
             </div>
 

@@ -170,7 +170,44 @@ export default async function ClientesPage({
             action={q ? { label: "Ver todos", href: "/clientes", secondary: true } : undefined}
           />
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="divide-y divide-[color:var(--border-1)] md:hidden">
+              {clientes.map((cliente: any) => {
+                const inicial = cliente.nombre.charAt(0).toUpperCase();
+                const avatarColors = [
+                  "bg-blue-100 text-blue-700",
+                  "bg-green-100 text-green-700",
+                  "bg-purple-100 text-purple-700",
+                  "bg-orange-100 text-orange-700",
+                  "bg-pink-100 text-pink-700",
+                  "bg-brand-100 text-brand-700",
+                ];
+                return (
+                  <div key={cliente.id} className="flex items-start justify-between gap-3 px-4 py-3.5">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${avatarColors[cliente.id % 6]}`}>
+                        {inicial}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-bold text-[color:var(--text-1)]">{cliente.nombre}</p>
+                        <p className="text-xs text-[color:var(--text-3)]">{cliente.telefono || "Sin teléfono"}</p>
+                        <p className="mt-1 text-xs font-semibold text-[color:var(--text-3)]">
+                          {cliente._count.pedidos} pedido{cliente._count.pedidos !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/pedidos/nuevo?clienteId=${cliente.id}`}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600"
+                    >
+                      <Plus size={12} strokeWidth={2.5} aria-hidden="true" />
+                      Pedido
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-[color:var(--border-1)]">
@@ -278,7 +315,8 @@ export default async function ClientesPage({
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

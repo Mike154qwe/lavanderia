@@ -2,7 +2,7 @@ import { SkeletonBox } from "@/components/Skeleton";
 
 export default function LoadingPedidoDetalle() {
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame page-frame--wide">
       <div className="mx-auto max-w-5xl space-y-4">
 
         {/* Header */}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { money, fmt, ESTADO_BADGE, estadoLabel, fechaCorta, fechaLarga } from "@/lib/format";
+import { money, fmt, fechaCorta, fechaLarga, estadoLabel } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
 import NotificarWhatsappButton from "./NotificarWhatsappButton";
+import EstadoBadge from "@/components/EstadoBadge";
 import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
 import { PrendaIcon } from "@/components/PrendaIcon";
 import {
@@ -192,9 +193,7 @@ export default async function DetallePedidoPage({
                 {fechaLarga(new Date(pedido.createdAt))} · {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
-            <span className={`rounded-full px-3 py-1.5 text-sm font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
-              {estadoLabel(pedido.estado)}
-            </span>
+            <EstadoBadge estado={pedido.estado} size="md" />
           </div>
 
           <div className="flex items-center gap-4 border-b border-[color:var(--border-1)] px-6 py-4">
@@ -482,7 +481,7 @@ export default async function DetallePedidoPage({
 
             <div className="flex flex-wrap gap-3">
               {pedido.estado === "RECIBIDO" && (
-                <QuickEstado pedidoId={pedido.id} estado="EN_PROCESO" label="→ En proceso" color="yellow" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="EN_PROCESO" label="En proceso" color="yellow" action={cambiarEstadoAction} />
               )}
               {(pedido.estado === "RECIBIDO" || pedido.estado === "EN_PROCESO") && (
                 <QuickEstado pedidoId={pedido.id} estado="LISTO" label="Marcar listo" color="green" action={cambiarEstadoAction} />
@@ -526,9 +525,7 @@ export default async function DetallePedidoPage({
                 <li key={h.id} className={`pb-4 ${i === historialVisible.length - 1 ? "pb-0" : ""}`}>
                   <div className="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-500 dark:border-gray-900" />
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[h.estado] ?? "bg-gray-100 text-gray-500"}`}>
-                      {estadoLabel(h.estado)}
-                    </span>
+                    <EstadoBadge estado={h.estado} />
                     <span className="text-xs text-[color:var(--text-3)]">
                       {fechaCorta(new Date(h.createdAt))} ·{" "}
                       {new Date(h.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}

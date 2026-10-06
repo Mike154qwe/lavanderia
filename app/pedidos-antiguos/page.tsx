@@ -1,8 +1,10 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatPedido, money, estadoLabel, ESTADO_BADGE, fechaCorta } from "@/lib/format";
+import { formatPedido, money, fechaCorta } from "@/lib/format";
 import { ChevronDown, CircleCheck, Clock, Layers, Wallet } from "lucide-react";
+import EstadoBadge from "@/components/EstadoBadge";
+import { EmptyState } from "@/components/EmptyState";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Pedidos antiguos" };
@@ -130,9 +132,7 @@ export default async function PedidosAntiguosPage() {
                       <span className="text-xl font-bold text-[color:var(--text-1)]">
                         {pedido.cliente.nombre}
                       </span>
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
-                        {estadoLabel(pedido.estado)}
-                      </span>
+                      <EstadoBadge estado={pedido.estado} />
                       <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-bold text-orange-700">
                         {diasEnLavanderia} días
                       </span>
@@ -188,14 +188,10 @@ export default async function PedidosAntiguosPage() {
           })}
 
           {pedidos.length === 0 && (
-            <div className="card p-12 text-center">
-              <span className="mx-auto figure-well figure-well--aqua h-12 w-12">
-                <CircleCheck size={24} strokeWidth={1.75} aria-hidden="true" />
-              </span>
-              <p className="mt-3 text-lg font-bold text-gray-500">
-                No hay pedidos con más de 3 meses pendientes.
-              </p>
-            </div>
+            <EmptyState
+              icon={<CircleCheck size={24} strokeWidth={1.75} />}
+              title="No hay pedidos con más de 3 meses pendientes."
+            />
           )}
         </div>
       </section>

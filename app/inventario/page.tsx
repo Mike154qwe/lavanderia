@@ -5,11 +5,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import MoneyInput from "@/components/MoneyInput";
 import { EmptyState } from "@/components/EmptyState";
-import { money, fmt, ESTADO_BADGE, estadoLabel } from "@/lib/format";
+import FieldIcon from "@/components/FieldIcon";
+import EstadoBadge from "@/components/EstadoBadge";
+import Pager from "@/components/Pager";
+import { money, fmt } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import BarcodeListener from "./BarcodeListener";
 import { PrendaIcon } from "@/components/PrendaIcon";
-import { AlertTriangle, ArrowDownToLine, Check, ChevronDown, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, X, Zap } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, Check, ChevronDown, ChevronRight, CircleCheck, CircleX, ClipboardList, Layers, Phone, Printer, Search, X, Zap } from "lucide-react";
 
 export const metadata: Metadata = { title: "Inventario" };
 
@@ -212,14 +215,16 @@ export default async function InventarioPage({
 
         {/* Búsqueda */}
         <form className="mt-4 flex gap-2">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar por recibo, cliente o teléfono…"
-            className="input-modern flex-1"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0 flex-1">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar por recibo, cliente o teléfono…"
+              className="input-modern w-full"
+            />
+          </FieldIcon>
           {q && (
-            <Link href="/inventario" className="inline-flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50">
+            <Link href="/inventario" className="btn-dark gap-1 whitespace-nowrap">
               <X size={14} strokeWidth={2.25} aria-hidden="true" />
               Limpiar
             </Link>
@@ -290,9 +295,8 @@ export default async function InventarioPage({
             action={q || estadoFiltro !== "TODOS" ? { label: "Ver todos", href: "/inventario", secondary: true } : undefined}
           />
         ) : (
-          <div className="overflow-x-auto">
-          <div className="min-w-[720px] divide-y divide-[color:var(--border-1)]">
-            <div className="grid grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] gap-x-4 bg-[color:var(--surface-2)] px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-3)]">
+          <div className="divide-y divide-[color:var(--border-1)]">
+            <div className="hidden grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] gap-x-4 bg-[color:var(--surface-2)] px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-3)] md:grid">
               <span>Recibo</span>
               <span>Cliente</span>
               <span>Estado</span>
@@ -313,30 +317,15 @@ export default async function InventarioPage({
               />
             ))}
           </div>
-          </div>
         )}
       </div>
 
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <div className="card flex items-center justify-between p-4">
-          <Link
-            href={buildUrl(Math.max(currentPage - 1, 1), q, estadoFiltro)}
-            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${currentPage === 1 ? "pointer-events-none text-gray-300" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            ← Anterior
-          </Link>
-          <span className="text-sm font-semibold text-gray-500">
-            Página {currentPage} / {totalPages}
-          </span>
-          <Link
-            href={buildUrl(Math.min(currentPage + 1, totalPages), q, estadoFiltro)}
-            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${currentPage >= totalPages ? "pointer-events-none text-gray-300" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            Siguiente →
-          </Link>
-        </div>
-      )}
+      <Pager
+        page={currentPage}
+        totalPages={totalPages}
+        hrefFor={(p) => buildUrl(p, q, estadoFiltro)}
+        className="card flex items-center justify-between p-4"
+      />
     </div>
   );
 }
@@ -356,13 +345,36 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const totalEnt     = pedido.prendas.reduce((s: number, p: any) =>
     s + p.entregasParciales.reduce((es: number, e: any) => es + e.cantidad, 0), 0);
   const dias         = diasDesde(pedido.createdAt);
-  const estadoInfo   = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
     <details className="group" open={autoOpen}>
       {/* ── Fila compacta (siempre visible) ── */}
-      <summary className="grid cursor-pointer list-none grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] items-center gap-x-4 px-5 py-4 transition hover:bg-[color:var(--surface-2)] group-open:bg-brand-50 dark:group-open:bg-brand-500/10">
+      <summary className="cursor-pointer list-none transition hover:bg-[color:var(--surface-2)] group-open:bg-brand-50 dark:group-open:bg-brand-500/10">
+        <div className="flex items-start justify-between gap-3 px-4 py-3.5 md:hidden">
+          <div className="min-w-0">
+            <p className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</p>
+            <p className="truncate text-sm font-bold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <EstadoBadge estado={pedido.estado} />
+              {saldo > 0 ? (
+                <span className="text-xs font-black text-red-600">{money(saldo)}</span>
+              ) : (
+                <span className="text-xs font-bold text-green-600">Pagado</span>
+              )}
+              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
+                {diasLabel(dias)}
+              </span>
+            </div>
+          </div>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            aria-hidden="true"
+            className="mt-1 shrink-0 text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+          />
+        </div>
 
+        <div className="hidden grid-cols-[4.5rem_minmax(10rem,1.5fr)_7.5rem_5.5rem_6.5rem_5.5rem_2.5rem] items-center gap-x-4 px-5 py-4 md:grid">
         <span className="font-mono text-sm font-bold text-brand-500">#{fmt(pedido.id)}</span>
 
         <div className="min-w-0">
@@ -370,10 +382,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           <p className="truncate text-xs text-[color:var(--text-3)]">{pedido.cliente.telefono ?? "—"}</p>
         </div>
 
-        {/* Estado */}
-        <span className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-          {estadoLabel(pedido.estado)}
-        </span>
+        <EstadoBadge estado={pedido.estado} />
 
         {/* Prendas */}
         <div className="text-center">
@@ -402,7 +411,6 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
           </span>
         </div>
 
-        {/* Flecha */}
         <div className="flex justify-end">
           <ChevronDown
             size={16}
@@ -410,6 +418,7 @@ function FilaPedido({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             aria-hidden="true"
             className="text-[color:var(--text-3)] transition-transform group-open:rotate-180"
           />
+        </div>
         </div>
       </summary>
 
@@ -441,7 +450,6 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
   const pendientes      = totalPrendas - totalEntregadas;
   const progresoPct     = totalPrendas > 0 ? Math.round((totalEntregadas / totalPrendas) * 100) : 0;
   const dias            = diasDesde(pedido.createdAt);
-  const estadoInfo      = ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500";
 
   return (
     <div>
@@ -461,9 +469,7 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
               >
                 {pedido.cliente.nombre}
               </Link>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${estadoInfo}`}>
-                {estadoLabel(pedido.estado)}
-              </span>
+              <EstadoBadge estado={pedido.estado} />
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${diasColor(dias)}`}>
                 {diasLabel(dias)}
               </span>
@@ -496,7 +502,8 @@ function PedidoCard({ pedido, agregarAbono, registrarEntregaParcial, cambiarEsta
             href={`/pedidos/${pedido.id}`}
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:border-brand-300 hover:text-brand-600"
           >
-            Ver detalle →
+            Ver detalle
+            <ChevronRight size={13} strokeWidth={2.25} aria-hidden="true" />
           </Link>
         </div>
       </div>

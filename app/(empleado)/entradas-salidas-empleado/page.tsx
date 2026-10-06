@@ -1,11 +1,13 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowDownRight, ArrowUpRight, X } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Search, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { money, fmt } from "@/lib/format";
 import EmpleadoLinks from "@/components/EmpleadoLinks";
 import PedidoRow from "./PedidoRow";
 import MonthCalendar from "@/components/MonthCalendar";
+import YearPager from "@/components/YearPager";
+import FieldIcon from "@/components/FieldIcon";
 
 export const metadata: Metadata = { title: "Lo de hoy" };
 
@@ -87,27 +89,22 @@ export default async function EntradasSalidasEmpleadoPage({
               ]}
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Link href={`/entradas-salidas-empleado?year=${year - 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              ← {year - 1}
-            </Link>
-            <span className="rounded-xl bg-brand-50 px-4 py-2 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-              {year}
-            </span>
-            <Link href={`/entradas-salidas-empleado?year=${year + 1}&q=${q}&tipo=${tipoFiltro}`} className="flex items-center gap-1 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-600 transition hover:bg-gray-50 dark:border-white/10 dark:text-gray-300">
-              {year + 1} →
-            </Link>
-          </div>
+          <YearPager
+            year={year}
+            hrefFor={(y) => `/entradas-salidas-empleado?year=${y}&q=${encodeURIComponent(q)}&tipo=${tipoFiltro}`}
+          />
         </div>
 
         {/* Filtros */}
         <form className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_160px_auto_auto]">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar recibo, cliente o teléfono…"
-            className="input-modern"
-          />
+          <FieldIcon icon={<Search size={16} strokeWidth={1.75} />} className="min-w-0">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Buscar recibo, cliente o teléfono…"
+              className="input-modern w-full"
+            />
+          </FieldIcon>
           <select name="tipo" defaultValue={tipoFiltro} className="input-modern">
             <option value="todos">Todos</option>
             <option value="entradas">Solo entradas</option>

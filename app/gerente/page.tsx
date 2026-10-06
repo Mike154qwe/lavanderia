@@ -26,6 +26,7 @@ import {
 import { guardarPanelRemotoEnFirestore } from "@/lib/panel-remoto-admin";
 import MonthCalendar from "@/components/MonthCalendar";
 import DateField from "@/components/DateField";
+import YearPager from "@/components/YearPager";
 
 export const metadata: Metadata = { title: "Gerente" };
 
@@ -511,13 +512,7 @@ export default async function GerentePage({
         </summary>
         <div className="space-y-4 border-t border-[color:var(--border-1)] p-4">
         <div className="flex items-center gap-2 px-1">
-          <Link href={`/gerente?year=${year - 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
-            ← {year - 1}
-          </Link>
-          <span className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">{year}</span>
-          <Link href={`/gerente?year=${year + 1}`} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:border-white/10 dark:text-gray-300">
-            {year + 1} →
-          </Link>
+          <YearPager year={year} hrefFor={(y) => `/gerente?year=${y}`} />
         </div>
         {MESES.map((mes, mesIndex) => {
           const esMesActual = year === hoy.getFullYear() && mesIndex === hoy.getMonth();

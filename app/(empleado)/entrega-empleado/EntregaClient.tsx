@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleAlert, CircleCheck, CircleX, FileText, Info, Phone, ScanLine, Search, TriangleAlert, Wallet, X } from "lucide-react";
+import { ArrowLeft, CircleAlert, CircleCheck, CircleX, FileText, Info, Phone, ScanLine, Search, TriangleAlert, Wallet, X } from "lucide-react";
 import { money } from "@/lib/format";
+import EstadoBadge from "@/components/EstadoBadge";
 
 export type PedidoEntrega = {
   id: number;
@@ -24,14 +25,6 @@ export type PedidoEntrega = {
 };
 
 type Status = "idle" | "loading" | "found" | "not-found" | "success-entrega" | "success-pago";
-
-const ESTADO_STYLE: Record<string, { bg: string; text: string; dot: string; label: string }> = {
-  RECIBIDO:   { bg: "bg-blue-50",   text: "text-blue-700",  dot: "bg-blue-400",  label: "Recibido"   },
-  EN_PROCESO: { bg: "bg-yellow-50", text: "text-yellow-700",dot: "bg-yellow-400",label: "En proceso" },
-  LISTO:      { bg: "bg-emerald-50",text: "text-emerald-700",dot:"bg-emerald-400",label: "Listo"   },
-  ENTREGADO:  { bg: "bg-gray-50",   text: "text-gray-500",  dot: "bg-gray-400",  label: "Entregado"  },
-  CANCELADO:  { bg: "bg-red-50",    text: "text-red-600",   dot: "bg-red-400",   label: "Cancelado"  },
-};
 
 const METODOS = ["Efectivo", "Nequi", "Daviplata", "Transferencia", "Tarjeta"];
 
@@ -121,8 +114,6 @@ export default function EntregaClient({
     }
   }
 
-  const estadoInfo = pedido ? (ESTADO_STYLE[pedido.estado] ?? ESTADO_STYLE["RECIBIDO"]) : null;
-
   return (
     <div className="page-frame">
       <div className="mx-auto max-w-lg">
@@ -139,9 +130,10 @@ export default function EntregaClient({
           </p>
           <Link
             href="/inventario-empleado"
-            className="mt-3 inline-flex rounded-[var(--radius-control)] px-3 py-1.5 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-[var(--radius-control)] px-3 py-1.5 text-xs font-bold text-[color:var(--text-3)] ring-1 ring-[color:var(--border-1)] transition hover:bg-[color:var(--surface-2)]"
           >
-            ← Buscar / entregar
+            <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
+            Buscar / entregar
           </Link>
         </div>
 
@@ -226,26 +218,21 @@ export default function EntregaClient({
         )}
 
         {/* ── PEDIDO ENCONTRADO ─────────────────────── */}
-        {(status === "found" || status === "success-pago") && pedido && estadoInfo && (
+        {(status === "found" || status === "success-pago") && pedido && (
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
 
             {/* Encabezado del pedido */}
-            <div className={`flex items-center justify-between px-5 py-4 ${estadoInfo.bg}`}>
+            <div className="flex items-center justify-between border-b border-[color:var(--border-1)] px-5 py-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                <p className="text-xs font-bold uppercase tracking-widest text-[color:var(--text-3)]">
                   Pedido
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-[color:var(--text-1)]">
                   #{pedido.codigoFormateado}
                 </p>
-                <p className="text-xs text-gray-400">{pedido.fechaFormateada}</p>
+                <p className="text-xs text-[color:var(--text-3)]">{pedido.fechaFormateada}</p>
               </div>
-              <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${estadoInfo.bg} ring-1 ring-current/20`}>
-                <span className={`h-2 w-2 rounded-full ${estadoInfo.dot}`} />
-                <span className={`text-sm font-bold ${estadoInfo.text}`}>
-                  {estadoInfo.label}
-                </span>
-              </div>
+              <EstadoBadge estado={pedido.estado} size="md" />
             </div>
 
             {/* Aviso si no está listo */}
