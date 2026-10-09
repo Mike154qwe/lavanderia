@@ -1,50 +1,51 @@
-// Respaldo LOCAL seguro de prisma/dev.db -- complementa (no reemplaza) a
+// Respaldo LOCAL seguro de una base SQLite -- complementa (no reemplaza) a
 // scripts/respaldo-db-firebase.js (ese sube a la nube cada 25 min; este deja
 // una copia point-in-time en disco, con integridad verificada y retención
 // acotada, pensado para una tarea programada diaria o para correr a mano al
 // final de una sesión de trabajo -- ver scripts/instalar-backup-seguro.ps1 y
-// el script "backup:sesion" de package.json).
+// scripts/backup-sesion.js).
 //
-// A propósito, a diferencia de respaldo-db-firebase.js: la ruta de la base
-// sale de DATABASE_URL (.env), no de una ruta fija -- así nunca puede
-// desincronizarse de a qué base le apunta realmente la app (ver el hallazgo
-// de la auditoría del 9-oct-2026: los dos mecanismos coincidían hoy, pero por
-// casualidad, no por diseño).
+// A propósito: la ruta de la base SIEMPRE se pasa explícita con --db, nunca
+// se adivina (ni de DATABASE_URL, ni de una ruta fija). La primera versión
+// la leía de DATABASE_URL automáticamente; se cambió a propósito (10-oct-2026)
+// para que correr esto nunca dependa de qué .env esté cargado en ese momento
+// ni de desde qué carpeta se invoque -- quien lo corre dice explícitamente
+// qué base respalda, y el script lo imprime siempre, sin ambigüedad.
 //
 // Uso:
-//   node scripts/backup-seguro.js             -- respalda + retención en dry-run
-//   node scripts/backup-seguro.js --aplicar    -- respalda + retención real (borra)
+//   node scripts/backup-seguro.js --db <ruta absoluta a un .db>              -- respalda + retención en dry-run
+//   node scripts/backup-seguro.js --db <ruta absoluta a un .db> --aplicar    -- respalda + retención real (borra)
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
 
-const RAIZ = path.join(__dirname, "..");
 const DESTINO_DIR = "C:\\LaManuelita_Backups\\auto";
 const RETENCION_HORAS_TODO = 72; // conserva TODO lo de este rango, sin importar cuántos haya por día
 const RETENCION_DIAS_TOTAL = 30; // más allá de esto, no se conserva nada
-const NOMBRE_RE = /^dev_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})\.db$/;
+// Sin segundos a propósito (AAAA-MM-DD_HH-MM): dos respaldos dentro del mismo
+// minuto civil de Bogotá chocan de nombre -- VACUUM INTO falla porque el
+// destino ya existe, con un error claro, en vez de pisarse en silencio.
+const NOMBRE_RE = /^dev_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})\.db$/;
 
-// ---- .env a mano (mismo patrón que scripts/respaldo-db-firebase.js) ----
-function cargarEnv(ruta) {
-  if (!fs.existsSync(ruta)) return;
-  for (const linea of fs.readFileSync(ruta, "utf8").split(/\r?\n/)) {
-    if (!linea.includes("=") || linea.trim().startsWith("#")) continue;
-    const i = linea.indexOf("=");
-    const clave = linea.slice(0, i).trim();
-    const valor = linea.slice(i + 1).trim().replace(/^["']|["']$/g, "");
-    if (clave && !(clave in process.env)) process.env[clave] = valor;
-  }
+function errorYSalir(mensaje) {
+  console.error(`[backup-seguro] ${mensaje}`);
+  process.exit(1);
 }
-cargarEnv(path.join(RAIZ, ".env"));
 
-function rutaDbDesdeDatabaseUrl() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("Falta DATABASE_URL (.env) -- no sé qué base respaldar.");
-  const m = /^file:(.+)$/.exec(url.trim());
-  if (!m) throw new Error(`DATABASE_URL no tiene forma "file:<ruta>": ${url}`);
-  return path.resolve(m[1]);
+/** --db <ruta>: obligatorio, debe existir, ser un archivo, y terminar en .db. Sin adivinar nada. */
+function rutaDbDesdeArgv(argv) {
+  const i = argv.indexOf("--db");
+  if (i === -1 || !argv[i + 1]) {
+    errorYSalir('Falta --db <ruta absoluta>. No se adivina la base a respaldar -- hay que pasarla explícita. Ejemplo: --db "C:\\ruta\\a\\dev.db"');
+  }
+  const ruta = path.resolve(argv[i + 1]);
+  if (!fs.existsSync(ruta)) errorYSalir(`--db no existe: ${ruta}`);
+  const info = fs.statSync(ruta);
+  if (!info.isFile()) errorYSalir(`--db no es un archivo: ${ruta}`);
+  if (path.extname(ruta).toLowerCase() !== ".db") errorYSalir(`--db debe terminar en .db: ${ruta}`);
+  return ruta;
 }
 
 // ---- Bogotá: UTC-5 fijo, Colombia no tiene horario de verano (mismo método ya
@@ -54,13 +55,13 @@ function partesBogota(d) {
   const b = new Date(d.getTime() - 5 * 3600 * 1000);
   return {
     y: b.getUTCFullYear(), m: b.getUTCMonth() + 1, day: b.getUTCDate(),
-    h: b.getUTCHours(), min: b.getUTCMinutes(), s: b.getUTCSeconds(),
+    h: b.getUTCHours(), min: b.getUTCMinutes(),
   };
 }
 function pad(n) { return String(n).padStart(2, "0"); }
 function nombreArchivo(d) {
   const p = partesBogota(d);
-  return `dev_${p.y}-${pad(p.m)}-${pad(p.day)}_${pad(p.h)}-${pad(p.min)}-${pad(p.s)}.db`;
+  return `dev_${p.y}-${pad(p.m)}-${pad(p.day)}_${pad(p.h)}-${pad(p.min)}.db`;
 }
 function diaCivilDesdeNombre(nombre) {
   const m = NOMBRE_RE.exec(nombre);
@@ -69,7 +70,7 @@ function diaCivilDesdeNombre(nombre) {
 function instanteDesdeNombre(nombre) {
   const m = NOMBRE_RE.exec(nombre);
   // El nombre ya está en hora Bogotá (pared) -- reconstruir el instante UTC real.
-  return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] + 5, +m[5], +m[6]));
+  return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] + 5, +m[5], 0));
 }
 
 // En Windows, el handle que better-sqlite3 abre al validar un archivo que
@@ -97,9 +98,9 @@ function contarTablas(db) {
   return out;
 }
 
-function hacerRespaldo() {
-  const origen = rutaDbDesdeDatabaseUrl();
-  if (!fs.existsSync(origen)) throw new Error(`No existe la base en DATABASE_URL: ${origen}`);
+/** `rutaDb` ya validada por rutaDbDesdeArgv (o, en pruebas, a mano). */
+function hacerRespaldo(rutaDb) {
+  console.log(`[backup-seguro] respaldando: ${rutaDb}`);
 
   fs.mkdirSync(DESTINO_DIR, { recursive: true });
   const ahora = new Date();
@@ -107,7 +108,7 @@ function hacerRespaldo() {
 
   // Solo lectura sobre el origen: VACUUM INTO escribe únicamente en `destino`,
   // nunca en el archivo que se está respaldando -- puede estar en uso.
-  const src = new Database(origen, { readonly: true, fileMustExist: true });
+  const src = new Database(rutaDb, { readonly: true, fileMustExist: true });
   try {
     src.prepare(`VACUUM INTO ?`).run(destino);
   } finally {
@@ -147,8 +148,10 @@ function hacerRespaldo() {
 
 // ---- Retención: todo lo de las últimas 72h se conserva completo; de ahí hasta
 // los 30 días, 1 por día civil (Bogotá) -- el más reciente de cada día; más
-// allá de 30 días, nada. Solo mira archivos dev_<fecha>_<hora>.db -- cualquier
-// otra cosa en la carpeta se ignora, nunca se toca. ----
+// allá de 30 días, nada. SOLO mira DESTINO_DIR (fijo, no configurable) y
+// archivos cuyo nombre completo coincide con NOMBRE_RE -- cualquier otra cosa
+// en esa carpeta, o cualquier archivo fuera de ella (aunque coincida el
+// patrón), nunca se toca ni se lista. ----
 function calcularRetencion(ahora) {
   if (!fs.existsSync(DESTINO_DIR)) return { conservar: [], borrar: [] };
   const archivos = fs.readdirSync(DESTINO_DIR).filter((n) => NOMBRE_RE.test(n));
@@ -186,7 +189,8 @@ function calcularRetencion(ahora) {
 function aplicarRetencion(aplicar) {
   const ahora = new Date();
   const { conservar, borrar } = calcularRetencion(ahora);
-  console.log(`\n[retención] ${aplicar ? "APLICANDO (--aplicar)" : "dry-run (por defecto, nada se borra)"}`);
+  console.log(`\n[retención] carpeta: ${DESTINO_DIR}`);
+  console.log(`[retención] ${aplicar ? "APLICANDO (--aplicar)" : "dry-run (por defecto, nada se borra)"}`);
   console.log(`[retención] conservar: ${conservar.length}`);
   for (const c of conservar) console.log(`  mantener  ${c.nombre}  (${c.motivo})`);
   console.log(`[retención] borrar: ${borrar.length}`);
@@ -199,8 +203,10 @@ function aplicarRetencion(aplicar) {
 }
 
 function main() {
-  const aplicar = process.argv.includes("--aplicar");
-  const destino = hacerRespaldo();
+  const argv = process.argv.slice(2);
+  const aplicar = argv.includes("--aplicar");
+  const rutaDb = rutaDbDesdeArgv(argv);
+  const destino = hacerRespaldo(rutaDb);
   if (destino === null) {
     process.exit(process.exitCode || 1);
   }
@@ -209,4 +215,7 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { hacerRespaldo, calcularRetencion, aplicarRetencion, nombreArchivo, partesBogota, DESTINO_DIR };
+module.exports = {
+  hacerRespaldo, calcularRetencion, aplicarRetencion, nombreArchivo, partesBogota,
+  rutaDbDesdeArgv, DESTINO_DIR, NOMBRE_RE,
+};

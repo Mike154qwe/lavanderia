@@ -1,18 +1,24 @@
-// Acción manual para correr al final de una sesión de trabajo ("npm run
-// backup:sesion"): hace exactamente lo mismo que backup-seguro.js (respaldo +
-// integridad + conteos + retención real) y además copia el respaldo nuevo a
-// OneDrive -- la tarea programada diaria (instalar-backup-seguro.ps1) NO
-// copia a OneDrive, solo deja el archivo en C:\LaManuelita_Backups\auto.
+// Acción manual para correr al final de una sesión de trabajo: hace exactamente
+// lo mismo que backup-seguro.js (respaldo + integridad + conteos + retención
+// real) y además copia el respaldo nuevo a OneDrive -- la tarea programada
+// diaria (instalar-backup-seguro.ps1) NO copia a OneDrive, solo deja el
+// archivo en C:\LaManuelita_Backups\auto.
+//
+// Igual que backup-seguro.js: la ruta de la base se pasa explícita, nunca se
+// adivina.
+//
+// Uso: node scripts/backup-sesion.js --db <ruta absoluta a un .db>
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
-const { hacerRespaldo, aplicarRetencion } = require("./backup-seguro.js");
+const { hacerRespaldo, aplicarRetencion, rutaDbDesdeArgv } = require("./backup-seguro.js");
 
 const ONEDRIVE_DIR = "C:\\Users\\mikev\\OneDrive\\LaManuelita_Backups";
 
 function main() {
-  const destino = hacerRespaldo();
+  const rutaDb = rutaDbDesdeArgv(process.argv.slice(2));
+  const destino = hacerRespaldo(rutaDb);
   if (destino === null) {
     console.error("[backup:sesion] el respaldo falló (ver arriba) -- no se copia a OneDrive.");
     process.exit(1);
