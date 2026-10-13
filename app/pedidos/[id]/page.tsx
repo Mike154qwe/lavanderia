@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { money, fmt, ESTADO_BADGE } from "@/lib/format";
+import { money, fmt, fechaCorta, fechaLarga, estadoLabel } from "@/lib/format";
 import { ESTADOS_PEDIDO, type EstadoPedido, METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
@@ -7,15 +7,22 @@ import Link from "next/link";
 import MoneyInput from "@/components/MoneyInput";
 import CancelButton from "./CancelButton";
 import NotificarWhatsappButton from "./NotificarWhatsappButton";
+import EstadoBadge from "@/components/EstadoBadge";
 import { whatsappLink, ESTADO_NOTIFICADO_LISTO } from "@/lib/whatsapp";
+import { PrendaIcon } from "@/components/PrendaIcon";
+import {
+  ArrowLeft,
+  ChevronDown,
+  ChevronRight,
+  CircleCheck,
+  FileText,
+  Phone,
+  Plus,
+  TriangleAlert,
+} from "lucide-react";
 
 const TIPOS_PRENDA = ["Camisa","Pantalón","Chaqueta","Vestido","Cobija","Tapete","Tenis","Traje","Cubrelecho"];
 const SERVICIOS_PRENDA = ["Lavado","Planchado","Tintura"];
-const PRENDA_EMOJI: Record<string, string> = {
-  Camisa: "👔", Pantalón: "👖", Chaqueta: "🧥", Cubrelecho: "🛏️",
-  Tenis: "👟", Traje: "🤵", Vestido: "👗", Cobija: "🧺", Tapete: "🟫",
-};
-function pEmoji(tipo: string) { return PRENDA_EMOJI[tipo] ?? "👕"; }
 
 export async function generateMetadata({
   params,
@@ -151,24 +158,24 @@ export default async function DetallePedidoPage({
   const terminado   = pedido.estado === "ENTREGADO" || pedido.estado === "CANCELADO";
 
   return (
-    <div className="p-6">
-      <div className="mx-auto max-w-4xl space-y-5">
+    <div className="page-frame page-frame--wide">
+      <div className="mx-auto w-full max-w-4xl space-y-5">
 
         {/* ── Back + acciones rápidas ─────────────────────── */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/pedidos"
-            className="flex items-center gap-1.5 text-sm font-semibold text-gray-400 transition hover:text-gray-700 dark:hover:text-gray-200"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--text-3)] transition hover:text-[color:var(--text-1)]"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
             Volver a pedidos
           </Link>
           <Link
             href={`/recibos/${pedido.id}/pdf`}
             target="_blank"
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:text-gray-400"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[color:var(--border-1)] px-4 py-2 text-sm font-semibold text-[color:var(--text-2)] transition hover:border-brand-300 hover:text-brand-600"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            <FileText size={16} strokeWidth={2} aria-hidden="true" />
             Ver recibo PDF
           </Link>
         </div>
@@ -176,31 +183,27 @@ export default async function DetallePedidoPage({
         {/* ── Header ─────────────────────────────────────── */}
         <div className="card overflow-hidden">
           {/* Top bar con ID y estado */}
-          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-gray-100 p-6 dark:border-white/[0.07]">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[color:var(--border-1)] p-6">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-500">Pedido</p>
-              <h1 className="mt-1 font-mono text-3xl font-black text-gray-900">
+              <p className="page-kicker text-brand-500">Pedido</p>
+              <h1 className="mt-1 font-mono text-3xl font-black text-[color:var(--text-1)]">
                 #{fmt(pedido.id)}
               </h1>
-              <p className="mt-1 text-sm capitalize text-gray-400">
-                {new Date(pedido.createdAt).toLocaleDateString("es-CO", {
-                  weekday: "long", year: "numeric", month: "long", day: "numeric",
-                })} · {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+              <p className="mt-1 text-sm text-[color:var(--text-3)]">
+                {fechaLarga(new Date(pedido.createdAt))} · {new Date(pedido.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
-            <span className={`rounded-full px-3 py-1.5 text-sm font-bold ${ESTADO_BADGE[pedido.estado] ?? "bg-gray-100 text-gray-500"}`}>
-              {pedido.estado.replace("_", " ")}
-            </span>
+            <EstadoBadge estado={pedido.estado} size="md" />
           </div>
 
-          {/* Cliente */}
-          <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4 dark:border-white/[0.07]">
+          <div className="flex items-center gap-4 border-b border-[color:var(--border-1)] px-6 py-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
               {inicial}
             </div>
             <div>
-              <p className="font-bold text-gray-900">{pedido.cliente.nombre}</p>
-              <p className="mt-0.5 text-sm text-gray-400">
+              <p className="font-bold text-[color:var(--text-1)]">{pedido.cliente.nombre}</p>
+              <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-[color:var(--text-3)]">
+                <Phone size={13} strokeWidth={2} aria-hidden="true" />
                 {pedido.cliente.telefono
                   ? <a href={`tel:${pedido.cliente.telefono}`} className="hover:text-brand-500">{pedido.cliente.telefono}</a>
                   : "Sin teléfono"}
@@ -209,11 +212,10 @@ export default async function DetallePedidoPage({
             </div>
           </div>
 
-          {/* Totales */}
-          <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-white/[0.07]">
+          <div className="grid grid-cols-3 divide-x divide-[color:var(--border-1)]">
             <div className="p-5 text-center">
-              <p className="text-xs font-bold uppercase text-gray-400">Total</p>
-              <p className="mt-1 text-xl font-black text-gray-900">{money(pedido.total)}</p>
+              <p className="text-xs font-bold uppercase text-[color:var(--text-3)]">Total</p>
+              <p className="mt-1 text-xl font-black text-[color:var(--text-1)]">{money(pedido.total)}</p>
             </div>
             <div className="p-5 text-center">
               <p className="text-xs font-bold uppercase text-green-600 dark:text-green-400">Pagado</p>
@@ -224,7 +226,7 @@ export default async function DetallePedidoPage({
                 Saldo
               </p>
               <p className={`mt-1 text-xl font-black ${saldo > 0 ? "text-red-500" : "text-green-600 dark:text-green-400"}`}>
-                {saldo > 0 ? money(saldo) : "✓ Pagado"}
+                {saldo > 0 ? money(saldo) : "Pagado"}
               </p>
             </div>
           </div>
@@ -291,7 +293,7 @@ export default async function DetallePedidoPage({
               <details key={p.id} className="group">
                 {/* Fila compacta */}
                 <summary className={`flex cursor-pointer list-none items-center gap-3 px-6 py-4 transition hover:bg-gray-50 group-open:bg-brand-50/40 dark:hover:bg-white/[0.02] dark:group-open:bg-brand-500/5 ${!terminado ? "" : "cursor-default"}`}>
-                  <span className="text-2xl leading-none">{pEmoji(p.tipo)}</span>
+                  <PrendaIcon tipo={p.tipo} size={22} className="shrink-0 text-gray-600 dark:text-gray-300" />
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-bold text-gray-900">{p.tipo}</span>
@@ -301,15 +303,20 @@ export default async function DetallePedidoPage({
                       <span className="text-sm text-gray-400">×{p.cantidad}</span>
                     </div>
                     {p.descripcion && (
-                      <p className="mt-0.5 text-xs font-semibold text-orange-600 dark:text-orange-400">⚠️ {p.descripcion}</p>
+                      <p className="mt-0.5 flex items-start gap-1 text-xs font-semibold text-orange-600 dark:text-orange-400">
+                        <TriangleAlert size={12} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+                        {p.descripcion}
+                      </p>
                     )}
                   </div>
                   <span className="shrink-0 font-black text-brand-500">{money(p.valor)}</span>
                   {!terminado && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-                      className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-open:rotate-180">
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
+                    <ChevronDown
+                      size={16}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      className="shrink-0 text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+                    />
                   )}
                 </summary>
 
@@ -367,14 +374,14 @@ export default async function DetallePedidoPage({
           {!terminado && (
             <details className="group border-t border-dashed border-gray-200 dark:border-white/10">
               <summary className="flex cursor-pointer list-none items-center gap-2 px-6 py-4 text-sm font-bold text-brand-600 transition hover:bg-brand-50/40 dark:text-brand-400 dark:hover:bg-brand-500/5">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                  <path d="M12 5v14M5 12h14"/>
-                </svg>
+                <Plus size={16} strokeWidth={2.5} aria-hidden="true" />
                 Agregar prenda
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-                  className="ml-auto h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
-                  <path d="M6 9l6 6 6-6"/>
-                </svg>
+                <ChevronDown
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  className="ml-auto text-[color:var(--text-3)] transition-transform group-open:rotate-180"
+                />
               </summary>
               <div className="border-t border-brand-100 bg-brand-50/20 px-6 py-4 dark:border-brand-500/20 dark:bg-brand-500/5">
                 <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-500">Nueva prenda</p>
@@ -462,7 +469,7 @@ export default async function DetallePedidoPage({
 
           {saldo <= 0 && !terminado && (
             <p className="flex items-center gap-2 border-t border-gray-100 px-6 py-3 text-sm font-semibold text-green-600 dark:border-white/[0.07] dark:text-green-400">
-              <span>✅</span> Pedido completamente pagado
+              <CircleCheck size={16} strokeWidth={2} aria-hidden="true" /> Pedido completamente pagado
             </p>
           )}
         </div>
@@ -474,13 +481,13 @@ export default async function DetallePedidoPage({
 
             <div className="flex flex-wrap gap-3">
               {pedido.estado === "RECIBIDO" && (
-                <QuickEstado pedidoId={pedido.id} estado="EN_PROCESO" label="→ En proceso" color="yellow" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="EN_PROCESO" label="En proceso" color="yellow" action={cambiarEstadoAction} />
               )}
               {(pedido.estado === "RECIBIDO" || pedido.estado === "EN_PROCESO") && (
-                <QuickEstado pedidoId={pedido.id} estado="LISTO" label="✅ Marcar listo" color="green" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="LISTO" label="Marcar listo" color="green" action={cambiarEstadoAction} />
               )}
               {pedido.estado === "LISTO" && saldo <= 0 && (
-                <QuickEstado pedidoId={pedido.id} estado="ENTREGADO" label="📦 Entregar pedido" color="brand" action={cambiarEstadoAction} />
+                <QuickEstado pedidoId={pedido.id} estado="ENTREGADO" label="Entregar pedido" color="brand" action={cambiarEstadoAction} />
               )}
               {pedido.estado === "LISTO" && saldo > 0 && (
                 <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400">
@@ -492,18 +499,18 @@ export default async function DetallePedidoPage({
 
             {/* Override manual */}
             <details className="group mt-4">
-              <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-gray-400 hover:text-gray-600">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 transition duration-200 group-open:rotate-90"><path d="M9 18l6-6-6-6"/></svg>
+              <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-[color:var(--text-3)] hover:text-[color:var(--text-2)]">
+                <ChevronRight size={14} strokeWidth={2} className="transition duration-200 group-open:rotate-90" aria-hidden="true" />
                 Cambio manual de estado
               </summary>
               <form action={cambiarEstadoAction} className="mt-3 flex gap-3">
                 <input type="hidden" name="pedidoId" value={pedido.id} />
                 <select name="estado" defaultValue={pedido.estado} className="input-modern flex-1">
                   {ESTADOS_PEDIDO.map((e) => (
-                    <option key={e} value={e}>{e.replace("_", " ")}</option>
+                    <option key={e} value={e}>{estadoLabel(e)}</option>
                   ))}
                 </select>
-                <button className="btn-dark whitespace-nowrap">Aplicar</button>
+                <button className="btn-primary whitespace-nowrap">Aplicar</button>
               </form>
             </details>
           </div>
@@ -518,11 +525,9 @@ export default async function DetallePedidoPage({
                 <li key={h.id} className={`pb-4 ${i === historialVisible.length - 1 ? "pb-0" : ""}`}>
                   <div className="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-500 dark:border-gray-900" />
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ESTADO_BADGE[h.estado] ?? "bg-gray-100 text-gray-500"}`}>
-                      {h.estado.replace("_", " ")}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(h.createdAt).toLocaleDateString("es-CO")} ·{" "}
+                    <EstadoBadge estado={h.estado} />
+                    <span className="text-xs text-[color:var(--text-3)]">
+                      {fechaCorta(new Date(h.createdAt))} ·{" "}
                       {new Date(h.createdAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>

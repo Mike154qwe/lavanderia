@@ -77,15 +77,15 @@ export default function Dashboard() {
 
   if (cargando) {
     return (
-      <div className="p-6">
-        <p className="text-sm font-semibold text-gray-400">Cargando panel remoto…</p>
+      <div className="remote-stage">
+        <p className="text-sm font-semibold text-[color:var(--text-2)]">Cargando panel remoto…</p>
       </div>
     );
   }
 
   if (error || !dias) {
     return (
-      <div className="p-6">
+      <div className="remote-stage">
         <div className="card p-6 text-center">
           <p className="font-bold text-gray-900 dark:text-white">No se pudo cargar el panel</p>
           <p className="mt-1 text-sm text-gray-500">{error}</p>
@@ -112,7 +112,7 @@ export default function Dashboard() {
   const seleccionado = dias.find((d) => d.fecha === diaSeleccionado) ?? masReciente ?? null;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6">
+    <div className="remote-stage space-y-5">
       {/* Encabezado + estado de conexión */}
       <div className="card flex flex-wrap items-start justify-between gap-3 p-6">
         <div>

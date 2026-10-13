@@ -13,7 +13,7 @@ export function EmptyState({
 }) {
   return (
     <div className="card empty-state mt-4">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[var(--radius-well)] bg-[color:var(--surface-2)] text-2xl">
+      <div className="mx-auto figure-well h-12 w-12 text-2xl">
         {icon}
       </div>
       <h3 className="empty-state__title">{title}</h3>

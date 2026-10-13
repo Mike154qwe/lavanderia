@@ -4,6 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { METODOS_PAGO, type MetodoPago } from "@/lib/types";
 import FlashMessage from "@/components/FlashMessage";
 import EmpleadoHero from "@/components/EmpleadoHero";
+import {
+  Banknote,
+  Droplets,
+  Package,
+  Pencil,
+  Shirt,
+  TriangleAlert,
+  User,
+  Wallet,
+} from "lucide-react";
 
 export const metadata: Metadata = { title: "Gastos del día" };
 import { revalidatePath } from "next/cache";
@@ -32,13 +42,13 @@ async function registrarGastoEmpleado(formData: FormData) {
 }
 
 const TIPOS = [
-  { tipo: "Jabones",        icon: "M9.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4.5M12 12v9M8 12h8" },
-  { tipo: "Insumos",        icon: "M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" },
-  { tipo: "Pago empleado",  icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" },
-  { tipo: "Pago prensista", icon: "M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z" },
-  { tipo: "Nómina",         icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
-  { tipo: "Novedad",        icon: "M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01" },
-  { tipo: "Otro",           icon: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" },
+  { tipo: "Jabones",        Icon: Droplets },
+  { tipo: "Insumos",        Icon: Package },
+  { tipo: "Pago empleado",  Icon: User },
+  { tipo: "Pago prensista", Icon: Shirt },
+  { tipo: "Nómina",         Icon: Banknote },
+  { tipo: "Novedad",        Icon: TriangleAlert },
+  { tipo: "Otro",           Icon: Pencil },
 ];
 
 export default async function GastosEmpleadoPage({
@@ -59,19 +69,19 @@ export default async function GastosEmpleadoPage({
   const totalGastos = gastos.reduce((s: number, g: any) => s + g.valor, 0);
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="page-frame">
       <FlashMessage message={flash ?? error} type={flash ? "success" : "error"} />
 
       <EmpleadoHero
         kicker="Caja"
         title="Gastos del día"
         subtitle="Jabones, insumos o pagos. El gerente los ve en el cierre."
-        icon="💵"
+        icon={<Wallet size={20} strokeWidth={1.75} />}
         tone="amber"
         links={[{ href: "/entradas-salidas-empleado", label: "Lo de hoy" }]}
       />
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
 
         {/* ── Formulario ───────────────────────────────────── */}
         <form action={registrarGastoEmpleado} className="card p-5">
@@ -91,10 +101,8 @@ export default async function GastosEmpleadoPage({
                   required
                   className="sr-only"
                 />
-                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-white/10">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-red-500">
-                    {item.icon.split("M").filter(Boolean).map((d, i) => <path key={i} d={`M${d}`} />)}
-                  </svg>
+                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-[var(--radius-well)] figure-well text-red-500">
+                  <item.Icon size={18} strokeWidth={1.75} aria-hidden="true" />
                 </div>
                 <p className="text-xs font-bold text-gray-700 dark:text-gray-300">{item.tipo}</p>
               </label>
@@ -178,7 +186,9 @@ export default async function GastosEmpleadoPage({
             </div>
           ) : (
             <div className="empty-state rounded-[var(--radius-well)] border border-dashed border-[color:var(--border-1)]">
-              <p className="text-3xl">💸</p>
+              <span className="mx-auto figure-well h-12 w-12">
+                <Wallet size={22} strokeWidth={1.75} aria-hidden="true" />
+              </span>
               <p className="empty-state__title">No hay gastos registrados hoy.</p>
             </div>
           )}
