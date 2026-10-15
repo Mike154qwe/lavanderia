@@ -53,78 +53,74 @@
 <line x1="1682" y1="1296" x2="1710" y2="1338" stroke="#334155" stroke-width="3"/>
 <text x="1682.0" y="1366.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#334155" text-anchor="middle">Cliente</text>
 <text x="1682.0" y="1394.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">dueño de las prendas</text>
-<ellipse cx="520" cy="168" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="160.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar pedido</text>
-<text x="520.0" y="194.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF01</text>
-<ellipse cx="520" cy="294" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="272.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Calcular valor con</text>
-<text x="520.0" y="302.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">tarifario</text>
-<text x="520.0" y="330.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF02</text>
-<ellipse cx="520" cy="420" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="398.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Actualizar estado del</text>
-<text x="520.0" y="428.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">pedido</text>
-<text x="520.0" y="456.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF03</text>
-<ellipse cx="520" cy="546" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="538.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar abono</text>
-<text x="520.0" y="572.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF04</text>
-<ellipse cx="520" cy="672" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="650.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar</text>
-<text x="520.0" y="680.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">observaciones</text>
-<text x="520.0" y="708.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF05</text>
-<ellipse cx="520" cy="798" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="790.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Buscar pedido</text>
-<text x="520.0" y="824.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF06</text>
-<ellipse cx="520" cy="924" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="902.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar historial del</text>
-<text x="520.0" y="932.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">cliente</text>
-<text x="520.0" y="960.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF07</text>
-<ellipse cx="520" cy="1050" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
-<text x="520.0" y="1042.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar gasto</text>
-<text x="520.0" y="1076.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF08</text>
-<ellipse cx="1330" cy="798" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
-<text x="1330.0" y="790.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Generar cierre de caja</text>
-<text x="1330.0" y="824.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF09</text>
-<ellipse cx="1330" cy="924" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
-<text x="1330.0" y="916.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Notificar pedido listo</text>
-<text x="1330.0" y="950.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF10</text>
-<ellipse cx="1330" cy="1050" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
-<text x="1330.0" y="1028.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Pedidos antiguos y</text>
-<text x="1330.0" y="1058.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">aviso</text>
-<text x="1330.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF11</text>
-<ellipse cx="1330" cy="1176" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
-<text x="1330.0" y="1168.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar panel remoto</text>
-<text x="1330.0" y="1202.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF12</text>
+<ellipse cx="522" cy="168" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="160.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar pedido</text>
+<text x="522.0" y="194.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF01</text>
+<ellipse cx="522" cy="300" rx="238" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="292.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Calcular valor con tarifario</text>
+<text x="522.0" y="326.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF02</text>
+<ellipse cx="522" cy="432" rx="242" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="424.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Actualizar estado del pedido</text>
+<text x="522.0" y="458.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF03</text>
+<ellipse cx="522" cy="564" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="556.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar abono</text>
+<text x="522.0" y="590.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF04</text>
+<ellipse cx="522" cy="696" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="674.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar</text>
+<text x="522.0" y="704.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">observaciones</text>
+<text x="522.0" y="732.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF05</text>
+<ellipse cx="522" cy="828" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="820.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Buscar pedido</text>
+<text x="522.0" y="854.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF06</text>
+<ellipse cx="522" cy="960" rx="242" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="952.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar historial del cliente</text>
+<text x="522.0" y="986.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF07</text>
+<ellipse cx="522" cy="1092" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar gasto</text>
+<text x="522.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF08</text>
+<ellipse cx="1288" cy="828" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="820.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Generar cierre de caja</text>
+<text x="1288.0" y="854.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF09</text>
+<ellipse cx="1288" cy="960" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="952.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Notificar pedido listo</text>
+<text x="1288.0" y="986.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF10</text>
+<ellipse cx="1288" cy="1092" rx="220" ry="56" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Pedidos antiguos y aviso</text>
+<text x="1288.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF11</text>
+<ellipse cx="1288" cy="1224" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="1216.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar panel remoto</text>
+<text x="1288.0" y="1250.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF12</text>
 <path d="M158.0,582.0 L250.0,582.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,168.0 L250.0,1050.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,168.0 L340.0,168.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,294.0 L340.0,294.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,420.0 L340.0,420.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,546.0 L340.0,546.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,672.0 L340.0,672.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,798.0 L340.0,798.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,924.0 L340.0,924.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M250.0,1050.0 L340.0,1050.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,168.0 L250.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,168.0 L342.0,168.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,300.0 L284.0,300.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,432.0 L280.0,432.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,564.0 L342.0,564.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,696.0 L342.0,696.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,828.0 L342.0,828.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,960.0 L280.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,1092.0 L342.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M1642.0,822.0 L1530.0,822.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1530.0,798.0 L1530.0,1176.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1530.0,798.0 L1510.0,798.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1530.0,924.0 L1510.0,924.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1530.0,1050.0 L1510.0,1050.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1530.0,1176.0 L1510.0,1176.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M1642.0,1250.0 L1108.0,1250.0 L1108.0,924.0 L1150.0,924.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7"/>
-<path d="M520.0,218.0 L520.0,244.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-dark)"/>
-<text x="714.0" y="239.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">«include»</text>
-<rect x="720.0" y="274.0" width="305.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
-<text x="734.0" y="300.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Tarifario por script, sin</text>
-<text x="734.0" y="328.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">pantalla de administración.</text>
-<rect x="720.0" y="386.0" width="356.8" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
-<text x="734.0" y="412.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Empleado hasta ENTREGADO;</text>
-<text x="734.0" y="440.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">CANCELADO solo del Gerente.</text>
-<rect x="720.0" y="624.0" width="351.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
-<text x="734.0" y="650.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Se anota al crear el pedido;</text>
-<text x="734.0" y="678.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">editarla después: solo Gerente.</text>
-<path d="M1682.0,1460.0 L158.0,1460.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="112,1460 160,1442 160,1478" fill="#ffffff" stroke="#1f2937" stroke-width="2.6"/>
-<text x="890.0" y="1444.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#64748b" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">generalización</text>
+<path d="M1530.0,828.0 L1530.0,1224.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,828.0 L1468.0,828.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,960.0 L1468.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,1092.0 L1508.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,1224.0 L1468.0,1224.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1642.0,1250.0 L1642.0,1300.0 L1038.0,1300.0 L1038.0,960.0 L1108.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7"/>
+<path d="M522.0,218.0 L522.0,244.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-dark)"/>
+<text x="716.0" y="239.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">«include»</text>
+<rect x="790.0" y="280.0" width="305.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Tarifario por script, sin</text>
+<text x="804.0" y="334.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">pantalla de administración.</text>
+<rect x="790.0" y="398.0" width="356.8" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="424.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Empleado hasta ENTREGADO;</text>
+<text x="804.0" y="452.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">CANCELADO solo del Gerente.</text>
+<rect x="790.0" y="648.0" width="351.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="674.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Se anota al crear el pedido;</text>
+<text x="804.0" y="702.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">editarla después: solo Gerente.</text>
+<path d="M1682.0,980.0 L1568.0,980.0 L1568.0,1452.0 L118.0,1452.0 L118.0,790.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="118.0,748.0 96.0,790.0 140.0,790.0" fill="#ffffff" stroke="#1f2937" stroke-width="2.8"/>
+<text x="890.0" y="1436.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#64748b" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">generalización</text>
 <rect x="30.0" y="1514.0" width="1740.0" height="136.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
 <text x="48.0" y="1550.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start">Convenciones</text>
 <rect x="48.0" y="1576.0" width="28.0" height="20.0" rx="4" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2"/>
