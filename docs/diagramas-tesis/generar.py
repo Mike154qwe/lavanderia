@@ -221,9 +221,9 @@ def fig01() -> tuple[SVG, int, int]:
     g.zone(30, 214, 1740, 430, "Esperanza", "Mostrador", GREEN_BG, GREEN)
     g.zone(30, 654, 1740, 560, "Diego", "Producción y caja", GREEN_BG, GREEN)
 
-    # Cliente
-    c_deja = g.box(310, 78, 270, 100, "Deja las prendas", "en el mostrador", GRAY, GRAY_BG)
-    c_recoge = g.box(1455, 78, 290, 100, "Regresa a recoger", "paga al llevarse", GRAY, GRAY_BG)
+    # Cliente — cajas más anchas/altas para que título y subtítulo no toquen el borde
+    c_deja = g.box(280, 68, 340, 118, "Deja las prendas", "en el mostrador", GRAY, GRAY_BG)
+    c_recoge = g.box(1395, 68, 350, 118, "Regresa a recoger", "paga al llevarse", GRAY, GRAY_BG)
 
     # Esperanza fila 1: pasos 1–4
     b1 = g.box(310, 268, 248, 128, "1. Recepción y clasificación", "marca la prenda", GREEN, GREEN_BG)
@@ -240,12 +240,12 @@ def fig01() -> tuple[SVG, int, int]:
     b6 = g.box(1095, 722, 270, 128, "6. Acoplado", "con el recibo", RED, RED_BG)
 
     # Diego fila 2: 9, ¿Cuadra?, Archiva
-    b9 = g.box(1240, 930, 255, 128, "9. Cierre de caja", "suma a mano", RED, RED_BG)
-    d10 = g.diamond(1635, 994, 210, 128, "¿Cuadra?", "paso 10", RED, RED_BG)
-    arch = g.box(1510, 1128, 250, 70, "Archiva el cierre", "", GREEN, GREEN_BG, title_size=27, sub_size=23)
+    b9 = g.box(1220, 948, 255, 128, "9. Cierre de caja", "suma a mano", RED, RED_BG)
+    d10 = g.diamond(1630, 1012, 280, 170, "¿Cuadra?", "paso 10", RED, RED_BG)
+    arch = g.box(1505, 1150, 250, 70, "Archiva el cierre", "", GREEN, GREEN_BG, title_size=27, sub_size=23)
 
-    # Etiqueta de confusión (bajo el paso 6, lejos de 8→9)
-    g.label(830, 878, "la confusión se detecta aquí", 26, RED, "start")
+    # Etiqueta de confusión, centrada debajo del paso 6
+    g.label(b6["cx"], b6["s"][1] + 30, "la confusión se detecta aquí", 26, RED, "middle")
 
     # Flechas — flujo principal, sin cruces
     g.arrow([c_deja["s"], b1["n"]])                                          # deja → 1
@@ -279,31 +279,31 @@ def fig01() -> tuple[SVG, int, int]:
         b8["n"],
     ])
 
-    # 8 → 9 por el canal derecho, horizontal a y=915 (bajo la etiqueta del 6)
+    # 8 → 9 por el canal derecho, por encima del rombo
     g.arrow([
         b8["e"],
         (1768, b8["cy"]),
-        (1768, 915),
-        (b9["cx"], 915),
+        (1768, 922),
+        (b9["cx"], 922),
         b9["n"],
     ])
     g.arrow([b9["e"], d10["we"]])                                            # 9 → 10
 
     # 10 sí → Archiva
     g.arrow([d10["s"], arch["n"]])
-    g.label(1635, 1112, "sí", 26, GREEN)
+    g.label(d10["cx"] + 36, d10["s"][1] + 18, "sí", 26, GREEN)
 
     # 10 no → 9, U por debajo, punteada roja
     g.arrow(
         [
-            (d10["we"][0], d10["cy"] + 28),
-            (d10["we"][0] - 10, 1108),
-            (b9["cx"], 1108),
+            (d10["we"][0], d10["cy"] + 36),
+            (d10["we"][0] - 16, 1138),
+            (b9["cx"], 1138),
             b9["s"],
         ],
         color=RED, dashed=True, marker="m-red",
     )
-    g.label(1410, 1096, "no", 26, RED)
+    g.label(1390, 1124, "no", 26, RED)
 
     # Notas
     g.note(
@@ -383,9 +383,9 @@ def fig02() -> tuple[SVG, int, int]:
     ger = stick(g, 1682, 760, "Gerente", "también opera", GRAY, GRAY_BG)
     cli = stick(g, 1682, 1188, "Cliente", "dueño de las prendas", GRAY, GRAY_BG)
 
-    left_x, right_x = 520, 1330
+    left_x, right_x = 522, 1288
     rx, ry = 180, 50
-    y0, gap = 168, 126
+    y0, gap = 168, 132
     left_items = [
         (0, "Registrar pedido", "RF01"),
         (1, "Calcular valor con tarifario", "RF02"),
@@ -403,11 +403,20 @@ def fig02() -> tuple[SVG, int, int]:
         (7, "Pedidos antiguos y aviso", "RF11"),
         (8, "Consultar panel remoto", "RF12"),
     ]
+    # Elipses más anchas para los títulos largos (una línea, con margen al borde)
+    oval_size = {
+        "RF02": (238, 56),
+        "RF03": (242, 56),
+        "RF07": (242, 56),
+        "RF11": (220, 56),
+    }
     L, R = {}, {}
     for i, title, code in left_items:
-        L[code] = oval(g, left_x, y0 + i * gap, rx, ry, title, code, GREEN, GREEN_BG)
+        orx, ory = oval_size.get(code, (rx, ry))
+        L[code] = oval(g, left_x, y0 + i * gap, orx, ory, title, code, GREEN, GREEN_BG)
     for i, title, code in right_items:
-        R[code] = oval(g, right_x, y0 + i * gap, rx, ry, title, code, PURPLE, PURPLE_BG)
+        orx, ory = oval_size.get(code, (rx, ry))
+        R[code] = oval(g, right_x, y0 + i * gap, orx, ory, title, code, PURPLE, PURPLE_BG)
 
     bus_e = 250
     g.line([(emp["cx"] + 40, emp["y"] + 62), (bus_e, emp["y"] + 62)], GRAY, width=2.6)
@@ -421,12 +430,14 @@ def fig02() -> tuple[SVG, int, int]:
     for code in ["RF09", "RF10", "RF11", "RF12"]:
         g.line([(bus_g, R[code]["cy"]), R[code]["e"]], GRAY, width=2.6)
 
-    # Cliente ⋯ RF10: entra por abajo y sube por la izquierda de la columna derecha
-    inner = 1108
+    # Cliente ⋯ RF10: pasa bajo RF12, a la izquierda de RF11, y entra a RF10
+    inner = R["RF11"]["we"][0] - 30
+    under = R["RF12"]["s"][1] + 26
     g.line(
         [
             (cli["cx"] - 40, cli["y"] + 62),
-            (inner, cli["y"] + 62),
+            (cli["cx"] - 40, under),
+            (inner, under),
             (inner, R["RF10"]["cy"]),
             R["RF10"]["we"],
         ],
@@ -436,7 +447,7 @@ def fig02() -> tuple[SVG, int, int]:
     g.arrow([L["RF01"]["s"], L["RF02"]["n"]], color=DARK, dashed=True, marker="m-dark")
     g.label(L["RF01"]["e"][0] + 14, (L["RF01"]["s"][1] + L["RF02"]["n"][1]) / 2 + 8, "«include»", 26, DARK, "start")
 
-    nx = 720
+    nx = 790
     callout(g, nx, L["RF02"]["cy"] - 20, [
         "Tarifario por script, sin",
         "pantalla de administración.",
@@ -450,14 +461,29 @@ def fig02() -> tuple[SVG, int, int]:
         "editarla después: solo Gerente.",
     ], RED, RED_BG)
 
-    # Generalización Gerente → Empleado (triángulo hueco a la izquierda)
-    gy = 1460
-    g.line([(ger["cx"], gy), (158, gy)], DARK, width=3.2)
-    g.add(
-        f'<polygon points="112,{gy} 160,{gy - 18} 160,{gy + 18}" fill="#ffffff" '
-        f'stroke="{DARK}" stroke-width="2.6"/>'
+    # Generalización Gerente → Empleado: sale del Gerente, pasa bajo el límite
+    # del sistema y termina con triángulo hueco en el Empleado.
+    gy = 1452
+    gx = 1568
+    tip_y = emp["y"] + 228
+    base_y = tip_y + 42
+    g.line(
+        [
+            (ger["cx"], ger["y"] + 220),
+            (gx, ger["y"] + 220),
+            (gx, gy),
+            (emp["cx"], gy),
+            (emp["cx"], base_y),
+        ],
+        DARK,
+        width=3.2,
     )
-    g.label(890, 1444, "generalización", 26, MUTED)
+    g.add(
+        f'<polygon points="{emp["cx"]:.1f},{tip_y:.1f} '
+        f'{emp["cx"] - 22:.1f},{base_y:.1f} {emp["cx"] + 22:.1f},{base_y:.1f}" '
+        f'fill="#ffffff" stroke="{DARK}" stroke-width="2.8"/>'
+    )
+    g.label(890, 1436, "generalización", 26, MUTED)
 
     g.rect(30, 1514, 1740, 136, "#ffffff", "#94a3b8", sw=2, rx=12)
     g.text(48, 1550, "Convenciones", 26, True, DARK)
@@ -752,8 +778,18 @@ def fig07() -> tuple[SVG, int, int]:
     g.arrow([es2["n"], cl2["s"]])
 
     g.arrow([cl3["s"], es3["n"]])
-    g.arrow([es3["s"], sy4["n"]])
-    g.label(1754, 615, "registra el pago", 26, DARK, "end")
+    # Entrega y cobro → Pago y ENTREGADO: rodea Cierre de caja por la izquierda
+    bypass = x4 - 72
+    g.arrow([
+        es3["s"],
+        (es3["cx"], 372),
+        (bypass, 372),
+        (bypass, sy4["cy"]),
+        sy4["we"],
+    ])
+    # Dentro del carril de Diego, a la izquierda del desvío y de Cierre de caja
+    g.label(1258, 496, "registra el", 26, DARK, "middle")
+    g.label(1258, 524, "pago", 26, DARK, "middle")
 
     # Cierre → totales por el canal derecho (no atraviesa Pago y ENTREGADO)
     g.arrow([
