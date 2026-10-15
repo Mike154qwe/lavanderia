@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1500" viewBox="0 0 1800 1500">
+<rect width="1800" height="1500" fill="#ffffff"/>
+<defs>
+  <marker id="m-dark" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#1f2937"/>
+  </marker>
+  <marker id="m-orange" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#c2410c"/>
+  </marker>
+  <marker id="m-red" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#be123c"/>
+  </marker>
+  <marker id="m-green" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#0f7b55"/>
+  </marker>
+  <marker id="m-purple" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#6d28d9"/>
+  </marker>
+  <marker id="m-gray" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#334155"/>
+  </marker>
+  <marker id="m-gen" markerWidth="18" markerHeight="14" refX="17" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L17,7 L1,13 Z" fill="#ffffff" stroke="#1f2937" stroke-width="1.8"/>
+  </marker></defs>
+<rect x="250.0" y="40.0" width="990.0" height="1088.0" rx="16" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="268.0" y="72.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="start">ESTADOS</text>
+<text x="417.8" y="72.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· camino principal</text>
+<rect x="510.0" y="90.0" width="360.0" height="130.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="690.0" y="149.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">RECIBIDO</text>
+<text x="690.0" y="185.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">pedido registrado</text>
+<rect x="510.0" y="320.0" width="360.0" height="130.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="690.0" y="379.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">EN_PROCESO</text>
+<text x="690.0" y="415.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">lavado / planchado</text>
+<rect x="510.0" y="550.0" width="360.0" height="130.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="690.0" y="609.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">LISTO</text>
+<text x="690.0" y="645.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">espera al cliente</text>
+<rect x="510.0" y="980.0" width="360.0" height="130.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="690.0" y="1039.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">ENTREGADO</text>
+<text x="690.0" y="1075.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">salida</text>
+<rect x="1320.0" y="320.0" width="360.0" height="130.0" rx="12" fill="#fff1f2" stroke="#be123c" stroke-width="3"/>
+<text x="1500.0" y="379.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">CANCELADO</text>
+<text x="1500.0" y="415.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">solo el Gerente</text>
+<path d="M690.0,220.0 L690.0,320.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<text x="700.0" y="268.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Marcar en proceso</text>
+<path d="M690.0,450.0 L690.0,550.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<text x="700.0" y="498.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Marcar listo</text>
+<path d="M510.0,155.0 L360.0,155.0 L360.0,615.0 L510.0,615.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<text x="360.0" y="400.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Marcar listo</text>
+<text x="360.0" y="428.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#64748b" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">directo</text>
+<path d="M870.0,155.0 L1180.0,155.0 L1180.0,345.0 L1320.0,345.0" fill="none" stroke="#be123c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-red)"/>
+<path d="M870.0,385.0 L1320.0,385.0" fill="none" stroke="#be123c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-red)"/>
+<path d="M870.0,615.0 L1180.0,615.0 L1180.0,425.0 L1320.0,425.0" fill="none" stroke="#be123c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-red)"/>
+<text x="1000.0" y="168.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#be123c" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Cancelar pedido</text>
+<text x="1008.0" y="304.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#be123c" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Cancelar pedido</text>
+<text x="1000.0" y="598.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#be123c" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Cancelar pedido</text>
+<path d="M690.0,680.0 L690.0,980.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<text x="700.0" y="800.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Entregar  [saldo = 0]</text>
+<path d="M560.0,680.0 L560.0,780.0 L440.0,780.0 L440.0,1045.0 L510.0,1045.0" fill="none" stroke="#c2410c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-orange)"/>
+<text x="268.0" y="770.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Cambio manual</text>
+<text x="268.0" y="798.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">de estado</text>
+<path d="M820.0,680.0 L820.0,820.0 L980.0,820.0 L980.0,1045.0 L870.0,1045.0" fill="none" stroke="#c2410c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-orange)"/>
+<text x="1000.0" y="808.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">Entrega parcial que</text>
+<text x="1000.0" y="836.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">completa todas las prendas</text>
+<rect x="430.0" y="1140.0" width="1330.0" height="140.0" rx="12" fill="#fff4ec" stroke="#c2410c" stroke-width="2.5"/>
+<text x="448.0" y="1176.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start">Nota</text>
+<text x="448.0" y="1208.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Los caminos punteados no validan el saldo pendiente (confirmado en el código del prototipo).</text>
+<text x="448.0" y="1238.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">La entrega parcial sí exige un abono si hay saldo, pero no exige que ese abono deje el saldo en cero.</text>
+<rect x="30.0" y="1310.0" width="1740.0" height="160.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="48.0" y="1348.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start">Convenciones</text>
+<rect x="48.0" y="1370.0" width="28.0" height="20.0" rx="4" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2"/>
+<text x="88.0" y="1388.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Estado del pedido</text>
+<rect x="380.0" y="1370.0" width="28.0" height="20.0" rx="4" fill="#fff1f2" stroke="#be123c" stroke-width="2"/>
+<text x="420.0" y="1388.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Cancelación (solo Gerente)</text>
+<line x1="820" y1="1380" x2="890" y2="1380" stroke="#1f2937" stroke-width="3.2" marker-end="url(#m-dark)"/>
+<text x="900.0" y="1388.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">valida saldo = 0</text>
+<line x1="1200" y1="1380" x2="1270" y2="1380" stroke="#c2410c" stroke-width="3.2" stroke-dasharray="8 6" marker-end="url(#m-orange)"/>
+<text x="1280.0" y="1388.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">no valida el saldo</text>
+<line x1="48" y1="1434" x2="118" y2="1434" stroke="#be123c" stroke-width="3.2" stroke-dasharray="8 6" marker-end="url(#m-red)"/>
+<text x="128.0" y="1440.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">cancelar desde RECIBIDO, EN_PROCESO o LISTO</text>
+</svg>

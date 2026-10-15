@@ -1,0 +1,278 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1760" viewBox="0 0 1800 1760">
+<rect width="1800" height="1760" fill="#ffffff"/>
+<defs>
+  <marker id="m-dark" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#1f2937"/>
+  </marker>
+  <marker id="m-orange" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#c2410c"/>
+  </marker>
+  <marker id="m-red" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#be123c"/>
+  </marker>
+  <marker id="m-green" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#0f7b55"/>
+  </marker>
+  <marker id="m-purple" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#6d28d9"/>
+  </marker>
+  <marker id="m-gray" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#334155"/>
+  </marker>
+  <marker id="m-gen" markerWidth="18" markerHeight="14" refX="17" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L17,7 L1,13 Z" fill="#ffffff" stroke="#1f2937" stroke-width="1.8"/>
+  </marker></defs>
+<rect x="50.0" y="48.0" width="500.0" height="204.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M50,60 Q50,48 62,48 H538 Q550,48 550,60 V92 H50 Z" fill="#eaf7f0"/>
+<text x="300.0" y="78.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">Cliente</text>
+<text x="62.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="538.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="51.5" y="124" width="497" height="32" fill="#f8fafc"/>
+<text x="62.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">nombre</text>
+<text x="538.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="62.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">telefono</text>
+<text x="538.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<rect x="51.5" y="188" width="497" height="32" fill="#f8fafc"/>
+<text x="62.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">direccion</text>
+<text x="538.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<text x="62.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">sedeId  FK</text>
+<text x="538.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="650.0" y="48.0" width="500.0" height="300.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M650,60 Q650,48 662,48 H1138 Q1150,48 1150,60 V92 H650 Z" fill="#eaf7f0"/>
+<text x="900.0" y="78.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">Pedido</text>
+<text x="662.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1138.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="651.5" y="124" width="497" height="32" fill="#f8fafc"/>
+<text x="662.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">clienteId  FK</text>
+<text x="1138.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="662.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">sedeId  FK</text>
+<text x="1138.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="651.5" y="188" width="497" height="32" fill="#f8fafc"/>
+<text x="662.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">servicio</text>
+<text x="1138.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="662.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">total</text>
+<text x="1138.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="651.5" y="252" width="497" height="32" fill="#f8fafc"/>
+<text x="662.0" y="274.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">estado</text>
+<text x="1138.0" y="274.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="662.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">observacion</text>
+<text x="1138.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<rect x="651.5" y="316" width="497" height="32" fill="#f8fafc"/>
+<text x="662.0" y="338.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">createdAt</text>
+<text x="1138.0" y="338.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">DateTime</text>
+<rect x="1250.0" y="48.0" width="500.0" height="268.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M1250,60 Q1250,48 1262,48 H1738 Q1750,48 1750,60 V92 H1250 Z" fill="#eaf7f0"/>
+<text x="1500.0" y="78.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">Prenda</text>
+<text x="1262.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1738.0" y="114.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="1251.5" y="124" width="497" height="32" fill="#f8fafc"/>
+<text x="1262.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">pedidoId  FK</text>
+<text x="1738.0" y="146.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="1262.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">tipo</text>
+<text x="1738.0" y="178.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<rect x="1251.5" y="188" width="497" height="32" fill="#f8fafc"/>
+<text x="1262.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">servicio</text>
+<text x="1738.0" y="210.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="1262.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">cantidad</text>
+<text x="1738.0" y="242.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="1251.5" y="252" width="497" height="32" fill="#f8fafc"/>
+<text x="1262.0" y="274.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">valor</text>
+<text x="1738.0" y="274.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="1262.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">descripcion</text>
+<text x="1738.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<rect x="50.0" y="340.0" width="500.0" height="140.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M50,352 Q50,340 62,340 H538 Q550,340 550,352 V384 H50 Z" fill="#eaf7f0"/>
+<text x="300.0" y="370.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">Sede</text>
+<text x="62.0" y="406.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="538.0" y="406.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="51.5" y="416" width="497" height="32" fill="#f8fafc"/>
+<text x="62.0" y="438.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">nombre</text>
+<text x="538.0" y="438.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="62.0" y="470.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">direccion</text>
+<text x="538.0" y="470.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<rect x="640.0" y="455.0" width="240.0" height="204.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M640,467 Q640,455 652,455 H868 Q880,455 880,467 V499 H640 Z" fill="#eaf7f0"/>
+<text x="760.0" y="485.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">Pago</text>
+<text x="652.0" y="521.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="868.0" y="521.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="531" width="237" height="32" fill="#f8fafc"/>
+<text x="652.0" y="553.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">pedidoId  FK</text>
+<text x="868.0" y="553.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="652.0" y="585.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">valor</text>
+<text x="868.0" y="585.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="595" width="237" height="32" fill="#f8fafc"/>
+<text x="652.0" y="617.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">metodo</text>
+<text x="868.0" y="617.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="652.0" y="649.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">createdAt</text>
+<text x="868.0" y="649.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">DateTime</text>
+<rect x="920.0" y="455.0" width="250.0" height="172.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M920,467 Q920,455 932,455 H1158 Q1170,455 1170,467 V499 H920 Z" fill="#eaf7f0"/>
+<text x="1045.0" y="485.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">HistorialEstado</text>
+<text x="932.0" y="521.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1158.0" y="521.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="921.5" y="531" width="247" height="32" fill="#f8fafc"/>
+<text x="932.0" y="553.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">pedidoId  FK</text>
+<text x="1158.0" y="553.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="932.0" y="585.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">estado</text>
+<text x="1158.0" y="585.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<rect x="921.5" y="595" width="247" height="32" fill="#f8fafc"/>
+<text x="932.0" y="617.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">createdAt</text>
+<text x="1158.0" y="617.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">DateTime</text>
+<rect x="1250.0" y="420.0" width="500.0" height="204.0" rx="12" fill="#ffffff" stroke="#0f7b55" stroke-width="3"/>
+<path d="M1250,432 Q1250,420 1262,420 H1738 Q1750,420 1750,432 V464 H1250 Z" fill="#eaf7f0"/>
+<text x="1500.0" y="450.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#0f7b55" text-anchor="middle">EntregaParcial</text>
+<text x="1262.0" y="486.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1738.0" y="486.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="1251.5" y="496" width="497" height="32" fill="#f8fafc"/>
+<text x="1262.0" y="518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">pedidoId  FK</text>
+<text x="1738.0" y="518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="1262.0" y="550.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">prendaId  FK</text>
+<text x="1738.0" y="550.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="1251.5" y="560" width="497" height="32" fill="#f8fafc"/>
+<text x="1262.0" y="582.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">cantidad</text>
+<text x="1738.0" y="582.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="1262.0" y="614.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">observacion</text>
+<text x="1738.0" y="614.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<rect x="30.0" y="800.0" width="1740.0" height="600.0" rx="16" fill="#f3efff" stroke="#6d28d9" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="832.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#6d28d9" text-anchor="start">ENTIDADES DE APOYO</text>
+<text x="367.8" y="832.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· no forman el núcleo transaccional</text>
+<rect x="60.0" y="892.0" width="520.0" height="268.0" rx="12" fill="#ffffff" stroke="#6d28d9" stroke-width="3"/>
+<path d="M60,904 Q60,892 72,892 H568 Q580,892 580,904 V936 H60 Z" fill="#f3efff"/>
+<text x="320.0" y="922.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#6d28d9" text-anchor="middle">GastoCaja</text>
+<text x="72.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="568.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="61.5" y="968" width="517" height="32" fill="#f8fafc"/>
+<text x="72.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">sedeId  FK</text>
+<text x="568.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="72.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">tipo</text>
+<text x="568.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<rect x="61.5" y="1032" width="517" height="32" fill="#f8fafc"/>
+<text x="72.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">valor</text>
+<text x="568.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="72.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">metodo</text>
+<text x="568.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<rect x="61.5" y="1096" width="517" height="32" fill="#f8fafc"/>
+<text x="72.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">responsable</text>
+<text x="568.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String?</text>
+<text x="72.0" y="1150.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">createdAt</text>
+<text x="568.0" y="1150.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">DateTime</text>
+<rect x="640.0" y="892.0" width="520.0" height="332.0" rx="12" fill="#ffffff" stroke="#6d28d9" stroke-width="3"/>
+<path d="M640,904 Q640,892 652,892 H1148 Q1160,892 1160,904 V936 H640 Z" fill="#f3efff"/>
+<text x="900.0" y="922.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#6d28d9" text-anchor="middle">CierreCaja</text>
+<text x="652.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1148.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="968" width="517" height="32" fill="#f8fafc"/>
+<text x="652.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#1d4ed8" text-anchor="start">sedeId  FK</text>
+<text x="1148.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="652.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">efectivo</text>
+<text x="1148.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="1032" width="517" height="32" fill="#f8fafc"/>
+<text x="652.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">nequi</text>
+<text x="1148.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="652.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">daviplata</text>
+<text x="1148.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="1096" width="517" height="32" fill="#f8fafc"/>
+<text x="652.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">transferencia</text>
+<text x="1148.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="652.0" y="1150.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">tarjeta</text>
+<text x="1148.0" y="1150.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="641.5" y="1160" width="517" height="32" fill="#f8fafc"/>
+<text x="652.0" y="1182.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">gastos / totalCaja</text>
+<text x="1148.0" y="1182.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="652.0" y="1214.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">createdAt</text>
+<text x="1148.0" y="1214.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">DateTime</text>
+<rect x="1220.0" y="892.0" width="520.0" height="204.0" rx="12" fill="#ffffff" stroke="#6d28d9" stroke-width="3"/>
+<path d="M1220,904 Q1220,892 1232,892 H1728 Q1740,892 1740,904 V936 H1220 Z" fill="#f3efff"/>
+<text x="1480.0" y="922.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#6d28d9" text-anchor="middle">Tarifario</text>
+<text x="1232.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#c2410c" text-anchor="start">id  PK</text>
+<text x="1728.0" y="958.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<rect x="1221.5" y="968" width="517" height="32" fill="#f8fafc"/>
+<text x="1232.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">categoria</text>
+<text x="1728.0" y="990.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<text x="1232.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">item</text>
+<text x="1728.0" y="1022.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">String</text>
+<rect x="1221.5" y="1032" width="517" height="32" fill="#f8fafc"/>
+<text x="1232.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">precioMin</text>
+<text x="1728.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int</text>
+<text x="1232.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">precioMax</text>
+<text x="1728.0" y="1086.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="end">Int?</text>
+<rect x="1220.0" y="1170.0" width="520.0" height="200.0" rx="12" fill="#fff4ec" stroke="#c2410c" stroke-width="2.5"/>
+<text x="1238.0" y="1206.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="start">Nota del Tarifario</text>
+<text x="1238.0" y="1238.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Sin relación formal con Prenda: el valor</text>
+<text x="1238.0" y="1268.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">se asigna por coincidencia de texto (RF02).</text>
+<text x="1238.0" y="1298.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Único junto (categoría + ítem).</text>
+<path d="M550.0,150.0 L650.0,150.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="556.0" y1="142.0" x2="556.0" y2="158.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="562.0" y1="142.0" x2="562.0" y2="158.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="150.0" x2="650.0" y2="141.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="150.0" x2="650.0" y2="150.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="150.0" x2="650.0" y2="159.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M1150.0,182.0 L1250.0,182.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1156.0" y1="174.0" x2="1156.0" y2="190.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1162.0" y1="174.0" x2="1162.0" y2="190.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="182.0" x2="1250.0" y2="173.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="182.0" x2="1250.0" y2="182.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="182.0" x2="1250.0" y2="191.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M760.0,348.0 L760.0,455.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="768.0" y1="354.0" x2="752.0" y2="354.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="768.0" y1="360.0" x2="752.0" y2="360.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="760.0" y1="439.0" x2="769.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="760.0" y1="439.0" x2="760.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="760.0" y1="439.0" x2="751.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M1045.0,348.0 L1045.0,455.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1053.0" y1="354.0" x2="1037.0" y2="354.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1053.0" y1="360.0" x2="1037.0" y2="360.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1045.0" y1="439.0" x2="1054.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1045.0" y1="439.0" x2="1045.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1045.0" y1="439.0" x2="1036.0" y2="455.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M1500.0,316.0 L1500.0,420.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1508.0" y1="322.0" x2="1492.0" y2="322.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1508.0" y1="328.0" x2="1492.0" y2="328.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1500.0" y1="404.0" x2="1509.0" y2="420.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1500.0" y1="404.0" x2="1500.0" y2="420.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1500.0" y1="404.0" x2="1491.0" y2="420.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M1150.0,324.0 L1214.0,324.0 L1214.0,522.0 L1250.0,522.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1156.0" y1="316.0" x2="1156.0" y2="332.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1162.0" y1="316.0" x2="1162.0" y2="332.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="522.0" x2="1250.0" y2="513.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="522.0" x2="1250.0" y2="522.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="1234.0" y1="522.0" x2="1250.0" y2="531.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M160.0,340.0 L160.0,252.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="152.0" y1="334.0" x2="168.0" y2="334.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="152.0" y1="328.0" x2="168.0" y2="328.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="160.0" y1="268.0" x2="151.0" y2="252.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="160.0" y1="268.0" x2="160.0" y2="252.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="160.0" y1="268.0" x2="169.0" y2="252.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M550.0,410.0 L622.0,410.0 L622.0,318.0 L650.0,318.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="556.0" y1="402.0" x2="556.0" y2="418.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="562.0" y1="402.0" x2="562.0" y2="418.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="318.0" x2="650.0" y2="309.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="318.0" x2="650.0" y2="318.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="634.0" y1="318.0" x2="650.0" y2="327.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M300.0,480.0 L300.0,862.0 L320.0,862.0 L320.0,892.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="308.0" y1="486.0" x2="292.0" y2="486.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="308.0" y1="492.0" x2="292.0" y2="492.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="320.0" y1="876.0" x2="329.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="320.0" y1="876.0" x2="320.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="320.0" y1="876.0" x2="311.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M320.0,862.0 L900.0,862.0 L900.0,892.0" fill="none" stroke="#1f2937" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="900.0" y1="876.0" x2="909.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="900.0" y1="876.0" x2="900.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="900.0" y1="876.0" x2="891.0" y2="892.0" stroke="#1f2937" stroke-width="2.6" stroke-linecap="round"/>
+<rect x="50.0" y="1430.0" width="1120.0" height="290.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="68.0" y="1468.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start">Convenciones</text>
+<rect x="68.0" y="1494.0" width="28.0" height="20.0" rx="4" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2"/>
+<text x="108.0" y="1512.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Núcleo transaccional</text>
+<rect x="420.0" y="1494.0" width="28.0" height="20.0" rx="4" fill="#f3efff" stroke="#6d28d9" stroke-width="2"/>
+<text x="460.0" y="1512.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Entidades de apoyo</text>
+<text x="68.0" y="1560.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">PK  en naranja     FK  en azul</text>
+<text x="68.0" y="1600.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Pata de gallo:  ||  uno y solo uno          &gt;  muchos</text>
+<text x="68.0" y="1644.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">Sede se relaciona con Cliente, Pedido, GastoCaja y CierreCaja (bus inferior).</text>
+</svg>
