@@ -38,9 +38,9 @@
 <rect x="30.0" y="654.0" width="1740.0" height="560.0" rx="16" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
 <text x="48.0" y="686.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="start">DIEGO</text>
 <text x="157.8" y="686.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· Producción y caja</text>
-<rect x="280.0" y="68.0" width="340.0" height="118.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
-<text x="450.0" y="121.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Deja las prendas</text>
-<text x="450.0" y="157.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">en el mostrador</text>
+<rect x="280.0" y="90.0" width="340.0" height="108.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<text x="450.0" y="138.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Deja las prendas</text>
+<text x="450.0" y="174.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">en el mostrador</text>
 <rect x="1395.0" y="68.0" width="350.0" height="118.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
 <text x="1570.0" y="121.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Regresa a recoger</text>
 <text x="1570.0" y="157.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">paga al llevarse</text>
@@ -85,7 +85,7 @@
 <rect x="1505.0" y="1150.0" width="250.0" height="70.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
 <text x="1630.0" y="1192.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Archiva el cierre</text>
 <text x="1230.0" y="880.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#be123c" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">la confusión se detecta aquí</text>
-<path d="M450.0,186.0 L434.0,268.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M450.0,198.0 L434.0,268.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M558.0,332.0 L565.0,332.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M810.0,332.0 L830.0,332.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M1075.0,332.0 L1095.0,332.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>

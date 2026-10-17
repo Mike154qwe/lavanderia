@@ -91,8 +91,7 @@
 <path d="M1160.0,238.0 L1160.0,160.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M1560.0,160.0 L1560.0,238.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M1560.0,358.0 L1560.0,372.0 L1348.0,372.0 L1348.0,705.0 L1420.0,705.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
-<text x="1258.0" y="496.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">registra el</text>
-<text x="1258.0" y="524.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">pago</text>
+<text x="1358.0" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">registra el pago</text>
 <path d="M1700.0,503.0 L1756.0,503.0 L1756.0,885.0 L1700.0,885.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
 <path d="M1420.0,885.0 L1300.0,885.0" fill="none" stroke="#c2410c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-orange)"/>
 <text x="1398.0" y="816.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="end" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">usa internet</text>

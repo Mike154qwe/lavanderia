@@ -118,7 +118,7 @@
 <rect x="790.0" y="648.0" width="351.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
 <text x="804.0" y="674.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Se anota al crear el pedido;</text>
 <text x="804.0" y="702.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">editarla después: solo Gerente.</text>
-<path d="M1682.0,980.0 L1568.0,980.0 L1568.0,1452.0 L118.0,1452.0 L118.0,790.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1682.0,980.0 L1544.0,980.0 L1544.0,1452.0 L118.0,1452.0 L118.0,790.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
 <polygon points="118.0,748.0 96.0,790.0 140.0,790.0" fill="#ffffff" stroke="#1f2937" stroke-width="2.8"/>
 <text x="890.0" y="1436.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#64748b" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">generalización</text>
 <rect x="30.0" y="1514.0" width="1740.0" height="136.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
