@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1680" viewBox="0 0 1800 1680">
+<rect width="1800" height="1680" fill="#ffffff"/>
+<defs>
+  <marker id="m-dark" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#1f2937"/>
+  </marker>
+  <marker id="m-orange" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#c2410c"/>
+  </marker>
+  <marker id="m-red" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#be123c"/>
+  </marker>
+  <marker id="m-green" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#0f7b55"/>
+  </marker>
+  <marker id="m-purple" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#6d28d9"/>
+  </marker>
+  <marker id="m-gray" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#334155"/>
+  </marker>
+  <marker id="m-gen" markerWidth="18" markerHeight="14" refX="17" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L17,7 L1,13 Z" fill="#ffffff" stroke="#1f2937" stroke-width="1.8"/>
+  </marker></defs>
+<rect x="250.0" y="36.0" width="1280.0" height="1396.0" rx="18" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+<text x="890.0" y="74.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="middle">LÍMITE DEL SISTEMA</text>
+<text x="890.0" y="104.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">· prototipo local-first</text>
+<circle cx="118" cy="542" r="22" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<line x1="118" y1="564" x2="118" y2="628" stroke="#334155" stroke-width="3"/>
+<line x1="84" y1="582" x2="152" y2="582" stroke="#334155" stroke-width="3"/>
+<line x1="118" y1="628" x2="90" y2="670" stroke="#334155" stroke-width="3"/>
+<line x1="118" y1="628" x2="146" y2="670" stroke="#334155" stroke-width="3"/>
+<text x="118.0" y="698.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#334155" text-anchor="middle">Empleado</text>
+<text x="118.0" y="726.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">mostrador</text>
+<circle cx="1682" cy="782" r="22" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="804" x2="1682" y2="868" stroke="#334155" stroke-width="3"/>
+<line x1="1648" y1="822" x2="1716" y2="822" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="868" x2="1654" y2="910" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="868" x2="1710" y2="910" stroke="#334155" stroke-width="3"/>
+<text x="1682.0" y="938.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#334155" text-anchor="middle">Gerente</text>
+<text x="1682.0" y="966.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">también opera</text>
+<circle cx="1682" cy="1210" r="22" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="1232" x2="1682" y2="1296" stroke="#334155" stroke-width="3"/>
+<line x1="1648" y1="1250" x2="1716" y2="1250" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="1296" x2="1654" y2="1338" stroke="#334155" stroke-width="3"/>
+<line x1="1682" y1="1296" x2="1710" y2="1338" stroke="#334155" stroke-width="3"/>
+<text x="1682.0" y="1366.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#334155" text-anchor="middle">Cliente</text>
+<text x="1682.0" y="1394.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">dueño de las prendas</text>
+<ellipse cx="522" cy="168" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="160.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar pedido</text>
+<text x="522.0" y="194.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF01</text>
+<ellipse cx="522" cy="300" rx="238" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="292.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Calcular valor con tarifario</text>
+<text x="522.0" y="326.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF02</text>
+<ellipse cx="522" cy="432" rx="242" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="424.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Actualizar estado del pedido</text>
+<text x="522.0" y="458.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF03</text>
+<ellipse cx="522" cy="564" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="556.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar abono</text>
+<text x="522.0" y="590.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF04</text>
+<ellipse cx="522" cy="696" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="674.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar</text>
+<text x="522.0" y="704.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">observaciones</text>
+<text x="522.0" y="732.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF05</text>
+<ellipse cx="522" cy="828" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="820.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Buscar pedido</text>
+<text x="522.0" y="854.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF06</text>
+<ellipse cx="522" cy="960" rx="242" ry="56" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="952.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar historial del cliente</text>
+<text x="522.0" y="986.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF07</text>
+<ellipse cx="522" cy="1092" rx="180" ry="50" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="522.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Registrar gasto</text>
+<text x="522.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF08</text>
+<ellipse cx="1288" cy="828" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="820.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Generar cierre de caja</text>
+<text x="1288.0" y="854.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF09</text>
+<ellipse cx="1288" cy="960" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="952.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Notificar pedido listo</text>
+<text x="1288.0" y="986.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF10</text>
+<ellipse cx="1288" cy="1092" rx="220" ry="56" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Pedidos antiguos y aviso</text>
+<text x="1288.0" y="1118.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF11</text>
+<ellipse cx="1288" cy="1224" rx="180" ry="50" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1288.0" y="1216.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Consultar panel remoto</text>
+<text x="1288.0" y="1250.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">RF12</text>
+<path d="M158.0,582.0 L250.0,582.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,168.0 L250.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,168.0 L342.0,168.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,300.0 L284.0,300.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,432.0 L280.0,432.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,564.0 L342.0,564.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,696.0 L342.0,696.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,828.0 L342.0,828.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,960.0 L280.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M250.0,1092.0 L342.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1642.0,822.0 L1530.0,822.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,828.0 L1530.0,1224.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,828.0 L1468.0,828.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,960.0 L1468.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,1092.0 L1508.0,1092.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1530.0,1224.0 L1468.0,1224.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1642.0,1250.0 L1642.0,1300.0 L1038.0,1300.0 L1038.0,960.0 L1108.0,960.0" fill="none" stroke="#334155" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7"/>
+<path d="M522.0,218.0 L522.0,244.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-dark)"/>
+<text x="716.0" y="239.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">«include»</text>
+<rect x="790.0" y="280.0" width="305.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="306.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Tarifario por script, sin</text>
+<text x="804.0" y="334.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">pantalla de administración.</text>
+<rect x="790.0" y="398.0" width="356.8" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="424.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Empleado hasta ENTREGADO;</text>
+<text x="804.0" y="452.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">CANCELADO solo del Gerente.</text>
+<rect x="790.0" y="648.0" width="351.7" height="74.0" rx="10" fill="#fff1f2" stroke="#be123c" stroke-width="2.4"/>
+<text x="804.0" y="674.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">Se anota al crear el pedido;</text>
+<text x="804.0" y="702.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#be123c" text-anchor="start">editarla después: solo Gerente.</text>
+<path d="M1682.0,980.0 L1544.0,980.0 L1544.0,1452.0 L118.0,1452.0 L118.0,790.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="118.0,748.0 96.0,790.0 140.0,790.0" fill="#ffffff" stroke="#1f2937" stroke-width="2.8"/>
+<text x="890.0" y="1436.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#64748b" text-anchor="middle" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">generalización</text>
+<rect x="30.0" y="1514.0" width="1740.0" height="136.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="48.0" y="1550.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start">Convenciones</text>
+<rect x="48.0" y="1576.0" width="28.0" height="20.0" rx="4" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2"/>
+<text x="88.0" y="1594.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">RF01–RF08 · Empleado (el Gerente los hereda)</text>
+<rect x="720.0" y="1576.0" width="28.0" height="20.0" rx="4" fill="#f3efff" stroke="#6d28d9" stroke-width="2"/>
+<text x="760.0" y="1594.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">RF09–RF12 · solo Gerente</text>
+<rect x="1150.0" y="1576.0" width="28.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+<text x="1190.0" y="1594.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Cliente · punteada solo a RF10</text>
+<text x="48.0" y="1632.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">«include»  RF01 incluye RF02.   Triángulo hueco: el Gerente es un Empleado (bajo el límite).</text>
+</svg>

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1680" viewBox="0 0 1800 1680">
+<rect width="1800" height="1680" fill="#ffffff"/>
+<defs>
+  <marker id="m-dark" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#1f2937"/>
+  </marker>
+  <marker id="m-orange" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#c2410c"/>
+  </marker>
+  <marker id="m-red" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#be123c"/>
+  </marker>
+  <marker id="m-green" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#0f7b55"/>
+  </marker>
+  <marker id="m-purple" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#6d28d9"/>
+  </marker>
+  <marker id="m-gray" markerWidth="14" markerHeight="14" refX="12" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L13,7 L1,13 Z" fill="#334155"/>
+  </marker>
+  <marker id="m-gen" markerWidth="18" markerHeight="14" refX="17" refY="7"
+          orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L17,7 L1,13 Z" fill="#ffffff" stroke="#1f2937" stroke-width="1.8"/>
+  </marker></defs>
+<rect x="30.0" y="30.0" width="1740.0" height="150.0" rx="16" fill="#f1f5f9" stroke="#334155" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="62.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#334155" text-anchor="start">CLIENTE</text>
+<text x="185.2" y="62.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· deja, recibe aviso y recoge</text>
+<rect x="30.0" y="190.0" width="1740.0" height="200.0" rx="16" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="222.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="start">ESPERANZA</text>
+<text x="234.4" y="222.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· Mostrador</text>
+<rect x="30.0" y="400.0" width="1740.0" height="180.0" rx="16" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="start">DIEGO</text>
+<text x="157.8" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· Producción y caja</text>
+<rect x="30.0" y="590.0" width="1740.0" height="430.0" rx="16" fill="#f3efff" stroke="#6d28d9" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="622.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#6d28d9" text-anchor="start">SISTEMA</text>
+<text x="189.6" y="622.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· prototipo local</text>
+<rect x="30.0" y="1030.0" width="1740.0" height="160.0" rx="16" fill="#f1f5f9" stroke="#334155" stroke-width="2.4" stroke-dasharray="9 7" fill-opacity="0.45"/>
+<text x="48.0" y="1062.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#334155" text-anchor="start">GERENTE</text>
+<text x="199.7" y="1062.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">· consulta remota</text>
+<rect x="320.0" y="72.0" width="280.0" height="88.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<text x="460.0" y="123.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Deja las prendas</text>
+<rect x="1020.0" y="72.0" width="280.0" height="88.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<text x="1160.0" y="110.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Recibe el aviso</text>
+<text x="1160.0" y="141.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">WhatsApp</text>
+<rect x="1420.0" y="72.0" width="280.0" height="88.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<text x="1560.0" y="123.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Recoge y paga</text>
+<rect x="320.0" y="238.0" width="280.0" height="120.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="460.0" y="292.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Pedido rápido</text>
+<text x="460.0" y="328.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">valor del tarifario</text>
+<rect x="1020.0" y="238.0" width="280.0" height="120.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="1160.0" y="292.5" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Notificación</text>
+<text x="1160.0" y="328.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#64748b" text-anchor="middle">por WhatsApp</text>
+<rect x="1420.0" y="238.0" width="280.0" height="120.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="1560.0" y="308.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Entrega y cobro</text>
+<rect x="680.0" y="448.0" width="280.0" height="110.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="820.0" y="495.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Lavado y</text>
+<text x="820.0" y="531.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">acoplado</text>
+<rect x="1420.0" y="448.0" width="280.0" height="110.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="3"/>
+<text x="1560.0" y="513.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#1f2937" text-anchor="middle">Cierre de caja</text>
+<rect x="320.0" y="650.0" width="280.0" height="110.0" rx="12" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="460.0" y="712.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Guarda RECIBIDO</text>
+<rect x="680.0" y="650.0" width="280.0" height="110.0" rx="12" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="820.0" y="699.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">EN_PROCESO</text>
+<text x="820.0" y="730.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">mientras se lava</text>
+<rect x="1020.0" y="650.0" width="280.0" height="110.0" rx="12" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1160.0" y="712.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">LISTO</text>
+<rect x="1420.0" y="650.0" width="280.0" height="110.0" rx="12" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1560.0" y="697.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Pago y</text>
+<text x="1560.0" y="728.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">ENTREGADO</text>
+<rect x="1420.0" y="830.0" width="280.0" height="110.0" rx="12" fill="#f3efff" stroke="#6d28d9" stroke-width="3"/>
+<text x="1560.0" y="892.5" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Calcula los totales</text>
+<rect x="1020.0" y="830.0" width="280.0" height="110.0" rx="12" fill="#fff4ec" stroke="#c2410c" stroke-width="3"/>
+<text x="1160.0" y="879.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Envía el resumen</text>
+<text x="1160.0" y="910.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">a Firestore</text>
+<rect x="1020.0" y="1078.0" width="280.0" height="90.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+<text x="1160.0" y="1117.0" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1f2937" text-anchor="middle">Panel remoto</text>
+<text x="1160.0" y="1148.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="middle">últimos cierres</text>
+<path d="M460.0,160.0 L460.0,238.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M460.0,358.0 L460.0,650.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M802.0,558.0 L802.0,650.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M838.0,650.0 L838.0,558.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M960.0,705.0 L1020.0,705.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M1160.0,650.0 L1160.0,358.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M1160.0,238.0 L1160.0,160.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M1560.0,160.0 L1560.0,238.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M1560.0,358.0 L1560.0,372.0 L1348.0,372.0 L1348.0,705.0 L1420.0,705.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<text x="1358.0" y="432.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">registra el pago</text>
+<path d="M1700.0,503.0 L1756.0,503.0 L1756.0,885.0 L1700.0,885.0" fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#m-dark)"/>
+<path d="M1420.0,885.0 L1300.0,885.0" fill="none" stroke="#c2410c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-orange)"/>
+<text x="1398.0" y="816.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#c2410c" text-anchor="end" stroke="#ffffff" stroke-width="7" paint-order="stroke" stroke-linejoin="round" stroke-linecap="round">usa internet</text>
+<path d="M1160.0,940.0 L1160.0,1078.0" fill="none" stroke="#c2410c" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="10 7" marker-end="url(#m-orange)"/>
+<rect x="30.0" y="1220.0" width="860.0" height="200.0" rx="12" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2.5"/>
+<text x="48.0" y="1256.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0f7b55" text-anchor="start">Funciona sin internet</text>
+<text x="48.0" y="1288.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Registro, estados, cobro y cierre local corren</text>
+<text x="48.0" y="1318.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">en el equipo del negocio. Solo el envío del</text>
+<text x="48.0" y="1348.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">resumen a Firestore (y el panel) usa internet.</text>
+<rect x="910.0" y="1220.0" width="860.0" height="200.0" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="2.5"/>
+<text x="928.0" y="1256.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#334155" text-anchor="start">Comparado con el proceso en papel</text>
+<text x="928.0" y="1288.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Un solo registro sustituye recibo y cuadernos.</text>
+<text x="928.0" y="1318.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">El aviso por WhatsApp evita que el cliente</text>
+<text x="928.0" y="1348.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">pregunte; el cierre ya no se suma a mano.</text>
+<rect x="30.0" y="1440.0" width="1740.0" height="210.0" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="48.0" y="1476.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1f2937" text-anchor="start">Convenciones</text>
+<rect x="48.0" y="1500.0" width="28.0" height="20.0" rx="4" fill="#eaf7f0" stroke="#0f7b55" stroke-width="2"/>
+<text x="88.0" y="1518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Operación en el local</text>
+<rect x="430.0" y="1500.0" width="28.0" height="20.0" rx="4" fill="#f3efff" stroke="#6d28d9" stroke-width="2"/>
+<text x="470.0" y="1518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Sistema (prototipo)</text>
+<rect x="820.0" y="1500.0" width="28.0" height="20.0" rx="4" fill="#fff4ec" stroke="#c2410c" stroke-width="2"/>
+<text x="860.0" y="1518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Usa internet</text>
+<rect x="1120.0" y="1500.0" width="28.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+<text x="1160.0" y="1518.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">Personas</text>
+<line x1="48" y1="1570" x2="110" y2="1570" stroke="#1f2937" stroke-width="3.2" marker-end="url(#m-dark)"/>
+<text x="120.0" y="1576.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">flujo local</text>
+<line x1="430" y1="1570" x2="492" y2="1570" stroke="#c2410c" stroke-width="3.2" stroke-dasharray="8 6" marker-end="url(#m-orange)"/>
+<text x="504.0" y="1576.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#1f2937" text-anchor="start">excepción / internet</text>
+<text x="48.0" y="1624.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">Ruta de mostrador: /pedidos/rapido  ·  El cierre local sigue si Firestore no responde.</text>
+</svg>

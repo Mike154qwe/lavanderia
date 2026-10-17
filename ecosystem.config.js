@@ -74,12 +74,16 @@ module.exports = {
     {
       name: "lavanderia",
       script: "node_modules/next/dist/bin/next",
-      args: "start",
+      // Solo el equipo del mostrador: no abre el puerto 3000 en la LAN ni en internet
+      // (RNF04, Figura 5 y Anexo G). `next start` sin -H escucha en 0.0.0.0.
+      args: "start -H 127.0.0.1",
       cwd: "C:\\Users\\mikev\\Downloads\\lavanderia-local-next-prisma-sqlite\\lavanderia-local",
       interpreter: "node",
       env: {
         NODE_ENV: "production",
         PORT: 3000,
+        HOSTNAME: "127.0.0.1",
+        TZ: "America/Bogota",
       },
       watch: false,
       autorestart: true,
