@@ -222,7 +222,8 @@ def fig01() -> tuple[SVG, int, int]:
     g.zone(30, 654, 1740, 560, "Diego", "Producción y caja", GREEN_BG, GREEN)
 
     # Cliente — cajas más anchas/altas para que título y subtítulo no toquen el borde
-    c_deja = g.box(280, 68, 340, 118, "Deja las prendas", "en el mostrador", GRAY, GRAY_BG)
+    # Más abajo que el subtítulo del carril («· deja y recoge prendas», y=68)
+    c_deja = g.box(280, 90, 340, 108, "Deja las prendas", "en el mostrador", GRAY, GRAY_BG)
     c_recoge = g.box(1395, 68, 350, 118, "Regresa a recoger", "paga al llevarse", GRAY, GRAY_BG)
 
     # Esperanza fila 1: pasos 1–4
@@ -464,7 +465,7 @@ def fig02() -> tuple[SVG, int, int]:
     # Generalización Gerente → Empleado: sale del Gerente, pasa bajo el límite
     # del sistema y termina con triángulo hueco en el Empleado.
     gy = 1452
-    gx = 1568
+    gx = 1544  # a la izquierda de «dueño de las prendas» (el texto llega ~1571)
     tip_y = emp["y"] + 228
     base_y = tip_y + 42
     g.line(
@@ -787,9 +788,9 @@ def fig07() -> tuple[SVG, int, int]:
         (bypass, sy4["cy"]),
         sy4["we"],
     ])
-    # Dentro del carril de Diego, a la izquierda del desvío y de Cierre de caja
-    g.label(1258, 496, "registra el", 26, DARK, "middle")
-    g.label(1258, 524, "pago", 26, DARK, "middle")
+    # A la derecha de la vertical Entrega→Pago, pegada a esa línea
+    # (hueco entre Entrega y cobro y Cierre de caja, para no tapar cajas)
+    g.label(bypass + 10, 432, "registra el pago", 26, DARK, "start")
 
     # Cierre → totales por el canal derecho (no atraviesa Pago y ENTREGADO)
     g.arrow([
