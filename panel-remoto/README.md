@@ -1,134 +1,29 @@
-# Panel remoto -- La Manuelita
+# Panel remoto — Lavaseco La Manuelita
 
-Sitio estático (Firebase Hosting) con el dashboard de solo lectura que la
-gerente abre desde su celular, fuera del negocio: KPIs acumulados, tendencia
-de ganancia neta y efectivo en caja por día, e historial de días con cierre
-(clic en un día para ver su detalle -- entradas, salidas, desglose del
-cierre). Vive en `lavanderia-local/panel-remoto/` -- una carpeta del mismo
-repositorio (importada con `git subtree`, historial preservado desde su
-antiguo repo `panel-remoto-web`, 22-sep-2026), pero es un proyecto Next.js
-**independiente** de la app del mostrador: su propio `package.json`, su
-propio `tsconfig.json` (con su propio alias `@/*`, que resuelve a esta
-carpeta), su propio `node_modules/` y su propio ciclo de despliegue. No
-tiene servidor propio -- corre 100% en el navegador y se despliega a
-Firebase Hosting con `next build` (`output: "export"`), aparte de
-`lavanderia-local`, que se despliega a PM2 (servidor Node en ejecución).
+Sitio estático (Firebase Hosting) para que la gerente consulte, desde el celular, los movimientos del día y el cierre de caja. Es **solo lectura**: este proyecto no escribe en Firestore.
 
-El `tsconfig.json` de `lavanderia-local` excluye explícitamente esta carpeta
-(`"exclude": [..., "panel-remoto"]`) -- sin eso, su `include` sin acotar
-(`**/*.ts`) intentaría tipar este proyecto con el alias `@/*` de
-`lavanderia-local`, que resuelve a rutas equivocadas.
+Es un Next.js independiente (`package.json` y `node_modules` propios). La aplicación del mostrador vive en la raíz del repositorio y se despliega con PM2; esta, con Firebase Hosting.
 
-**Estrictamente de solo lectura.** No existe ninguna función de escritura a
-Firestore en este proyecto (ni `setDoc`, ni `addDoc`, nada) -- a propósito,
-para que sea imposible escribir por error, no solo que la interfaz no
-tenga botones. `lib/panel-remoto.ts` aquí es una copia reducida, de solo
-lectura, de la de `lavanderia-local`.
+Autenticación: Firebase Auth (correo y contraseña). No reutiliza la cookie del mostrador, porque este sitio queda en internet.
 
-Ambos proyectos comparten el mismo proyecto de Firebase
-(`lavaseco-la-manuelita`) y la misma colección de Firestore (`panelRemoto`,
-que escribe `hacerCierreCaja` en `lavanderia-local/app/gerente/page.tsx`,
-vía `lavanderia-local/lib/panel-remoto-admin.ts` desde el 23-sep-2026 --
-Admin SDK, no el SDK web; ver "Reglas de Firestore" más abajo), pero no
-comparten código ni ciclo de despliegue.
+Los datos los escribe la aplicación del local (Admin SDK) en la colección `panelRemoto`. Las reglas están en `/firestore.rules` en la raíz del repo.
 
-## Por qué vive en el monorepo pero no se mezcla con la app del mostrador
-
-Nunca tuvo sentido como rama de `lavanderia-local`: una rama es para código
-que eventualmente se fusiona de vuelta al mismo artefacto desplegable, y
-esto nunca se fusiona con nada -- `lavanderia-local` se despliega a PM2
-(servidor Node corriendo); esto se despliega a Firebase Hosting (archivos
-estáticos, sin servidor). Empezó como repositorio propio, hermano de
-`lavanderia-local` (`panel-remoto-web/`), y se unificó a este repo con
-`git subtree` (22-sep-2026) para tener todo el código del trabajo de grado
-en un solo lugar sin perder el historial -- pero sigue siendo, en la
-práctica, un proyecto Next.js aparte: su propio `package.json`, su propio
-`tsconfig.json`, su propio ciclo de instalar/compilar/desplegar. La única
-diferencia real de estar dentro del monorepo es que su `tsconfig.json`
-raíz debe excluirse del de `lavanderia-local` (ver arriba).
-
-## Autenticación
-
-Protegido con **Firebase Auth** (correo + contraseña) -- `components/
-AuthGate.tsx`. A propósito NO reutiliza la cookie simple del sistema local
-(`empleado_activo`, ver `lavanderia-local/lib/empleado-auth.ts`): ese
-mecanismo asume que ya hay control de acceso físico al mostrador y que el
-navegador está en la misma red que el servidor. Este sitio queda expuesto a
-internet entero, así que necesita autenticación real.
-
-**Cuenta actual: `lvmanuelita@gmail.com`.** Es la cuenta del **prototipo
-académico**, creada para las pruebas de este trabajo de grado -- no es
-necesariamente la cuenta final que usaría la gerente en una operación real
-del negocio. Si el sistema se llegara a desplegar de verdad, queda como
-trabajo futuro decidir la cuenta definitiva (correo real de la gerente,
-posiblemente con verificación en dos pasos) y rotar o revocar esta.
-
-## Reglas de Firestore
-
-`panelRemoto` pasa de completamente cerrado (`allow read, write: if false`,
-cierre de emergencia de RNF04 documentado en `lavanderia-local/lib/
-empleado-auth.ts`) a **lectura permitida solo para usuarios autenticados**
-con Firebase Auth (este sitio) y **escritura solo desde la cuenta de
-servicio del Admin SDK** (`allow write: if false` para cualquier otro --
-ver `lavanderia-local/lib/panel-remoto-admin.ts`). Todo lo demás -- incluida
-`respaldosDb`, que tiene la base completa comprimida -- sigue cerrado del
-todo. El archivo de reglas vive en `lavanderia-local/firestore.rules` (un
-solo juego de reglas por proyecto de Firebase, gobierna ambos sitios).
-
-La cuenta de servicio del Admin SDK (JSON, fuera de git) vive un nivel
-arriba de `lavanderia-local/`, en `firebase/` -- ver el README de la raíz
-del proyecto (`lavanderia-local/README.md`) para la tabla completa de
-dónde vive cada credencial.
-
-## Historial y backfill (22-sep-2026)
-
-`panelRemoto` solo se escribía en vivo desde `hacerCierreCaja` -- los cierres
-de mayo-junio (anteriores a esa sincronización) nunca llegaron a Firestore.
-`lavanderia-local/scripts/backfill-panel-remoto.ts` llenó esos días una vez
-(no sobrescribe días que ya existan). Importante: `panelRemoto` es **un
-documento por día**, no por cierre -- un día con varios cierres solo guarda
-los números del **último** cierre de ese día, más las entradas/salidas del
-día completo.
-
-**Resuelto (23-sep-2026):** el backfill ya escribía dos campos por día,
-`gastosEfectivo` y `efectivoEnCaja` (`CierreRemoto` en `lib/panel-remoto.ts`,
-opcionales -- documentos viejos pueden no tenerlos), necesarios para la
-tendencia de "efectivo en caja", pero `hacerCierreCaja`
-(`lavanderia-local/app/gerente/page.tsx`) no los incluía todavía cuando se
-migró la escritura al Admin SDK. Quedó pendiente un momento real: el primer
-cierre en vivo tras desbloquear la escritura sí habría llegado sin
-`efectivoEnCaja`. Se corrigió el mismo día -- `hacerCierreCaja` ya pasa
-ambos campos, verificado con un cierre de prueba real (documento en
-Firestore con los dos campos, y el hero de este dashboard mostrando el
-número en vez de "--"). El dashboard sigue manejando el caso de documentos
-viejos sin el campo (`efectivoEnCaja !== undefined`), pero ya no es el
-camino esperado para cierres nuevos.
-
-## Desarrollo local
-
-Todos los comandos corren **desde esta carpeta** (`lavanderia-local/panel-remoto/`),
-no desde la raíz del repo -- tiene su propio `package.json`/`node_modules`,
-separado del de `lavanderia-local`.
+## Local
 
 ```bash
-cd lavanderia-local/panel-remoto
+cd panel-remoto
 npm install
-npm run dev          # http://localhost:3002 (puerto distinto al de lavanderia-local)
+npm run dev          # http://localhost:3002
 ```
 
-`.env.local` (config web de Firebase, no secreta) no viaja con `git subtree`
--- si es una copia nueva del repo, hay que recrearlo a mano (ver
-`lib/firebase.ts` para las variables que necesita).
+Crear `.env.local` con las variables `NEXT_PUBLIC_FIREBASE_*` (ver `lib/firebase.ts`).
 
-## Build y despliegue
+## Despliegue
 
 ```bash
-cd lavanderia-local/panel-remoto
-npm run build         # genera out/ (exportación estática)
-firebase deploy --only hosting   # publica a https://lavaseco-la-manuelita.web.app
+cd panel-remoto
+npm run build
+firebase deploy --only hosting
 ```
 
-`firebase.json`/`.firebaserc` son relativos a esta carpeta -- el comando de
-despliegue no cambió, solo desde dónde se ejecuta.
-
-**En producción desde el 23-sep-2026:** `https://lavaseco-la-manuelita.web.app`.
+El comando se ejecuta **desde esta carpeta** (`firebase.json` es de este proyecto).
