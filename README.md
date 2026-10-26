@@ -1,98 +1,98 @@
+<p align="center">
+  <img src="public/logo/header.png" alt="Lavaseco La Manuelita" width="420">
+</p>
+
 # Lavaseco La Manuelita
 
-Sistema de gestión para una lavandería/tintorería de barrio (trabajo de
-grado). Mostrador (recepción de pedidos, cobros, entregas), panel financiero
-de la gerente (cierres de caja, movimientos, gastos) y un panel remoto de
-solo lectura para que la gerente consulte el negocio desde su celular, fuera
-del local.
+Prototipo de sistema de información **offline-first** para una lavandería de barrio en Bogotá. El registro de pedidos y el cierre de caja corren en un computador del local, **sin depender de internet**. Un panel remoto de solo lectura permite a la gerente consultar el día desde el celular.
 
-## Estructura del monorepo
+Este repositorio es el código del prototipo. El documento de grado se entrega a la facultad por separado.
 
-Este repositorio contiene **dos proyectos Next.js independientes**, cada uno
-con su propio ciclo de instalación/compilación/despliegue:
+**Trabajo de grado** — Ingeniería de Sistemas y Computación, Universidad Católica de Colombia, 2026.
 
-```
-lavanderia-local/          ← este proyecto: el sistema del mostrador y de
-│                             la gerente. Server Next.js corriendo con PM2.
-├── app/                     Rutas (App Router)
-├── components/              Componentes compartidos
-├── lib/                     Lógica compartida (caja, auth, Firestore admin)
-├── prisma/                  Esquema y base de datos SQLite
-├── scripts/                 Seeds, backfill, respaldo a Firebase
-├── tests/                   Pruebas (node:test)
-├── docs/                    Notas de bugs/decisiones puntuales
-└── panel-remoto/           ← proyecto APARTE, importado con `git subtree`
-    ├── app/, components/, lib/   Su propio código (alias @/* propio)
-    ├── package.json              Sus propias dependencias, node_modules
-    └── README.md                 Documentación completa de esa parte
-```
+| | |
+|---|---|
+| Autores | Joel David Marín Galindo · Mike Anderson Villarreal Agudelo |
+| Directora | Sara Fernanda Sánchez |
+| Caso | Lavaseco La Manuelita (localidad de Suba) |
+| Alcance | Prototipo académico. No es un producto comercial ni un despliegue permanente del negocio. |
+| Stack | Next.js, Prisma, SQLite (WAL), Firebase (Firestore, Hosting, Auth), PM2 |
 
-`panel-remoto/` vive dentro de este repositorio (mismo historial de git,
-mismo trabajo de grado) pero **no se mezcla** con `lavanderia-local`: no
-comparten código, ni build, ni forma de desplegarse. El `tsconfig.json` de
-este proyecto excluye explícitamente esa carpeta (si no, su alias `@/*`
-chocaría con el de `panel-remoto/`). Ver **`panel-remoto/README.md`** para
-todo lo específico de esa parte (estructura, autenticación, despliegue).
+La validación en operación real (8–30 de septiembre de 2026) midió 367 pedidos y 3 cierres de caja. El tiempo de registro pasó de 7,32 a 3,77 min (−48,5 %) y el de cierre de 47,31 a 14,54 min (−69,3 %). El SUS de la gerente fue 85,8. Las trece pruebas de caja negra (CF01–CF13) se cumplieron. El diseño fue preexperimental (un grupo, antes/después): el cambio se observó junto con el uso del prototipo; **no prueba causalidad**.
 
-## Cómo se despliega cada parte
+## Qué hay en el prototipo
 
-| | `lavanderia-local` (esto) | `panel-remoto/` |
+- Pedido rápido, tarifario, estados, abonos y entregas parciales
+- Cierre de caja (ganancia neta y efectivo en caja, por separado)
+- Inventario en piso, código de barras, pedidos antiguos
+- Roles de empleado y gerente
+- Panel remoto de consulta, con caché cuando el celular no tiene señal
+
+## Arquitectura
+
+Dos proyectos Next.js en el mismo repositorio. No comparten build ni despliegue.
+
+| | Aplicación del local | Panel remoto (`panel-remoto/`) |
 |---|---|---|
-| **Dónde corre** | PM2 (proceso Node en ejecución, `next start`), en el mismo PC del mostrador | Firebase Hosting (archivos estáticos, `next build` con `output: "export"`) |
-| **Base de datos** | SQLite local (`prisma/dev.db`) | Ninguna — lee/escribe Firestore |
-| **Acceso** | Red local únicamente | Internet (con Firebase Auth) |
-| **Comando de build** | `npm run build` (desde aquí) | `npm run build` (desde `panel-remoto/`) |
-| **Comando de arranque/deploy** | `pm2 start ecosystem.config.js` (o `pm2 restart lavanderia` tras un build nuevo) | `firebase deploy --only hosting` (desde `panel-remoto/`) |
+| Uso | Mostrador y gerente en el negocio | Consulta desde el celular |
+| Dónde corre | Node + PM2 en el PC del local (`127.0.0.1:3000`) | Firebase Hosting (sitio estático) |
+| Datos | SQLite (`prisma/dev.db`) | Lee Firestore; no escribe |
+| Internet | No hace falta para registrar un pedido | Hace falta para actualizar; sin red muestra la última caché |
 
-### Arranque automático con PM2 (Windows)
-
-`ecosystem.config.js` define dos procesos:
-- **`lavanderia`** — el servidor Next.js (`next start`, puerto 3000).
-- **`respaldo-db`** — script de respaldo periódico a Firebase (cron interno
-  de PM2, cada 25 min; corre y termina, no es un proceso siempre encendido).
-
-Detalle completo del mecanismo de arranque automático (registro de Windows,
-`pm2 resurrect`, `pm2 save`, recuperación manual si algo falla) documentado
-como comentario al inicio de `ecosystem.config.js` — léase ahí antes de
-tocar el arranque automático.
-
-**Orden seguro para desplegar un cambio de código:**
 ```
-pm2 stop lavanderia
-npm run build        # prisma generate && next build
-pm2 restart lavanderia
+.
+├── app/                 Mostrador y panel de gerente (App Router)
+├── components/
+├── lib/                 Caja, autenticación, Firestore Admin
+├── prisma/              Esquema SQLite
+├── scripts/             Seeds y respaldo
+├── tests/               Cálculo de caja y control de acceso (RNF04)
+├── firestore.rules      Reglas de Firestore (ambos sitios)
+├── ecosystem.config.js  PM2 en el equipo del local
+└── panel-remoto/        Proyecto aparte — ver su README
 ```
-`prisma generate` falla con `EPERM` si `lavanderia` sigue corriendo (el
-motor de Prisma queda bloqueado) — por eso el `pm2 stop` primero.
 
-## Credenciales — dónde vive cada una
+## Cómo correrlo en local
 
-Nada de esto está en git (`.env`, la carpeta `firebase/` y todo archivo de
-credenciales están fuera del control de versiones a propósito):
+Hace falta Node.js 20 o superior. Copiar `.env.example` a `.env` y completar los valores (sin `.env` la aplicación no arranca: `AUTH_SECRET` es obligatorio).
 
-| Credencial | Dónde vive | Para qué |
-|---|---|---|
-| `.env` (este proyecto) | `lavanderia-local/.env` | `DATABASE_URL`, `GERENTE_USER`/`GERENTE_PASSWORD`, `AUTH_SECRET` (cookie firmada de gerente), `NEXT_PUBLIC_FIREBASE_*` (config pública del SDK web), `FIREBASE_SERVICE_ACCOUNT_PATH` |
-| Clave de servicio del Admin SDK (JSON) | Un nivel arriba de este repo: `../firebase/lavaseco-la-manuelita-firebase-adminsdk-fbsvc-*.json` (ruta exacta en `FIREBASE_SERVICE_ACCOUNT_PATH`) | Usada por `lib/panel-remoto-admin.ts` (sincronizar cierres a Firestore) y por `scripts/respaldo-db-firebase.js`/`scripts/backfill-panel-remoto.ts`. Bypasea `firestore.rules` por diseño — tratarla como cualquier contraseña de administrador: si se filtra, rotarla en Google Cloud Console (IAM → Service Accounts → esa cuenta → Keys) y actualizar `FIREBASE_SERVICE_ACCOUNT_PATH` |
-| Contraseña de Firebase Auth del panel remoto | Solo en Firebase Auth (consola de Firebase) — no en ningún archivo de texto del disco | Login de `panel-remoto/` (`lvmanuelita@gmail.com`) |
-| `panel-remoto/.env.local` | `panel-remoto/.env.local` (no viaja con `git subtree`, hay que recrearlo en una copia nueva del repo) | Config pública del SDK web para ese proyecto — ver `panel-remoto/lib/firebase.ts` |
+```bash
+npm install
+npx prisma migrate dev
+npm run dev                 # http://localhost:3000
+```
 
-`firestore.rules` (en la raíz de este proyecto) gobierna Firestore para
-**ambos** sitios — un solo juego de reglas por proyecto de Firebase. No hay
-despliegue automático de reglas desde este repo (a propósito, dado lo
-sensible del cambio): aplicarlas es pegar el contenido del archivo en
-Firebase Console → Firestore Database → Reglas → Publicar.
+Panel remoto, en otra terminal:
+
+```bash
+cd panel-remoto
+npm install
+npm run dev                 # http://localhost:3002
+```
+
+Las variables de Firebase del panel van en `panel-remoto/.env.local`. Detalle de esa parte: [`panel-remoto/README.md`](panel-remoto/README.md).
 
 ## Pruebas
 
-```
-npm run test:caja    # cálculo de caja, ventanas de cierre, formato del ticket
-npm run test:rnf04   # matriz de acceso por ruta (proxy.ts), RNF04
+```bash
+npm run test:caja     # cálculo de caja y cierres
+npm run test:rnf04    # acceso por ruta (empleado / gerente)
 ```
 
-## Desarrollo local
+## Despliegue en el local (resumen)
 
+En el computador del negocio el servidor se ata a `127.0.0.1` (no se publica en la red ni en internet). Arranque con PM2:
+
+```bash
+pm2 stop lavanderia
+npm run build
+pm2 restart lavanderia
 ```
-npm install
-npm run dev           # http://localhost:3000
-```
+
+Hay que detener el proceso antes del build: si no, `prisma generate` falla por archivo bloqueado. El detalle de Windows, `pm2 save` y el respaldo cada 25 minutos está en los comentarios de `ecosystem.config.js`.
+
+El panel remoto se publica desde `panel-remoto/` con `npm run build` y `firebase deploy --only hosting`.
+
+## Datos personales
+
+El prototipo guarda nombre y teléfono de clientes (Ley 1581 de 2012). Las credenciales **no van en git**. Las reglas de Firestore se aplican a mano desde la consola de Firebase, pegando `firestore.rules`.
