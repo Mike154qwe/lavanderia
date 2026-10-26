@@ -2,6 +2,9 @@ node_modules/
 .next/
 .env
 .env.local
+panel-remoto/node_modules/
+panel-remoto/.next/
+panel-remoto/out/
 prisma/dev.db
 prisma/dev.db-journal
 prisma/dev.db-wal
